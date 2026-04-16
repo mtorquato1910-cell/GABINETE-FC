@@ -3,7 +3,10 @@ import { notFound } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { ProductDetailClient } from '@/components/product/ProductDetailClient'
+import { ReviewSection } from '@/components/product/ReviewSection'
 import { getProductBySlug, getAllProductSlugs } from '@/lib/actions/products'
+import { getProductReviews } from '@/lib/actions/reviews'
+import { auth } from '@/lib/auth'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -31,14 +34,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params
-  const product = await getProductBySlug(slug)
+  const [product, session] = await Promise.all([
+    getProductBySlug(slug),
+    auth(),
+  ])
   if (!product) notFound()
+
+  const reviews = await getProductReviews(product.id)
+  const isLoggedIn = !!session?.user
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1">
         <ProductDetailClient product={product} />
+        <ReviewSection
+          productId={product.id}
+          reviews={reviews}
+          isLoggedIn={isLoggedIn}
+        />
       </main>
       <Footer />
     </div>

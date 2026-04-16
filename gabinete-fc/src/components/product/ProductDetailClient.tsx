@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { ArrowLeft, ShoppingCart } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCartStore } from '@/stores/cart-store'
+import { SocialProof } from '@/components/shared/SocialProof'
+import { StockAlertButton } from '@/components/product/StockAlertButton'
 import type { Product } from '@/types'
 
 interface Props {
@@ -110,14 +112,21 @@ export function ProductDetailClient({ product }: Props) {
             </div>
           </div>
 
+          {/* Social Proof */}
+          <SocialProof productId={product.id} />
+
           {/* CTA */}
-          <button
-            onClick={handleAdd}
-            className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground py-4 font-bold text-sm uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            Adicionar ao Carrinho
-          </button>
+          {product.stock > 0 ? (
+            <button
+              onClick={handleAdd}
+              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground py-4 font-bold text-sm uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Adicionar ao Carrinho
+            </button>
+          ) : (
+            <StockAlertButton productId={product.id} size={selectedSize || 'Único'} />
+          )}
 
           {/* Details */}
           <div className="grid grid-cols-2 gap-4 text-xs uppercase tracking-wider text-muted-foreground border-t border-border pt-6">
