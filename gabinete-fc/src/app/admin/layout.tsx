@@ -5,7 +5,7 @@ import { Logo } from '@/components/layout/Logo'
 import {
   LayoutDashboard, Package, ShoppingBag, Tag,
   Settings, Star, TrendingUp, Boxes, LogOut,
-  Megaphone, LayoutGrid, BarChart2,
+  Megaphone, LayoutGrid, BarChart2, Flame,
 } from 'lucide-react'
 
 const navItems = [
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/admin/financeiro', icon: TrendingUp, label: 'Financeiro' },
   { href: '/admin/marketing', icon: Megaphone, label: 'Campanhas' },
   { href: '/admin/analytics', icon: BarChart2, label: 'Analytics' },
+  { href: '/admin/heatmap', icon: Flame, label: 'Heatmap' },
   { href: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
 ]
 
