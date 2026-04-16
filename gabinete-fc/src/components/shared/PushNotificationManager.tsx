@@ -8,7 +8,7 @@ export function PushNotificationManager({ vapidPublicKey }: { vapidPublicKey?: s
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) return
-    setPermission(Notification.permission)
+    void Promise.resolve(Notification.permission).then(p => setPermission(p))
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then(reg => {
         reg.pushManager.getSubscription().then(sub => setIsSubscribed(!!sub))

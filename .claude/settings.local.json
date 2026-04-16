@@ -10,7 +10,9 @@
       "Bash(powershell.exe -Command \"if \\(!\\(Test-Path 'C:\\\\\\\\gfc'\\)\\) { New-Item -ItemType Junction -Path 'C:\\\\\\\\gfc' -Target 'C:\\\\\\\\Users\\\\\\\\mathe\\\\\\\\OneDrive\\\\\\\\Área de Trabalho\\\\\\\\GABINETE FC\\\\\\\\GABINETE-FC\\\\\\\\gabinete-fc'; Write-Host 'Junction criado' } else { Write-Host 'Junction ja existe' }\" 2>&1)",
       "Bash(powershell.exe -Command \"New-Item -ItemType Junction -Path 'C:\\\\\\\\gfc' -Target 'C:\\\\\\\\Users\\\\\\\\mathe\\\\\\\\OneDrive\\\\\\\\Área de Trabalho\\\\\\\\GABINETE FC\\\\\\\\GABINETE-FC\\\\\\\\gabinete-fc'\" 2>&1)",
       "Bash(powershell.exe -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force; Write-Host 'Processos node encerrados'\" 2>&1)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(tasklist:*)",
+      "Bash(curl:*)"
     ]
   }
 }

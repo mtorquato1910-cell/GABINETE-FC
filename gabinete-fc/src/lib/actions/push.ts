@@ -1,5 +1,6 @@
 'use server'
 import { prisma } from '@/lib/db'
+import { getWebPush } from '@/lib/webpush'
 
 // Salva subscription VAPID do usuário
 export async function savePushSubscription(subscription: {
@@ -26,24 +27,66 @@ export async function savePushSubscription(subscription: {
   return { success: true }
 }
 
-// Envia push para um usuário (stub)
-// TODO Sprint 15: Implementar com web-push library
+// Envia push para um usuário via web-push
 export async function sendPushNotification(params: {
   userId?: string
   title: string
   body: string
   url?: string
 }) {
-  console.log('[PUSH STUB] Notificação:', params)
+  const wp = getWebPush()
+
+  if (!wp) {
+    console.log('[PUSH] VAPID não configurado — adicione NEXT_PUBLIC_VAPID_PUBLIC_KEY e VAPID_PRIVATE_KEY no .env')
+    return { success: false, reason: 'vapid_not_configured' }
+  }
 
   const subscriptions = params.userId
     ? await prisma.pushSubscription.findMany({ where: { userId: params.userId, isActive: true } })
-    : []
+    : await prisma.pushSubscription.findMany({ where: { isActive: true } })
 
-  // TODO: usar web-push para enviar de verdade
-  // const webpush = require('web-push')
-  // webpush.setVapidDetails(...)
-  // for (const sub of subscriptions) { await webpush.sendNotification(...) }
+  const payload = JSON.stringify({
+    title: params.title,
+    body: params.body,
+    url: params.url || '/',
+  })
 
-  return { success: true, sent: subscriptions.length }
+  let sent = 0
+  const results = await Promise.allSettled(
+    subscriptions.map(async (sub) => {
+      try {
+        await wp.sendNotification(
+          {
+            endpoint: sub.endpoint,
+            keys: {
+              p256dh: sub.p256dhKey,
+              auth: sub.authKey,
+            },
+          },
+          payload
+        )
+        sent++
+      } catch (err: unknown) {
+        // Remove subscriptions inválidas (410 = expirada)
+        const statusCode = (err as { statusCode?: number })?.statusCode
+        if (statusCode === 410 || statusCode === 404) {
+          await prisma.pushSubscription.update({
+            where: { id: sub.id },
+            data: { isActive: false },
+          })
+        }
+      }
+    })
+  )
+
+  return { success: true, sent, total: subscriptions.length, results: results.length }
+}
+
+// Envia push para todos os subscribers (broadcast)
+export async function broadcastPushNotification(params: {
+  title: string
+  body: string
+  url?: string
+}) {
+  return sendPushNotification(params)
 }

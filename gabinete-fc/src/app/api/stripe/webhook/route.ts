@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ received: true })
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Webhook error' }, { status: 400 })
   }
 }

@@ -9,7 +9,7 @@ export function SocialProof({ productId }: { productId: string }) {
   useEffect(() => {
     // Simula 3-15 visitantes
     const n = Math.floor(Math.random() * 13) + 3
-    setViewers(n)
+    void Promise.resolve(n).then(val => setViewers(val))
   }, [productId])
 
   if (!viewers) return null

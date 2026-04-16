@@ -1,11 +1,8 @@
+import bcrypt from 'bcryptjs'
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { z } from 'zod'
 import { prisma } from './db'
-
-// Note: In production, use bcryptjs for password hashing
-// For local dev without bcrypt, we use a simple comparison
-// npm install bcryptjs @types/bcryptjs — will be added in Sprint 4
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -35,9 +32,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await prisma.user.findUnique({ where: { email } })
         if (!user || !user.password) return null
 
-        // TODO Sprint 4: substituir por bcrypt.compare(password, user.password)
-        // Por ora: comparação simples para dev local (NUNCA em produção)
-        if (password !== user.password) return null
+        const isValid = await bcrypt.compare(password, user.password)
+        if (!isValid) return null
 
         return {
           id: user.id,

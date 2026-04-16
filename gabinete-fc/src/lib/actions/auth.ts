@@ -1,4 +1,5 @@
 'use server'
+import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 
@@ -21,9 +22,10 @@ export async function registerUser(data: unknown) {
     return { error: { email: ['Email já cadastrado'] } }
   }
 
-  // TODO Sprint 4: substituir por bcrypt.hash(password, 12)
+  const hashedPassword = await bcrypt.hash(password, 12)
+
   await prisma.user.create({
-    data: { name, email, password, role: 'customer' },
+    data: { name, email, password: hashedPassword, role: 'customer' },
   })
 
   return { success: true }

@@ -26,7 +26,7 @@ export default async function BuscaPage({ searchParams }: Props) {
           <SearchForm initialQuery={q} />
           {q && (
             <p className="text-muted-foreground text-sm mt-4">
-              {products.length} resultado{products.length !== 1 ? 's' : ''} para "{q}"
+              {products.length} resultado{products.length !== 1 ? 's' : ''} para &quot;{q}&quot;
             </p>
           )}
         </div>
@@ -34,7 +34,7 @@ export default async function BuscaPage({ searchParams }: Props) {
         {q && products.length === 0 && (
           <div className="py-24 text-center">
             <p className="text-muted-foreground text-xs uppercase tracking-widest">
-              Nenhum produto encontrado para "{q}"
+              Nenhum produto encontrado para &quot;{q}&quot;
             </p>
           </div>
         )}
