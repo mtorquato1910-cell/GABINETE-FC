@@ -1,20 +1,21 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('🌱 Iniciando seed...')
 
-  // Admin user (senha: Admin@123 — TROCAR em produção!)
+  // Admin user com senha hasheada (bcrypt)
+  const hashedPassword = await bcrypt.hash('Admin@123', 12)
   await prisma.user.upsert({
     where: { email: 'admin@gabinetefc.com.br' },
-    update: {},
+    update: { password: hashedPassword },
     create: {
       email: 'admin@gabinetefc.com.br',
       name: 'Admin Gabinete FC',
       role: 'admin',
-      // TODO Sprint 4: usar bcrypt.hash()
-      password: 'Admin@123',
+      password: hashedPassword,
     },
   })
 
@@ -152,7 +153,7 @@ async function main() {
     })
   }
 
-  console.log('✅ Seed concluído! Admin e produtos criados.')
+  console.log('✅ Seed concluído! Admin com bcrypt e produtos criados.')
 }
 
 main()

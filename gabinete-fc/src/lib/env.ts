@@ -13,23 +13,31 @@ const serverSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 
-  // Stripe (Sprint 4)
+  // Stripe (Sprint 18)
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
-  // Correios (Sprint 5)
+  // Correios CWS (Sprint 20)
   CORREIOS_USERNAME: z.string().optional(),
   CORREIOS_PASSWORD: z.string().optional(),
+  CORREIOS_CEP_ORIGEM: z.string().optional().default('01310100'),
 
-  // Claude (Sprint 5)
+  // Claude (opcional)
   ANTHROPIC_API_KEY: z.string().optional(),
 
-  // Email Resend (Sprint 5)
+  // Email Resend (Sprint 19)
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().optional().default('Gabinete FC <noreply@gabinetefc.com.br>'),
 
-  // Push VAPID (Sprint 15)
+  // Push VAPID (Sprint 21)
   VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().optional().default('mailto:contato@gabinetefc.com.br'),
+
+  // Meta CAPI (Sprint 22)
+  META_ACCESS_TOKEN: z.string().optional(),
+
+  // Cron Jobs
+  CRON_SECRET: z.string().optional(),
 })
 
 // Schema de variáveis PÚBLICAS (client)
@@ -38,6 +46,7 @@ const clientSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().optional().default('Gabinete FC'),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
+  NEXT_PUBLIC_META_PIXEL_ID: z.string().optional(),
 })
 
 // Validação server-side
@@ -62,6 +71,7 @@ const _clientEnv = (() => {
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    NEXT_PUBLIC_META_PIXEL_ID: process.env.NEXT_PUBLIC_META_PIXEL_ID,
   })
 
   if (!result.success) {

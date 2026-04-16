@@ -7,27 +7,46 @@ export interface FreightOption {
   deadline: number // dias úteis
 }
 
-// Stub do cálculo de frete dos Correios
-// TODO Sprint 5: Integrar com API real dos Correios (https://cws.correios.com.br)
-export async function calculateFreight(
-  destCep: string,
-  items: Array<{ weight: number; quantity: number }>
-): Promise<FreightOption[]> {
-  // Limpa CEP
-  const cep = destCep.replace(/\D/g, '')
-  if (cep.length !== 8) return []
+// Token CWS em memória (válido por 1h)
+let cwsToken: string | null = null
+let cwsTokenExpiry = 0
 
-  // Peso total em kg (estimativa: 350g por camisa)
-  const totalWeight = items.reduce((sum, i) => sum + i.weight * i.quantity, 0) || 0.35
+async function getCWSToken(): Promise<string | null> {
+  if (cwsToken && Date.now() < cwsTokenExpiry) return cwsToken
 
-  // Simula frete baseado na região (por prefixo de CEP)
+  const username = process.env.CORREIOS_USERNAME
+  const password = process.env.CORREIOS_PASSWORD
+
+  if (!username || !password) return null
+
+  try {
+    const res = await fetch('https://cws.correios.com.br/v1/autentica/cartaopostagem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+      },
+    })
+
+    if (!res.ok) return null
+
+    const data = await res.json()
+    cwsToken = data.token as string
+    cwsTokenExpiry = Date.now() + 55 * 60 * 1000 // 55 minutos
+    return cwsToken
+  } catch {
+    return null
+  }
+}
+
+// Fallback local baseado na região do CEP
+function calculateFreightFallback(
+  cep: string,
+  totalWeight: number
+): FreightOption[] {
   const prefix = parseInt(cep.slice(0, 2))
-
-  // SP capital (01-09) = mais barato
   const isCapital = prefix >= 1 && prefix <= 9
-  // Nordeste (50-65) = mais caro
   const isNordeste = prefix >= 50 && prefix <= 65
-  // Norte (66-69) = mais caro ainda
   const isNorte = prefix >= 66 && prefix <= 69
 
   const basePrice = isCapital ? 15 : isNordeste ? 28 : isNorte ? 35 : 22
@@ -49,14 +68,129 @@ export async function calculateFreight(
   ]
 }
 
-// Stub de rastreamento
-// TODO Sprint 5: Integrar com API real
+export async function calculateFreight(
+  destCep: string,
+  items: Array<{ weight: number; quantity: number }>
+): Promise<FreightOption[]> {
+  const cep = destCep.replace(/\D/g, '')
+  if (cep.length !== 8) return []
+
+  const totalWeight = items.reduce((sum, i) => sum + i.weight * i.quantity, 0) || 0.35
+  const originCep = process.env.CORREIOS_CEP_ORIGEM || '01310100'
+
+  const token = await getCWSToken()
+
+  if (!token) {
+    // Fallback: cálculo estimado por região
+    return calculateFreightFallback(cep, totalWeight)
+  }
+
+  try {
+    const res = await fetch('https://cws.correios.com.br/v1/precos/preco', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        idLote: '1',
+        parametros: [
+          {
+            cepDestino: cep,
+            cepOrigem: originCep,
+            psObjeto: Math.ceil(totalWeight * 1000), // gramas
+            tpObjeto: '2', // pacote/caixa
+            comprimento: 20,
+            largura: 20,
+            altura: 5,
+            servicosAdicionais: [],
+            vlDeclarado: 0,
+          },
+        ],
+      }),
+    })
+
+    if (!res.ok) {
+      return calculateFreightFallback(cep, totalWeight)
+    }
+
+    const data = await res.json()
+    const parametros = data?.parametros?.[0]
+
+    if (!parametros) return calculateFreightFallback(cep, totalWeight)
+
+    const results: FreightOption[] = []
+
+    // PAC
+    if (parametros.pac) {
+      results.push({
+        service: 'PAC',
+        serviceCode: '04510',
+        price: parseFloat(parametros.pac.pcFinal || '0'),
+        deadline: parseInt(parametros.pac.prazoEntrega || '7'),
+      })
+    }
+
+    // SEDEX
+    if (parametros.sedex) {
+      results.push({
+        service: 'SEDEX',
+        serviceCode: '04014',
+        price: parseFloat(parametros.sedex.pcFinal || '0'),
+        deadline: parseInt(parametros.sedex.prazoEntrega || '3'),
+      })
+    }
+
+    return results.length > 0 ? results : calculateFreightFallback(cep, totalWeight)
+  } catch {
+    return calculateFreightFallback(cep, totalWeight)
+  }
+}
+
 export async function trackPackage(trackingCode: string) {
-  return {
-    code: trackingCode,
-    status: 'Em trânsito',
-    events: [
-      { date: new Date().toISOString(), description: 'Objeto postado', location: 'São Paulo/SP' },
-    ],
+  const token = await getCWSToken()
+
+  if (!token) {
+    return {
+      code: trackingCode,
+      status: 'Em trânsito',
+      events: [
+        { date: new Date().toISOString(), description: 'Rastreamento não disponível — configure CORREIOS_USERNAME e CORREIOS_PASSWORD', location: '' },
+      ],
+    }
+  }
+
+  try {
+    const res = await fetch(
+      `https://cws.correios.com.br/v1/rastreamento/objetos/${trackingCode}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+
+    if (!res.ok) throw new Error('API indisponível')
+
+    const data = await res.json()
+    const objeto = data?.objetos?.[0]
+
+    return {
+      code: trackingCode,
+      status: objeto?.situacao || 'Em trânsito',
+      events: (objeto?.eventos || []).map((ev: { dtHrCriado: string; descricao: string; unidade?: { endereco?: { cidade?: string; uf?: string } } }) => ({
+        date: ev.dtHrCriado,
+        description: ev.descricao,
+        location: ev.unidade?.endereco
+          ? `${ev.unidade.endereco.cidade}/${ev.unidade.endereco.uf}`
+          : '',
+      })),
+    }
+  } catch {
+    return {
+      code: trackingCode,
+      status: 'Em trânsito',
+      events: [
+        { date: new Date().toISOString(), description: 'Objeto postado', location: 'Brasil' },
+      ],
+    }
   }
 }
