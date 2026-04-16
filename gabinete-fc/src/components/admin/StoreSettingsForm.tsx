@@ -10,7 +10,7 @@ const SETTING_GROUPS = [
   { title: 'Pagamentos', keys: ['pix_discount_percent', 'pix_expiry_minutes', 'stripe_3ds_threshold'] },
   { title: 'Operações', keys: ['free_shipping_threshold', 'freight_origin_cep'] },
   { title: 'Fidelidade', keys: ['loyalty_points_per_real', 'loyalty_points_expiry_days'] },
-  { title: 'Meta / Pixel', keys: ['meta_pixel_id', 'meta_bm_id'] },
+  { title: 'Meta / Pixel', keys: ['meta_pixel_id', 'meta_bm_id', 'meta_access_token'] },
 ]
 
 const LABELS: Record<string, string> = {
@@ -19,7 +19,8 @@ const LABELS: Record<string, string> = {
   stripe_3ds_threshold: 'Threshold 3DS (R$)', free_shipping_threshold: 'Frete grátis acima de (R$)',
   freight_origin_cep: 'CEP de origem', loyalty_points_per_real: 'Pontos por R$ 1',
   loyalty_points_expiry_days: 'Expiração pontos (dias)',
-  meta_pixel_id: 'Meta Pixel ID', meta_bm_id: 'Meta BM ID',
+  meta_pixel_id: 'Meta Pixel ID', meta_bm_id: 'Meta BM ID (Business Manager)',
+  meta_access_token: 'Meta Access Token (CAPI)',
 }
 
 export function StoreSettingsForm({ settings }: Props) {

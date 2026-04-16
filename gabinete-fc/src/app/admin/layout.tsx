@@ -4,17 +4,21 @@ import Link from 'next/link'
 import { Logo } from '@/components/layout/Logo'
 import {
   LayoutDashboard, Package, ShoppingBag, Tag,
-  Settings, Star, TrendingUp, Boxes, LogOut
+  Settings, Star, TrendingUp, Boxes, LogOut,
+  Megaphone, LayoutGrid, BarChart2,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/admin/vitrine', icon: LayoutGrid, label: 'Vitrine' },
   { href: '/admin/produtos', icon: Package, label: 'Produtos' },
   { href: '/admin/pedidos', icon: ShoppingBag, label: 'Pedidos' },
   { href: '/admin/cupons', icon: Tag, label: 'Cupons' },
   { href: '/admin/avaliacoes', icon: Star, label: 'Avaliações' },
   { href: '/admin/estoque', icon: Boxes, label: 'Estoque' },
   { href: '/admin/financeiro', icon: TrendingUp, label: 'Financeiro' },
+  { href: '/admin/marketing', icon: Megaphone, label: 'Campanhas' },
+  { href: '/admin/analytics', icon: BarChart2, label: 'Analytics' },
   { href: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
 ]
 

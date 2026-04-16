@@ -106,6 +106,17 @@ export async function createCoupon(data: unknown) {
   return { success: true, couponId: coupon.id }
 }
 
+export async function toggleFeatured(productId: string, featured: boolean) {
+  await requireAdmin()
+  await prisma.product.update({
+    where: { id: productId },
+    data: { isFeatured: featured },
+  })
+  revalidatePath('/')
+  revalidatePath('/admin/vitrine')
+  return { success: true }
+}
+
 export async function updateStoreSetting(key: string, value: string) {
   await requireAdmin()
   await prisma.storeSetting.upsert({

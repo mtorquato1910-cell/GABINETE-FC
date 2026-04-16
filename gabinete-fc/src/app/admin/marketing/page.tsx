@@ -4,11 +4,9 @@ export default async function MarketingPage() {
   const [
     utmSources,
     totalOrdersPaid,
-    newsletterCount,
     recentOrders,
     addToCartEvents,
     checkoutEvents,
-    purchaseEvents,
     clickEvents,
     abandonedSessions,
   ] = await Promise.all([
@@ -22,8 +20,6 @@ export default async function MarketingPage() {
     }),
     // Pedidos pagos
     prisma.order.count({ where: { paymentStatus: 'paid' } }),
-    // Newsletter leads
-    prisma.newsletterSubscriber.count({ where: { isActive: true } }),
     // Últimos pedidos com UTM (para atribuição)
     prisma.order.findMany({
       where: { paymentStatus: 'paid' },
@@ -35,8 +31,6 @@ export default async function MarketingPage() {
     prisma.behaviorEvent.count({ where: { eventType: 'add_to_cart' } }),
     // Funil: checkout iniciado
     prisma.behaviorEvent.count({ where: { eventType: 'checkout_start' } }),
-    // Funil: purchase (compra finalizada)
-    prisma.order.count({ where: { paymentStatus: 'paid' } }),
     // Heatmap: cliques por página
     prisma.behaviorEvent.groupBy({
       by: ['pageUrl'],
@@ -45,16 +39,16 @@ export default async function MarketingPage() {
       orderBy: { _count: { pageUrl: 'desc' } },
       take: 15,
     }),
-    // Sessões abandonadas: tiveram add_to_cart mas não purchase
+    // Sessões com add_to_cart (estimativa de abandonados)
     prisma.behaviorEvent.findMany({
       where: { eventType: 'add_to_cart' },
       select: { sessionId: true },
       distinct: ['sessionId'],
-    }).then(r => r.length),
+    }).then((r: { sessionId: string | null }[]) => r.length),
   ])
 
-  // Receita últimos 30 pedidos
-  const totalRevenue = recentOrders.reduce((s, o) => s + o.total, 0)
+  // Receita últimos pedidos
+  const totalRevenue = recentOrders.reduce((s: number, o: { total: number }) => s + o.total, 0)
 
   // Funil de conversão
   const totalSessions = await prisma.behaviorEvent.findMany({
@@ -66,7 +60,7 @@ export default async function MarketingPage() {
     { label: 'Sessões únicas', value: totalSessions, color: 'bg-blue-500' },
     { label: 'Add to Cart', value: addToCartEvents, color: 'bg-yellow-500' },
     { label: 'Checkout iniciado', value: checkoutEvents, color: 'bg-orange-500' },
-    { label: 'Compras finalizadas', value: purchaseEvents, color: 'bg-green-500' },
+    { label: 'Compras finalizadas', value: totalOrdersPaid, color: 'bg-green-500' },
   ]
 
   const maxFunnel = Math.max(totalSessions, 1)
@@ -83,8 +77,8 @@ export default async function MarketingPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: 'Pedidos pagos', value: totalOrdersPaid },
-            { label: 'Leads (newsletter)', value: newsletterCount },
-            { label: 'Sessões c/ add-to-cart', value: addToCartEvents },
+            { label: 'Add-to-cart (eventos)', value: addToCartEvents },
+            { label: 'Sessões c/ add-to-cart', value: abandonedSessions },
             { label: 'Carrinhos abandonados*', value: Math.max(0, abandonedSessions - totalOrdersPaid) },
           ].map(kpi => (
             <div key={kpi.label} className="border border-border p-4">
@@ -137,7 +131,7 @@ export default async function MarketingPage() {
               </tr>
             </thead>
             <tbody>
-              {utmSources.map((row, i) => {
+              {utmSources.map((row: { utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; _count: { sessionId: number } }, i: number) => {
                 const share = totalSessions > 0 ? ((row._count.sessionId / totalSessions) * 100).toFixed(1) : '0'
                 return (
                   <tr key={i} className="border-b border-border last:border-0 hover:bg-secondary/30">
@@ -176,7 +170,7 @@ export default async function MarketingPage() {
                 Sem dados de clique ainda. Os eventos são coletados automaticamente pelo AnalyticsTracker.
               </p>
             ) : (
-              clickEvents.map((ev) => {
+              clickEvents.map((ev: { pageUrl: string | null; _count: number }) => {
                 const maxClicks = clickEvents[0]._count
                 const pct = maxClicks > 0 ? (ev._count / maxClicks) * 100 : 0
                 const heat = pct > 70 ? 'bg-red-500' : pct > 40 ? 'bg-orange-400' : pct > 20 ? 'bg-yellow-400' : 'bg-blue-400'
