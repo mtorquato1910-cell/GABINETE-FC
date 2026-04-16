@@ -44,7 +44,7 @@ export function ProductCard({ product }: ProductCardProps) {
         className="relative aspect-[4/5] bg-secondary overflow-hidden block p-6"
       >
         <Image
-          src={product.images[0] || '/images/products/placeholder-jersey.jpg'}
+          src={product.images[0] || '/images/products/placeholder-jersey.svg'}
           alt={product.name}
           fill
           className="object-cover product-img"

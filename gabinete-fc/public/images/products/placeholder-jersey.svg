@@ -1,0 +1,9 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'>
+  <rect width='400' height='500' fill='#111111'/>
+  <rect x='100' y='80' width='200' height='220' fill='#1a1a1a' rx='8'/>
+  <path d='M100 80 L0 140 L40 180 L100 140 L100 80Z' fill='#222222'/>
+  <path d='M300 80 L400 140 L360 180 L300 140 L300 80Z' fill='#222222'/>
+  <path d='M100 80 L200 60 L300 80 L300 140 L200 120 L100 140Z' fill='#1f1f1f'/>
+  <text x='200' y='380' font-family='Arial' font-size='14' fill='#737373' text-anchor='middle'>GABINETE FC</text>
+  <text x='200' y='400' font-family='Arial' font-size='12' fill='#4a4a4a' text-anchor='middle'>Imagem em breve</text>
+</svg>

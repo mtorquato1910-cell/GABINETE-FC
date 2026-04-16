@@ -43,7 +43,7 @@ export function ProductDetailClient({ product }: Props) {
         {/* Image */}
         <div className="bg-secondary p-8 lg:p-16 flex items-center justify-center min-h-[50vh] relative">
           <Image
-            src={product.images[0] || '/images/products/placeholder-jersey.jpg'}
+            src={product.images[0] || '/images/products/placeholder-jersey.svg'}
             alt={product.name}
             width={500}
             height={600}

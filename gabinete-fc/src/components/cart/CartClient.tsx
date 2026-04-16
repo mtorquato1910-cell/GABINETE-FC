@@ -49,7 +49,7 @@ export function CartClient() {
             >
               <div className="relative w-20 h-24 bg-secondary shrink-0">
                 <Image
-                  src={item.product.images[0] || '/images/products/placeholder-jersey.jpg'}
+                  src={item.product.images[0] || '/images/products/placeholder-jersey.svg'}
                   alt={item.product.name}
                   fill
                   className="object-cover product-img"
