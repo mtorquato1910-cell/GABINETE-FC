@@ -1,73 +1,5 @@
 import Link from 'next/link'
-
-function FootballField() {
-  return (
-    <svg
-      viewBox="0 0 105 68"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      style={{ maxHeight: '100%' }}
-      aria-hidden="true"
-    >
-      {/* Background */}
-      <rect width="105" height="68" fill="#0a0a0a" />
-
-      {/* Subtle grass stripes */}
-      {[0,1,2,3,4,5,6].map(i => (
-        <rect key={i} x={i * 15} y="0" width="15" height="68"
-          fill={i % 2 === 0 ? '#0f0f0f' : '#0a0a0a'} />
-      ))}
-
-      {/* Field border */}
-      <rect x="2" y="2" width="101" height="64" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Center line */}
-      <line x1="52.5" y1="2" x2="52.5" y2="66" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Center circle */}
-      <circle cx="52.5" cy="34" r="9.15" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Center spot */}
-      <circle cx="52.5" cy="34" r="0.6" fill="white" opacity="0.9" />
-
-      {/* Left penalty area */}
-      <rect x="2" y="13.84" width="16.5" height="40.32" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Right penalty area */}
-      <rect x="86.5" y="13.84" width="16.5" height="40.32" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Left goal area */}
-      <rect x="2" y="24.84" width="5.5" height="18.32" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Right goal area */}
-      <rect x="97.5" y="24.84" width="5.5" height="18.32" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Left goal */}
-      <rect x="0" y="28.84" width="2" height="10.32" fill="none" stroke="white" strokeWidth="0.5" opacity="0.6" />
-
-      {/* Right goal */}
-      <rect x="103" y="28.84" width="2" height="10.32" fill="none" stroke="white" strokeWidth="0.5" opacity="0.6" />
-
-      {/* Left penalty spot */}
-      <circle cx="13.5" cy="34" r="0.6" fill="white" opacity="0.9" />
-
-      {/* Right penalty spot */}
-      <circle cx="91.5" cy="34" r="0.6" fill="white" opacity="0.9" />
-
-      {/* Left penalty arc */}
-      <path d="M 18.5 27.5 A 9.15 9.15 0 0 1 18.5 40.5" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Right penalty arc */}
-      <path d="M 86.5 27.5 A 9.15 9.15 0 0 0 86.5 40.5" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-
-      {/* Corner arcs */}
-      <path d="M 2 4.5 A 2.5 2.5 0 0 0 4.5 2" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-      <path d="M 100.5 2 A 2.5 2.5 0 0 0 103 4.5" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-      <path d="M 2 63.5 A 2.5 2.5 0 0 1 4.5 66" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-      <path d="M 100.5 66 A 2.5 2.5 0 0 1 103 63.5" fill="none" stroke="white" strokeWidth="0.5" opacity="0.8" />
-    </svg>
-  )
-}
+import Image from 'next/image'
 
 export function HeroSection() {
   return (
@@ -98,17 +30,24 @@ export function HeroSection() {
         </Link>
       </div>
 
-      {/* Right — Campo de futebol */}
-      <div className="relative min-h-[40vh] lg:min-h-full bg-[#0a0a0a] flex items-center justify-center overflow-hidden p-4 lg:p-8">
-        <div className="w-full h-full flex items-center justify-center" style={{ minHeight: '300px' }}>
-          <FootballField />
-        </div>
-        <div className="absolute bottom-6 right-6 text-right">
+      {/* Right — Campo de futebol (imagem real) */}
+      <div className="relative min-h-[40vh] lg:min-h-full bg-[#0a0a0a] overflow-hidden">
+        <Image
+          src="/images/campo-futebol.jpg"
+          alt="Campo de futebol Gabinete FC"
+          fill
+          className="object-cover opacity-80"
+          priority
+          sizes="(max-width: 1024px) 100vw, 50vw"
+        />
+        {/* Overlay escuro para manter legibilidade */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+        <div className="absolute bottom-6 right-6 text-right z-10">
           <div className="text-4xl font-bold text-primary">01</div>
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Campaign / 2026</div>
         </div>
-        <div className="absolute top-6 left-6">
-          <div className="text-[10px] uppercase tracking-widest text-muted-foreground opacity-50">
+        <div className="absolute top-6 left-6 z-10">
+          <div className="text-[10px] uppercase tracking-widest text-white/50">
             Gabinete FC Stadium
           </div>
         </div>

@@ -410,8 +410,11 @@ model BehaviorEvent {
   utmSource   String?
   utmMedium   String?
   utmCampaign String?
+  posX        Float?
+  posY        Float?
   createdAt   DateTime @default(now())
 
   @@index([sessionId, eventType])
+  @@index([pageUrl, eventType])
   @@map("behavior_events")
 }
