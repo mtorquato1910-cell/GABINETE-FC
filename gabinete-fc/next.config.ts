@@ -1,21 +1,24 @@
 import type { NextConfig } from 'next'
+import path from 'path'
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    // Define o root como o diretório do projeto para evitar warning de múltiplos lockfiles
+    root: path.resolve(__dirname),
+  },
+
   images: {
     remotePatterns: [
-      // Uploadthing (Sprint 6)
       {
         protocol: 'https',
         hostname: 'utfs.io',
       },
-      // Placeholder/local assets
       {
         protocol: 'http',
         hostname: 'localhost',
       },
     ],
   },
-  // Suppress Prisma edge runtime warning
   serverExternalPackages: ['@prisma/client', 'prisma'],
 }
 
