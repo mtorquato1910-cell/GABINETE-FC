@@ -12,7 +12,7 @@ export function Logo({ variant = 'full', className = '' }: LogoProps) {
       <Link href="/" className={`flex items-center ${className}`}>
         <span className="text-xl font-bold tracking-tighter">
           <span className="text-primary">GABINETE</span>
-          <span className="text-foreground">//</span>
+          <span className="text-foreground">{'// '}</span>
           <span className="text-foreground">FC</span>
         </span>
       </Link>
