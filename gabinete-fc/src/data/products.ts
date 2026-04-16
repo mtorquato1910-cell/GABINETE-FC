@@ -1,0 +1,195 @@
+import type { Product, Category } from '@/types'
+
+// ============================================================
+// MOCK DATA — Substituir por queries Prisma no Sprint 2
+// ============================================================
+
+export const mockProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Brasil Home 2024',
+    slug: 'brasil-home-2024',
+    description:
+      'Camisa oficial da Seleção Brasileira. Tecido Dri-FIT premium, corte jogador. A amarelinha que é a cara do Brasil.',
+    team: 'Brasil',
+    category: 'selecoes',
+    badge: 'Lançamento',
+    price: 349.9,
+    originalPrice: null,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['PP', 'P', 'M', 'G', 'GG', 'XGG'],
+    stock: 45,
+    status: 'active',
+    featured: true,
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15'),
+  },
+  {
+    id: '2',
+    name: 'Brasil Away 2024',
+    slug: 'brasil-away-2024',
+    description:
+      'Camisa reserva azul da Seleção Brasileira. Design moderno com detalhes em verde e amarelo.',
+    team: 'Brasil',
+    category: 'selecoes',
+    badge: 'Promo',
+    price: 299.9,
+    originalPrice: 399.9,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['P', 'M', 'G', 'GG'],
+    stock: 23,
+    status: 'active',
+    featured: true,
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15'),
+  },
+  {
+    id: '3',
+    name: 'Argentina Home 2024',
+    slug: 'argentina-home-2024',
+    description:
+      'A clássica albiceleste. Camisa titular da Argentina com as tradicionais listras azuis e brancas.',
+    team: 'Argentina',
+    category: 'selecoes',
+    badge: 'Esgotando',
+    price: 429.9,
+    originalPrice: null,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['P', 'M', 'G', 'GG', 'XGG'],
+    stock: 8,
+    status: 'active',
+    featured: true,
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15'),
+  },
+  {
+    id: '4',
+    name: 'França Home 2024',
+    slug: 'franca-home-2024',
+    description:
+      'Les Bleus. A camisa dos campeões mundiais com o icônico azul francês e detalhes tricolor.',
+    team: 'França',
+    category: 'selecoes',
+    badge: null,
+    price: 389.9,
+    originalPrice: null,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['PP', 'P', 'M', 'G', 'GG'],
+    stock: 31,
+    status: 'active',
+    featured: false,
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-01-20'),
+  },
+  {
+    id: '5',
+    name: 'Portugal Home 2024',
+    slug: 'portugal-home-2024',
+    description:
+      'A seleção das quinas. Camisa titular de Portugal em vermelho e verde com escudo bordado.',
+    team: 'Portugal',
+    category: 'selecoes',
+    badge: null,
+    price: 369.9,
+    originalPrice: null,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['P', 'M', 'G', 'GG', 'XGG'],
+    stock: 19,
+    status: 'active',
+    featured: true,
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-01-20'),
+  },
+  {
+    id: '6',
+    name: 'Colômbia Away 2024',
+    slug: 'colombia-away-2024',
+    description: 'Camisa reserva da seleção colombiana. Design arrojado em vermelho com detalhes tricolor.',
+    team: 'Colômbia',
+    category: 'selecoes',
+    badge: null,
+    price: 299.9,
+    originalPrice: null,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['P', 'M', 'G', 'GG'],
+    stock: 15,
+    status: 'active',
+    featured: false,
+    createdAt: new Date('2024-01-25'),
+    updatedAt: new Date('2024-01-25'),
+  },
+  {
+    id: '7',
+    name: 'Real Madrid Home 2024',
+    slug: 'real-madrid-home-2024',
+    description: 'O uniforme dos Galácticos. Camisa titular do Real Madrid em branco clássico com escudo bordado.',
+    team: 'Real Madrid',
+    category: 'clubes',
+    badge: 'Exclusivo',
+    price: 459.9,
+    originalPrice: null,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['PP', 'P', 'M', 'G', 'GG', 'XGG'],
+    stock: 27,
+    status: 'active',
+    featured: true,
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-02-01'),
+  },
+  {
+    id: '8',
+    name: 'Barcelona Away 2024',
+    slug: 'barcelona-away-2024',
+    description: 'Camisa reserva do Barça. Design elegante em amarelo e vermelho, exclusivo da temporada.',
+    team: 'Barcelona',
+    category: 'clubes',
+    badge: null,
+    price: 429.9,
+    originalPrice: 519.9,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['P', 'M', 'G', 'GG'],
+    stock: 12,
+    status: 'active',
+    featured: true,
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-02-01'),
+  },
+  {
+    id: '9',
+    name: 'Brasil Retrô 1994',
+    slug: 'brasil-retro-1994',
+    description: 'A lendária camisa do tetracampeonato. Reprodução fiel da camisa da Copa de 94.',
+    team: 'Brasil',
+    category: 'retro',
+    badge: 'Colecionador',
+    price: 319.9,
+    originalPrice: null,
+    images: ['/images/products/placeholder-jersey.jpg'],
+    sizesAvailable: ['P', 'M', 'G', 'GG', 'XGG'],
+    stock: 9,
+    status: 'active',
+    featured: true,
+    createdAt: new Date('2024-02-10'),
+    updatedAt: new Date('2024-02-10'),
+  },
+]
+
+export const mockCategories: Category[] = [
+  { id: 'all', label: 'Todos', slug: 'all' },
+  { id: 'selecoes', label: 'Seleções', slug: 'selecoes' },
+  { id: 'clubes', label: 'Clubes', slug: 'clubes' },
+  { id: 'retro', label: 'Retrô', slug: 'retro' },
+]
+
+export function getProductBySlug(slug: string): Product | undefined {
+  return mockProducts.find((p) => p.slug === slug)
+}
+
+export function getFeaturedProducts(): Product[] {
+  return mockProducts.filter((p) => p.featured && p.status === 'active')
+}
+
+export function getProductsByCategory(category: string): Product[] {
+  if (category === 'all') return mockProducts.filter((p) => p.status === 'active')
+  return mockProducts.filter((p) => p.category === category && p.status === 'active')
+}
