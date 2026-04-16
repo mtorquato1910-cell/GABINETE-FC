@@ -2,15 +2,17 @@ import type { Metadata } from 'next'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { ProductGrid } from '@/components/product/ProductGrid'
-import { mockProducts } from '@/data/products'
+import { getActiveProducts } from '@/lib/actions/products'
 
 export const metadata: Metadata = {
-  title: 'Loja',
+  title: 'Loja | Gabinete FC',
   description: 'Todas as camisas de futebol premium. Seleções e clubes do mundo todo.',
 }
 
-export default function LojaPage() {
-  const activeProducts = mockProducts.filter((p) => p.status === 'active')
+export const revalidate = 3600
+
+export default async function LojaPage() {
+  const products = await getActiveProducts()
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -22,7 +24,7 @@ export default function LojaPage() {
             Autênticas. Importadas. Entrega para todo o Brasil.
           </p>
         </div>
-        <ProductGrid products={activeProducts} showFilters />
+        <ProductGrid products={products} showFilters />
       </main>
       <Footer />
     </div>

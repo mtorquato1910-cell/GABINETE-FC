@@ -4,11 +4,13 @@ import { HeroSection } from '@/components/shared/HeroSection'
 import { MarqueeBanner } from '@/components/shared/MarqueeBanner'
 import { ProductGrid } from '@/components/product/ProductGrid'
 import { NewsletterSection } from '@/components/shared/NewsletterSection'
-import { getFeaturedProducts } from '@/data/products'
+import { getFeaturedProducts } from '@/lib/actions/products'
 import Link from 'next/link'
 
-export default function HomePage() {
-  const featured = getFeaturedProducts()
+export const revalidate = 3600 // Revalida a cada hora
+
+export default async function HomePage() {
+  const featured = await getFeaturedProducts()
 
   return (
     <div className="min-h-screen flex flex-col uppercase tracking-widest">
@@ -17,7 +19,7 @@ export default function HomePage() {
         <HeroSection />
         <MarqueeBanner />
 
-        {/* Featured products */}
+        {/* Destques */}
         <section>
           <div className="flex justify-between items-center px-4 md:px-6 py-4 border-b border-border">
             <h2 className="text-xs font-bold uppercase tracking-widest">Destaques</h2>
