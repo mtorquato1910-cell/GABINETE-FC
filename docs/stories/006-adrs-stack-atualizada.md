@@ -5,7 +5,7 @@
 **Tipo:** Architecture Decision Record
 **Agente:** @architect
 **SP:** 2
-**Status:** [ ] Não iniciado
+**Status:** [x] Concluído — 2026-04-16
 
 ---
 

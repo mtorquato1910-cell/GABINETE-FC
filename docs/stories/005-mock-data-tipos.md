@@ -5,7 +5,7 @@
 **Referência:** US-01.4 (complementar) + US-A.1 (adaptado)
 **Agente:** @dev
 **SP:** 5
-**Status:** [ ] Não iniciado
+**Status:** [x] Concluído — 2026-04-16
 
 ---
 

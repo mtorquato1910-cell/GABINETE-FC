@@ -5,7 +5,7 @@
 **Referência:** US-01.4 + US-03.1 (adaptado para NextAuth)
 **Agente:** @dev
 **SP:** 5
-**Status:** [ ] Não iniciado
+**Status:** [x] Concluído (setup base) — 2026-04-16
 
 ---
 
