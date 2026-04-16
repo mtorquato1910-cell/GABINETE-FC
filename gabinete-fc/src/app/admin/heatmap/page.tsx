@@ -2,18 +2,17 @@ import { HeatmapDashboard } from '@/components/admin/HeatmapDashboard'
 import { prisma } from '@/lib/db'
 
 export default async function HeatmapPage() {
-  // Get available pages that have position events
-  const pages = await prisma.behaviorEvent.findMany({
-    where: {
-      eventType: { in: ['click', 'mouse_move'] },
-      posX: { not: null },
-      pageUrl: { not: null },
-    },
-    select: { pageUrl: true },
-    distinct: ['pageUrl'],
-  })
+  // Get available pages that have click or mouse_move events (raw query bypasses stale engine schema)
+  const rows = await prisma.$queryRaw<{ pageUrl: string }[]>`
+    SELECT DISTINCT pageUrl
+    FROM behavior_events
+    WHERE eventType IN ('click', 'mouse_move')
+      AND posX IS NOT NULL
+      AND pageUrl IS NOT NULL
+    LIMIT 50
+  `
 
-  const pageList = pages.map(p => p.pageUrl as string).filter(Boolean)
+  const pageList = rows.map(r => r.pageUrl).filter(Boolean)
 
   return (
     <div>

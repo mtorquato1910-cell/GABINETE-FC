@@ -12,37 +12,54 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const pageUrl = searchParams.get('page') ?? '/'
   const sessionId = searchParams.get('session') ?? undefined
-  const type = searchParams.get('type') ?? 'heatmap' // 'heatmap' | 'journey' | 'leads'
+  const type = searchParams.get('type') ?? 'heatmap'
 
   if (type === 'leads') {
-    // Return list of unique sessions with UTM info and first/last seen
-    const sessions = await prisma.behaviorEvent.groupBy({
-      by: ['sessionId'],
-      _count: { id: true },
-      _min: { createdAt: true },
-      _max: { createdAt: true },
-      orderBy: { _max: { createdAt: 'desc' } },
-      take: 100,
-    })
+    // Unique sessions with event count and first/last seen
+    const sessions = await prisma.$queryRaw<{
+      sessionId: string
+      events: number
+      firstSeen: string
+      lastSeen: string
+    }[]>`
+      SELECT
+        sessionId,
+        COUNT(id) as events,
+        MIN(createdAt) as firstSeen,
+        MAX(createdAt) as lastSeen
+      FROM behavior_events
+      GROUP BY sessionId
+      ORDER BY MAX(createdAt) DESC
+      LIMIT 100
+    `
 
-    // Fetch UTM + userId for each session (first event)
+    // Fetch first event per session for UTM/userId/landing
     const details = await Promise.all(
       sessions.map(async (s) => {
-        const first = await prisma.behaviorEvent.findFirst({
-          where: { sessionId: s.sessionId },
-          select: { userId: true, utmSource: true, utmMedium: true, utmCampaign: true, pageUrl: true },
-          orderBy: { createdAt: 'asc' },
-        })
+        const first = await prisma.$queryRaw<{
+          userId: string | null
+          utmSource: string | null
+          utmMedium: string | null
+          utmCampaign: string | null
+          pageUrl: string | null
+        }[]>`
+          SELECT userId, utmSource, utmMedium, utmCampaign, pageUrl
+          FROM behavior_events
+          WHERE sessionId = ${s.sessionId}
+          ORDER BY createdAt ASC
+          LIMIT 1
+        `
+        const f = first[0]
         return {
           sessionId: s.sessionId,
-          events: s._count.id,
-          firstSeen: s._min.createdAt,
-          lastSeen: s._max.createdAt,
-          userId: first?.userId ?? null,
-          utmSource: first?.utmSource ?? null,
-          utmMedium: first?.utmMedium ?? null,
-          utmCampaign: first?.utmCampaign ?? null,
-          landingPage: first?.pageUrl ?? null,
+          events: Number(s.events),
+          firstSeen: s.firstSeen,
+          lastSeen: s.lastSeen,
+          userId: f?.userId ?? null,
+          utmSource: f?.utmSource ?? null,
+          utmMedium: f?.utmMedium ?? null,
+          utmCampaign: f?.utmCampaign ?? null,
+          landingPage: f?.pageUrl ?? null,
         }
       })
     )
@@ -51,38 +68,41 @@ export async function GET(req: NextRequest) {
   }
 
   if (type === 'journey' && sessionId) {
-    // Return ordered events for a specific session
-    const events = await prisma.behaviorEvent.findMany({
-      where: { sessionId },
-      orderBy: { createdAt: 'asc' },
-      select: {
-        id: true,
-        eventType: true,
-        pageUrl: true,
-        posX: true,
-        posY: true,
-        productId: true,
-        utmSource: true,
-        utmMedium: true,
-        utmCampaign: true,
-        createdAt: true,
-      },
-    })
+    const events = await prisma.$queryRaw<{
+      id: string
+      eventType: string
+      pageUrl: string | null
+      posX: number | null
+      posY: number | null
+      productId: string | null
+      utmSource: string | null
+      utmMedium: string | null
+      utmCampaign: string | null
+      createdAt: string
+    }[]>`
+      SELECT id, eventType, pageUrl, posX, posY, productId, utmSource, utmMedium, utmCampaign, createdAt
+      FROM behavior_events
+      WHERE sessionId = ${sessionId}
+      ORDER BY createdAt ASC
+    `
 
     return NextResponse.json({ journey: events })
   }
 
-  // Default: heatmap data for a specific page
-  const events = await prisma.behaviorEvent.findMany({
-    where: {
-      pageUrl,
-      eventType: { in: ['click', 'mouse_move'] },
-      posX: { not: null },
-      posY: { not: null },
-    },
-    select: { posX: true, posY: true, eventType: true },
-    take: 5000,
-  })
+  // Heatmap points for a specific page
+  const points = await prisma.$queryRaw<{
+    posX: number | null
+    posY: number | null
+    eventType: string
+  }[]>`
+    SELECT posX, posY, eventType
+    FROM behavior_events
+    WHERE pageUrl = ${pageUrl}
+      AND eventType IN ('click', 'mouse_move')
+      AND posX IS NOT NULL
+      AND posY IS NOT NULL
+    LIMIT 5000
+  `
 
-  return NextResponse.json({ points: events })
+  return NextResponse.json({ points })
 }
