@@ -47,7 +47,7 @@ export function ProductCard({ product }: ProductCardProps) {
           src={product.images[0] || '/images/products/placeholder-jersey.svg'}
           alt={product.name}
           fill
-          className="object-cover product-img"
+          className="object-cover product-img grayscale group-hover:grayscale-0 transition-all duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         {isOutOfStock && (
