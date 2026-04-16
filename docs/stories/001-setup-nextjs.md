@@ -5,7 +5,7 @@
 **Referência:** US-01.1
 **Agente:** @dev
 **SP:** 5
-**Status:** [ ] Não iniciado
+**Status:** [x] Concluído — 2026-04-16
 
 ---
 
@@ -29,13 +29,13 @@ Criar o projeto Next.js 14 com App Router, TypeScript strict, Tailwind CSS, shad
 
 ## Tarefas
 
-- [ ] 1. Inicializar o projeto Next.js 14
-- [ ] 2. Configurar Tailwind com tema Gabinete FC
-- [ ] 3. Instalar e configurar shadcn/ui
-- [ ] 4. Criar estrutura de pastas
-- [ ] 5. Copiar logo para `public/`
-- [ ] 6. Criar layout raiz com tema aplicado
-- [ ] 7. Criar página de teste confirmando que está funcional
+- [x] 1. Inicializar o projeto Next.js 14
+- [x] 2. Configurar Tailwind com tema Gabinete FC
+- [x] 3. Instalar e configurar shadcn/ui
+- [x] 4. Criar estrutura de pastas
+- [x] 5. Copiar logo para `public/`
+- [x] 6. Criar layout raiz com tema aplicado
+- [x] 7. Criar página de teste confirmando que está funcional
 
 ---
 

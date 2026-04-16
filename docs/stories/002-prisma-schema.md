@@ -5,7 +5,7 @@
 **Referência:** US-01.2 (adaptado para Prisma + SQLite/Railway)
 **Agente:** @data-engineer
 **SP:** 8
-**Status:** [ ] Não iniciado
+**Status:** [x] Concluído — 2026-04-16
 
 ---
 
