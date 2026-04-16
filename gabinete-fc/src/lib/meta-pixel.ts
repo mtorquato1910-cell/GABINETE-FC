@@ -3,8 +3,8 @@
 
 declare global {
   interface Window {
-    fbq: (command: string, event: string, params?: Record<string, unknown>, options?: Record<string, unknown>) => void
-    _fbq: unknown
+    fbq?: (command: string, event: string, params?: Record<string, unknown>, options?: Record<string, unknown>) => void
+    _fbq?: unknown
   }
 }
 
