@@ -1,26 +1,148 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
+
+  /* Gabinete FC brand colors */
+  --color-gfc-black: #050505;
+  --color-gfc-dark: #0a0a0a;
+  --color-gfc-card: #111111;
+  --color-gfc-border: #1f1f1f;
+  --color-gfc-green: #a3e635;
+  --color-gfc-green-dark: #84cc16;
+  --color-gfc-white: #ffffff;
+  --color-gfc-gray: #737373;
+  --color-gfc-gray-light: #a3a3a3;
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Gabinete FC Dark Theme — always dark */
+:root {
+  --background: oklch(0.06 0 0);          /* #050505 — ultra dark */
+  --foreground: oklch(0.985 0 0);          /* #FAFAFA — white */
+  --card: oklch(0.1 0 0);                  /* #111 — card bg */
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.08 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.85 0.22 130);         /* #a3e635 — volt green */
+  --primary-foreground: oklch(0.06 0 0);   /* black on green */
+  --secondary: oklch(0.12 0 0);            /* dark secondary */
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.15 0 0);
+  --muted-foreground: oklch(0.56 0 0);     /* #737373 */
+  --accent: oklch(0.85 0.22 130);          /* same as primary */
+  --accent-foreground: oklch(0.06 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.2 0 0);               /* #1f1f1f */
+  --input: oklch(0.15 0 0);
+  --ring: oklch(0.85 0.22 130);
+  --radius: 0px;                            /* sharp corners — editorial style */
+
+  /* Charts */
+  --chart-1: oklch(0.85 0.22 130);
+  --chart-2: oklch(0.7 0.2 130);
+  --chart-3: oklch(0.55 0.18 130);
+  --chart-4: oklch(0.4 0.15 130);
+  --chart-5: oklch(0.25 0.1 130);
+
+  /* Sidebar */
+  --sidebar: oklch(0.08 0 0);
+  --sidebar-foreground: oklch(0.9 0 0);
+  --sidebar-primary: oklch(0.85 0.22 130);
+  --sidebar-primary-foreground: oklch(0.06 0 0);
+  --sidebar-accent: oklch(0.12 0 0);
+  --sidebar-accent-foreground: oklch(0.9 0 0);
+  --sidebar-border: oklch(0.2 0 0);
+  --sidebar-ring: oklch(0.85 0.22 130);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: oklch(0.06 0 0);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.2 0 0);
+    border-radius: 0;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.85 0.22 130);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Marquee animation */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+/* Grayscale product images */
+.product-img {
+  filter: grayscale(100%) contrast(1.1);
+  transition: filter 0.5s ease;
+}
+.product-img:hover,
+.group:hover .product-img {
+  filter: grayscale(0%) contrast(1);
 }

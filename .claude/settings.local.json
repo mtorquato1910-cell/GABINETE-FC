@@ -3,7 +3,9 @@
     "allow": [
       "Bash(cd:*)",
       "Bash(python:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)"
     ]
   }
 }
