@@ -9,6 +9,7 @@ const navItems = [
   { href: '/minha-conta/pedidos', label: 'Pedidos' },
   { href: '/minha-conta/enderecos', label: 'Endereços' },
   { href: '/minha-conta/lista-desejos', label: 'Lista de Desejos' },
+  { href: '/minha-conta/fidelidade', label: 'Fidelidade' },
 ]
 
 export default async function ContaLayout({ children }: { children: React.ReactNode }) {

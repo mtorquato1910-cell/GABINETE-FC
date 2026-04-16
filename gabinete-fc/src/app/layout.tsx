@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist_Mono } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import { SupportChat } from '@/components/shared/SupportChat'
+import { BackToTop } from '@/components/shared/BackToTop'
 import './globals.css'
 
 const geistMono = Geist_Mono({
@@ -62,6 +63,7 @@ export default function RootLayout({
         {children}
         <Toaster position="bottom-right" theme="dark" />
         <SupportChat />
+        <BackToTop />
       </body>
     </html>
   )

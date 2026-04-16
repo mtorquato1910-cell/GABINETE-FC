@@ -11,13 +11,19 @@ export function NewsletterSection() {
     e.preventDefault()
     if (!email) return
     setLoading(true)
-    // TODO Sprint 5: integrar com Resend
-    await new Promise((r) => setTimeout(r, 500))
-    toast.success('Cadastrado!', {
-      description: 'Você receberá novidades em breve.',
-    })
-    setEmail('')
-    setLoading(false)
+    try {
+      await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      toast.success('Cadastrado!', { description: 'Você receberá novidades em breve.' })
+      setEmail('')
+    } catch {
+      toast.error('Erro ao cadastrar. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

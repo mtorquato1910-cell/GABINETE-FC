@@ -4,57 +4,79 @@ import { Logo } from './Logo'
 export function Footer() {
   return (
     <footer className="border-t border-border mt-auto">
-      <div className="p-6 md:p-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs">
-          <div>
-            <Logo variant="text" className="mb-4" />
-            <p className="text-muted-foreground leading-relaxed max-w-xs">
-              Camisas de futebol autênticas importadas. Seleções e clubes do mundo todo com entrega
-              para todo o Brasil.
-            </p>
-          </div>
+      {/* Main footer */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-0 border-b border-border">
+        {/* Brand */}
+        <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-border">
+          <Logo variant="text" />
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-3 leading-relaxed">
+            Camisas de futebol premium.<br />
+            Autênticas, importadas, entregues.
+          </p>
+        </div>
 
-          <div className="flex flex-col gap-2 uppercase tracking-widest">
-            <span className="text-muted-foreground mb-2 font-bold">Navegação</span>
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <Link href="/loja" className="hover:text-primary transition-colors">
-              Camisas
-            </Link>
-            <Link href="/carrinho" className="hover:text-primary transition-colors">
-              Carrinho
-            </Link>
-            <Link href="/minha-conta" className="hover:text-primary transition-colors">
-              Minha Conta
-            </Link>
-          </div>
-
-          <div className="flex flex-col gap-2 uppercase tracking-widest">
-            <span className="text-muted-foreground mb-2 font-bold">Suporte</span>
-            <span className="text-muted-foreground">contato@gabinetefc.com.br</span>
-            <span className="text-muted-foreground">Frete grátis acima de R$ 500</span>
-            <span className="text-muted-foreground">Troca em até 30 dias</span>
-            <Link href="/politicas" className="hover:text-primary transition-colors">
-              Políticas
-            </Link>
-            <Link href="/faq" className="hover:text-primary transition-colors">
-              FAQ
-            </Link>
+        {/* Loja */}
+        <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-border">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Loja</p>
+          <div className="flex flex-col gap-2">
+            {[
+              { href: '/loja', label: 'Todas as Camisas' },
+              { href: '/loja/selecoes', label: 'Seleções' },
+              { href: '/loja/clubes-europeus', label: 'Clubes Europeus' },
+              { href: '/loja/clubes-brasileiros', label: 'Clubes Brasileiros' },
+              { href: '/loja/retro', label: 'Retrô' },
+              { href: '/lancamentos', label: 'Lançamentos' },
+              { href: '/promocoes', label: 'Promoções' },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest">
+                {label}
+              </Link>
+            ))}
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-muted-foreground uppercase tracking-widest">
-          <span>© 2026 Gabinete FC. Todos os direitos reservados.</span>
-          <div className="flex gap-6">
-            <Link href="/politicas/privacidade" className="hover:text-primary transition-colors">
-              Privacidade
-            </Link>
-            <Link href="/politicas/termos" className="hover:text-primary transition-colors">
-              Termos
-            </Link>
+        {/* Ajuda */}
+        <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-border">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Ajuda</p>
+          <div className="flex flex-col gap-2">
+            {[
+              { href: '/faq', label: 'FAQ' },
+              { href: '/politicas', label: 'Políticas' },
+              { href: '/sobre', label: 'Sobre Nós' },
+              { href: '/minha-conta/pedidos', label: 'Meus Pedidos' },
+            ].map(({ href, label }) => (
+              <Link key={href} href={href} className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest">
+                {label}
+              </Link>
+            ))}
           </div>
         </div>
+
+        {/* Contato */}
+        <div className="p-6 md:p-8">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Contato</p>
+          <div className="flex flex-col gap-2">
+            <a href="mailto:contato@gabinetefc.com.br" className="text-xs text-muted-foreground hover:text-primary transition-colors normal-case">
+              contato@gabinetefc.com.br
+            </a>
+            <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest">
+              WhatsApp
+            </a>
+            <a href="https://instagram.com/gabinetefc" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest">
+              Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 gap-2">
+        <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+          © {new Date().getFullYear()} Gabinete FC. Todos os direitos reservados.
+        </p>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+          CNPJ 00.000.000/0001-00
+        </p>
       </div>
     </footer>
   )
