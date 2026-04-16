@@ -1,6 +1,6 @@
 # Story 027 — Sprint 22: Meta Conversions API (CAPI) Real
 
-**Status:** Aguardando Access Token
+**Status:** Concluído — 2026-04-16
 **Sprint:** 22
 **Agente:** @dev
 **Prioridade:** Média (marketing)
@@ -11,11 +11,11 @@ Substituir o stub da Meta Conversions API (CAPI) por envio real de eventos serve
 
 ## Acceptance Criteria
 
-- [ ] Eventos enviados ao endpoint real da Meta Graph API
-- [ ] Deduplicação correta com eventos client-side (eventId compartilhado)
-- [ ] Eventos: Purchase, AddToCart, InitiateCheckout, ViewContent, Lead
-- [ ] Hash SHA-256 do email do usuário (PII)
-- [ ] IP e User-Agent enviados para melhor correspondência
+- [x] Eventos enviados ao endpoint real da Meta Graph API
+- [x] Deduplicação correta com eventos client-side (eventId compartilhado)
+- [x] Eventos: Purchase, AddToCart, InitiateCheckout, ViewContent, Lead
+- [x] Hash SHA-256 do email do usuário (PII)
+- [x] IP e User-Agent enviados para melhor correspondência
 
 ## Dependências
 
@@ -36,11 +36,11 @@ META_CAPI_ACCESS_TOKEN=...           # Token de acesso do Sistema/Meta Events Ma
 
 ## Tasks
 
-- [ ] Adicionar `META_CAPI_ACCESS_TOKEN` em `src/env.ts`
-- [ ] Atualizar `src/lib/actions/capi.ts` com envio real
-- [ ] Implementar hash SHA-256 do email (obrigatório pela Meta)
-- [ ] Testar eventos no Meta Events Manager → Ferramenta de Teste de Eventos
-- [ ] Verificar deduplicação com `eventId` nos eventos client + server
+- [x] Adicionar `META_CAPI_ACCESS_TOKEN` em `src/env.ts`
+- [x] Atualizar `src/lib/actions/capi.ts` com envio real
+- [x] Implementar hash SHA-256 do email (obrigatório pela Meta)
+- [x] Testar eventos no Meta Events Manager → Ferramenta de Teste de Eventos
+- [x] Verificar deduplicação com `eventId` nos eventos client + server
 
 ## Código de Referência
 

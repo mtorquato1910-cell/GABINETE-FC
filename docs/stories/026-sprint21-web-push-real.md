@@ -1,6 +1,6 @@
 # Story 026 — Sprint 21: Push Notifications com web-push
 
-**Status:** Aguardando chaves VAPID
+**Status:** Concluído — 2026-04-16
 **Sprint:** 21
 **Agente:** @dev
 **Prioridade:** Baixa (engajamento)
@@ -11,12 +11,12 @@ Substituir o stub de push notifications por envio real usando a biblioteca `web-
 
 ## Acceptance Criteria
 
-- [ ] `web-push` instalado com chaves VAPID configuradas
-- [ ] `sendPushNotification` enviando notificações reais para subscribers
-- [ ] Envio em batch para múltiplos usuários
-- [ ] Remoção automática de subscriptions inválidas (410 Gone)
-- [ ] Notificação de pedido confirmado via push
-- [ ] Notificação de promoção para todos os subscribers
+- [x] `web-push` instalado com chaves VAPID configuradas
+- [x] `sendPushNotification` enviando notificações reais para subscribers
+- [x] Envio em batch para múltiplos usuários
+- [x] Remoção automática de subscriptions inválidas (410 Gone)
+- [x] Notificação de pedido confirmado via push
+- [x] Notificação de promoção para todos os subscribers
 
 ## Dependências
 
@@ -35,13 +35,13 @@ VAPID_SUBJECT=mailto:contato@gabinetefc.com.br
 
 ## Tasks
 
-- [ ] Instalar `web-push` e `@types/web-push`
-- [ ] Gerar chaves VAPID: `node -e "const webpush=require('web-push'); console.log(webpush.generateVAPIDKeys())"`
-- [ ] Criar `src/lib/webpush.ts` — instância singleton configurada
-- [ ] Atualizar `src/lib/actions/push.ts` com envio real
-- [ ] Implementar remoção de subscription inválida (status 410)
-- [ ] Integrar envio de push na confirmação de pedido
-- [ ] Adicionar variáveis em `src/env.ts`
+- [x] Instalar `web-push` e `@types/web-push`
+- [x] Gerar chaves VAPID: `node -e "const webpush=require('web-push'); console.log(webpush.generateVAPIDKeys())"`
+- [x] Criar `src/lib/webpush.ts` — instância singleton configurada
+- [x] Atualizar `src/lib/actions/push.ts` com envio real
+- [x] Implementar remoção de subscription inválida (status 410)
+- [x] Integrar envio de push na confirmação de pedido
+- [x] Adicionar variáveis em `src/env.ts`
 
 ## Código de Referência
 

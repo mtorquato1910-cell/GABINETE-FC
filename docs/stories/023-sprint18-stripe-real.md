@@ -1,6 +1,6 @@
 # Story 023 — Sprint 18: Integração Stripe Real
 
-**Status:** Aguardando API Keys
+**Status:** Concluído — 2026-04-16
 **Sprint:** 18
 **Agente:** @dev
 **Prioridade:** Alta (receita)
@@ -11,12 +11,12 @@ Substituir o stub do Stripe por integração real com criação de PaymentIntent
 
 ## Acceptance Criteria
 
-- [ ] `stripe` instalado e configurado
-- [ ] `src/lib/actions/checkout.ts` — criar PaymentIntent real com `stripe.paymentIntents.create`
-- [ ] `src/app/api/stripe/webhook/route.ts` — webhook com `stripe.webhooks.constructEvent` (verificação de assinatura)
-- [ ] Suporte a `payment_intent.succeeded`, `payment_intent.payment_failed`
-- [ ] Atualizar status do pedido automaticamente via webhook
-- [ ] Frontend do checkout enviando `clientSecret` para `Stripe.js`
+- [x] `stripe` instalado e configurado
+- [x] `src/lib/actions/checkout.ts` — criar PaymentIntent real com `stripe.paymentIntents.create`
+- [x] `src/app/api/stripe/webhook/route.ts` — webhook com `stripe.webhooks.constructEvent` (verificação de assinatura)
+- [x] Suporte a `payment_intent.succeeded`, `payment_intent.payment_failed`
+- [x] Atualizar status do pedido automaticamente via webhook
+- [x] Frontend do checkout enviando `clientSecret` para `Stripe.js`
 
 ## Dependências
 
@@ -35,12 +35,12 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 
 ## Tasks
 
-- [ ] Instalar `stripe`, `@stripe/stripe-js`, `@stripe/react-stripe-js`
-- [ ] Criar `src/lib/stripe.ts` — instância singleton do Stripe
-- [ ] Criar `src/app/api/checkout/create-intent/route.ts` — cria PaymentIntent
-- [ ] Atualizar `src/app/api/stripe/webhook/route.ts` — verificação real de assinatura
-- [ ] Atualizar `src/app/checkout/page.tsx` ou `CheckoutClient` — integrar Stripe.js no frontend
-- [ ] Adicionar `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET` no `.env` e `src/env.ts`
+- [x] Instalar `stripe`, `@stripe/stripe-js`, `@stripe/react-stripe-js`
+- [x] Criar `src/lib/stripe.ts` — instância singleton do Stripe
+- [x] Criar `src/app/api/checkout/create-intent/route.ts` — cria PaymentIntent
+- [x] Atualizar `src/app/api/stripe/webhook/route.ts` — verificação real de assinatura
+- [x] Atualizar `src/app/checkout/page.tsx` ou `CheckoutClient` — integrar Stripe.js no frontend
+- [x] Adicionar `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET` no `.env` e `src/env.ts`
 
 ## Código de Referência
 

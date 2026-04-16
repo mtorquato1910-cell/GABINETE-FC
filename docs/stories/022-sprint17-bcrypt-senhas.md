@@ -1,6 +1,6 @@
 # Story 022 — Sprint 17: Segurança de Senhas com bcrypt
 
-**Status:** Aguardando implementação
+**Status:** Concluído — 2026-04-16
 **Sprint:** 17
 **Agente:** @dev
 **Prioridade:** Alta (segurança crítica)
@@ -11,10 +11,10 @@ Substituir o armazenamento de senhas em texto plano por hashing seguro com bcryp
 
 ## Acceptance Criteria
 
-- [ ] Senha hasheada com `bcryptjs` no cadastro de usuário
-- [ ] Comparação correta de senha no login via `bcrypt.compare`
-- [ ] Todas as senhas existentes no banco precisam ser re-hasheadas (script de migração)
-- [ ] Nenhuma senha em texto plano no banco de dados
+- [x] Senha hasheada com `bcryptjs` no cadastro de usuário
+- [x] Comparação correta de senha no login via `bcrypt.compare`
+- [x] Todas as senhas existentes no banco precisam ser re-hasheadas (script de migração)
+- [x] Nenhuma senha em texto plano no banco de dados
 
 ## Dependências
 
@@ -29,10 +29,10 @@ Nenhuma — bcrypt é puro código.
 
 ## Tasks
 
-- [ ] Instalar `bcryptjs` e `@types/bcryptjs`
-- [ ] Atualizar `src/lib/actions/auth.ts` — substituir `// TODO: bcrypt.hash` por implementação real
-- [ ] Atualizar `src/lib/auth.ts` — substituir `// TODO: bcrypt.compare` por implementação real
-- [ ] Criar script de migração para re-hashear senhas existentes (se houver usuários)
+- [x] Instalar `bcryptjs` e `@types/bcryptjs`
+- [x] Atualizar `src/lib/actions/auth.ts` — substituir `// TODO: bcrypt.hash` por implementação real
+- [x] Atualizar `src/lib/auth.ts` — substituir `// TODO: bcrypt.compare` por implementação real
+- [x] Criar script de migração para re-hashear senhas existentes (se houver usuários)
 
 ## Arquivos a Modificar
 

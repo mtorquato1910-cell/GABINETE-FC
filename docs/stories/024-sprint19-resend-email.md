@@ -1,6 +1,6 @@
 # Story 024 — Sprint 19: Email Transacional com Resend
 
-**Status:** Aguardando API Key
+**Status:** Concluído — 2026-04-16
 **Sprint:** 19
 **Agente:** @dev
 **Prioridade:** Alta (comunicação com cliente)
@@ -11,13 +11,13 @@ Substituir todos os stubs de email por envio real usando Resend + React Email. T
 
 ## Acceptance Criteria
 
-- [ ] `resend` e `react-email` instalados
-- [ ] Template de email para confirmação de pedido
-- [ ] Template de email para carrinho abandonado
-- [ ] Template de email para recuperação de senha (forgot password)
-- [ ] Template de email para notificação de envio com código de rastreio
-- [ ] `src/lib/actions/email.ts` com implementação real de todos os métodos
-- [ ] Cron de carrinho abandonado enviando emails reais
+- [x] `resend` e `react-email` instalados
+- [x] Template de email para confirmação de pedido
+- [x] Template de email para carrinho abandonado
+- [x] Template de email para recuperação de senha (forgot password)
+- [x] Template de email para notificação de envio com código de rastreio
+- [x] `src/lib/actions/email.ts` com implementação real de todos os métodos
+- [x] Cron de carrinho abandonado enviando emails reais
 
 ## Dependências
 
@@ -34,13 +34,13 @@ EMAIL_FROM=Gabinete FC <noreply@gabinetefc.com.br>
 
 ## Tasks
 
-- [ ] Instalar `resend`, `@react-email/components`, `@react-email/render`
-- [ ] Criar `src/emails/OrderConfirmation.tsx` — template React Email
-- [ ] Criar `src/emails/AbandonedCart.tsx` — template React Email
-- [ ] Criar `src/emails/ShippingNotification.tsx` — template React Email
-- [ ] Atualizar `src/lib/actions/email.ts` com `resend.emails.send()`
-- [ ] Atualizar `src/app/api/cron/abandoned-cart/route.ts` para usar email real
-- [ ] Adicionar `RESEND_API_KEY` em `src/env.ts`
+- [x] Instalar `resend`, `@react-email/components`, `@react-email/render`
+- [x] Criar `src/emails/OrderConfirmation.tsx` — template React Email
+- [x] Criar `src/emails/AbandonedCart.tsx` — template React Email
+- [x] Criar `src/emails/ShippingNotification.tsx` — template React Email
+- [x] Atualizar `src/lib/actions/email.ts` com `resend.emails.send()`
+- [x] Atualizar `src/app/api/cron/abandoned-cart/route.ts` para usar email real
+- [x] Adicionar `RESEND_API_KEY` em `src/env.ts`
 
 ## Código de Referência
 

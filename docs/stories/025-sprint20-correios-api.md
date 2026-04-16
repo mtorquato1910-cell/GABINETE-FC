@@ -1,6 +1,6 @@
 # Story 025 — Sprint 20: Integração API Correios Real
 
-**Status:** Aguardando credenciais
+**Status:** Concluído — 2026-04-16
 **Sprint:** 20
 **Agente:** @dev
 **Prioridade:** Média (frete)
@@ -11,11 +11,11 @@ Substituir o stub de cálculo de frete dos Correios por integração real com a 
 
 ## Acceptance Criteria
 
-- [ ] Cálculo de frete real para PAC e SEDEX usando API CWS
-- [ ] Rastreamento de encomenda por código de rastreio
-- [ ] CEP de origem configurável via variável de ambiente
-- [ ] Fallback para frete fixo se API indisponível
-- [ ] Cache de consultas de CEP para evitar rate limiting
+- [x] Cálculo de frete real para PAC e SEDEX usando API CWS
+- [x] Rastreamento de encomenda por código de rastreio
+- [x] CEP de origem configurável via variável de ambiente
+- [x] Fallback para frete fixo se API indisponível
+- [x] Cache de consultas de CEP para evitar rate limiting
 
 ## Dependências
 
@@ -33,13 +33,13 @@ CORREIOS_CEP_ORIGEM=01310100        # CEP da loja
 
 ## Tasks
 
-- [ ] Obter credenciais na API CWS: https://cws.correios.com.br
-- [ ] Atualizar `src/lib/actions/correios.ts` com chamadas reais à API
-- [ ] Implementar autenticação OAuth2 da CWS (token Bearer)
-- [ ] Implementar `calcularFrete(cepDestino, produtos)` real
-- [ ] Implementar `rastrearEncomenda(codigoRastreio)` real
-- [ ] Adicionar cache com `unstable_cache` do Next.js para consultas de CEP
-- [ ] Adicionar as variáveis em `src/env.ts`
+- [x] Obter credenciais na API CWS: https://cws.correios.com.br
+- [x] Atualizar `src/lib/actions/correios.ts` com chamadas reais à API
+- [x] Implementar autenticação OAuth2 da CWS (token Bearer)
+- [x] Implementar `calcularFrete(cepDestino, produtos)` real
+- [x] Implementar `rastrearEncomenda(codigoRastreio)` real
+- [x] Adicionar cache com `unstable_cache` do Next.js para consultas de CEP
+- [x] Adicionar as variáveis em `src/env.ts`
 
 ## Endpoints CWS
 
