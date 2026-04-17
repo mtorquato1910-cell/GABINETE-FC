@@ -29,35 +29,41 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (user?.role !== 'admin') redirect('/auth/login')
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-[#050505]">
       {/* Sidebar */}
-      <aside className="w-56 bg-sidebar border-r border-border flex flex-col shrink-0 sticky top-0 h-screen overflow-y-auto">
-        <div className="px-4 py-5 border-b border-border">
+      <aside className="w-52 bg-[#070707] border-r border-[#1a1a1a] flex flex-col shrink-0 sticky top-0 h-screen overflow-y-auto">
+        {/* Logo area */}
+        <div className="px-5 py-5 border-b border-[#1a1a1a]">
           <Logo variant="text" />
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Admin</p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <p className="text-[9px] text-primary uppercase tracking-[0.25em] font-bold">Painel Admin</p>
+          </div>
         </div>
-        <nav className="flex-1 py-4">
+
+        <nav className="flex-1 py-3 overflow-y-auto">
           {navItems.map(({ href, icon: Icon, label }) => (
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary hover:bg-accent/10 transition-colors"
+              className="group flex items-center gap-3 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all duration-150 border-l-2 border-transparent hover:border-primary/50"
             >
-              <Icon className="w-4 h-4 shrink-0" />
+              <Icon className="w-3.5 h-3.5 shrink-0 group-hover:text-primary transition-colors" />
               {label}
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-border">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-2">
+
+        <div className="p-5 border-t border-[#1a1a1a]">
+          <p className="text-[9px] text-muted-foreground uppercase tracking-widest mb-3 font-bold">
             {user?.name ?? 'Admin'}
           </p>
           <Link
             href="/api/auth/signout"
-            className="flex items-center gap-2 text-[10px] text-muted-foreground hover:text-destructive transition-colors uppercase tracking-widest"
+            className="flex items-center gap-2 text-[9px] text-muted-foreground hover:text-destructive transition-colors uppercase tracking-widest font-bold"
           >
             <LogOut className="w-3 h-3" />
-            Sair
+            Encerrar sessão
           </Link>
         </div>
       </aside>

@@ -19,15 +19,26 @@ export default async function HomePage() {
         <HeroSection />
         <MarqueeBanner />
 
-        {/* Destques */}
+        {/* Destaques */}
         <section>
-          <div className="flex justify-between items-center px-4 md:px-6 py-4 border-b border-border">
-            <h2 className="text-xs font-bold uppercase tracking-widest">Destaques</h2>
+          <div className="flex justify-between items-center px-4 md:px-8 py-4 border-b border-[#1a1a1a] bg-[#050505]">
+            <div className="flex items-center gap-4">
+              <h2
+                className="text-2xl md:text-3xl font-black uppercase leading-none"
+                style={{ fontFamily: "'Barlow Condensed', 'Space Grotesk', sans-serif", fontWeight: 900 }}
+              >
+                Destaques
+              </h2>
+              <span className="hidden sm:block text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Seleção da semana
+              </span>
+            </div>
             <Link
               href="/loja"
-              className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest"
+              className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest group flex items-center gap-2"
             >
-              Ver todos →
+              Ver todos
+              <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
             </Link>
           </div>
           <ProductGrid products={featured} showFilters={false} />

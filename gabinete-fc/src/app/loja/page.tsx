@@ -18,10 +18,18 @@ export default async function LojaPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1">
-        <div className="px-4 md:px-6 py-8 border-b border-border">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase">Camisas</h1>
-          <p className="text-muted-foreground text-sm mt-2">
-            Autênticas. Importadas. Entrega para todo o Brasil.
+        <div className="px-4 md:px-8 py-10 border-b border-[#1a1a1a] flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-[#050505]">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">Gabinete FC — Coleção</p>
+            <h1
+              className="text-[clamp(3rem,8vw,6rem)] font-black leading-[0.9] tracking-tight uppercase text-white"
+              style={{ fontFamily: "'Barlow Condensed', 'Space Grotesk', sans-serif", fontWeight: 900 }}
+            >
+              Todas as<br />Camisas.
+            </h1>
+          </div>
+          <p className="text-muted-foreground text-xs uppercase tracking-widest max-w-[28ch] sm:text-right">
+            Autênticas. Importadas.<br />Entrega para todo o Brasil.
           </p>
         </div>
         <ProductGrid products={products} showFilters />
