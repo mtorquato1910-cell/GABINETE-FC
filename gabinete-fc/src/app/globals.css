@@ -13,9 +13,10 @@
   --font-heading: 'Barlow Condensed', 'Space Grotesk', system-ui, sans-serif;
 
   /* Gabinete FC brand colors */
-  --color-gfc-black: #050505;
+  --color-gfc-black: #000000;
   --color-gfc-dark: #0a0a0a;
-  --color-gfc-card: #0f0f0f;
+  --color-gfc-card: #0a0a0a;
+  --color-gfc-card-hover: #121212;
   --color-gfc-border: #1a1a1a;
   --color-gfc-green: #a3e635;
   --color-gfc-green-dark: #84cc16;
@@ -59,25 +60,25 @@
   --radius-xl: calc(var(--radius) * 1.4);
 }
 
-/* Gabinete FC Dark Theme — always dark */
+/* ─── GABINETE FC — TRUE BLACK LUXURY THEME ──────────────────── */
 :root {
-  --background: oklch(0.05 0 0);          /* ~#050505 — ultra dark */
+  --background: oklch(0 0 0);             /* #000000 — True Black */
   --foreground: oklch(0.985 0 0);          /* #FAFAFA — white */
-  --card: oklch(0.09 0 0);                 /* ~#0f0f0f — card bg */
+  --card: oklch(0.04 0 0);                 /* ~#0a0a0a — card bg */
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.08 0 0);
+  --popover: oklch(0.05 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.85 0.22 130);         /* #a3e635 — volt green */
+  --primary: oklch(0.85 0.22 130);         /* #a3e635 — volt green (USE SPARINGLY) */
   --primary-foreground: oklch(0.06 0 0);   /* black on green */
-  --secondary: oklch(0.11 0 0);            /* ~#111 dark secondary */
+  --secondary: oklch(0.07 0 0);            /* ~#0a0a0a dark secondary */
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.14 0 0);
-  --muted-foreground: oklch(0.56 0 0);     /* #737373 */
-  --accent: oklch(0.85 0.22 130);          /* same as primary */
+  --muted: oklch(0.10 0 0);
+  --muted-foreground: oklch(0.50 0 0);     /* 50% white — hierarchy */
+  --accent: oklch(0.85 0.22 130);
   --accent-foreground: oklch(0.06 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.17 0 0);              /* ~#1a1a1a — subtle border */
-  --input: oklch(0.14 0 0);
+  --border: oklch(0.13 0 0);              /* ~#1a1a1a — very subtle border */
+  --input: oklch(0.10 0 0);
   --ring: oklch(0.85 0.22 130);
   --radius: 0px;                           /* sharp corners — editorial */
 
@@ -89,13 +90,13 @@
   --chart-5: oklch(0.25 0.1 130);
 
   /* Sidebar */
-  --sidebar: oklch(0.07 0 0);
+  --sidebar: oklch(0.04 0 0);
   --sidebar-foreground: oklch(0.9 0 0);
   --sidebar-primary: oklch(0.85 0.22 130);
   --sidebar-primary-foreground: oklch(0.06 0 0);
-  --sidebar-accent: oklch(0.11 0 0);
+  --sidebar-accent: oklch(0.08 0 0);
   --sidebar-accent-foreground: oklch(0.9 0 0);
-  --sidebar-border: oklch(0.17 0 0);
+  --sidebar-border: oklch(0.13 0 0);
   --sidebar-ring: oklch(0.85 0.22 130);
 }
 
@@ -113,14 +114,14 @@
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 3px;
+    height: 3px;
   }
   ::-webkit-scrollbar-track {
-    background: oklch(0.05 0 0);
+    background: #000;
   }
   ::-webkit-scrollbar-thumb {
-    background: oklch(0.2 0 0);
+    background: oklch(0.18 0 0);
     border-radius: 0;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -128,38 +129,61 @@
   }
 }
 
-/* ─── HEADING FONT — Barlow Condensed para hero/títulos ─────── */
+/* ─── SELECTION & FOCUS ──────────────────────────────────────── */
+::selection {
+  background: oklch(0.85 0.22 130);
+  color: oklch(0.06 0 0);
+}
+:focus-visible {
+  outline: 1px solid oklch(0.85 0.22 130);
+  outline-offset: 2px;
+}
+
+/* ─── HEADING FONT — Barlow Condensed para hero/títulos ──────── */
 .font-heading,
 h1.hero-title {
   font-family: 'Barlow Condensed', 'Space Grotesk', system-ui, sans-serif;
-  font-weight: 900;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
 }
 
 /* ─── MARQUEE ────────────────────────────────────────────────── */
 @keyframes marquee {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to   { transform: translateX(-50%); }
 }
 .animate-marquee {
-  animation: marquee 30s linear infinite;
+  animation: marquee 35s linear infinite;
 }
 .animate-marquee:hover {
   animation-play-state: paused;
 }
 
-/* ─── PRODUCT CARD IMAGE — sem grayscale, cor total ─────────── */
+/* ─── PRODUCT CARD IMAGE — boutique floating effect ──────────── */
 .product-img {
-  transition: transform 0.5s ease, filter 0.5s ease;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              filter 0.6s ease;
   filter: none;
+  will-change: transform;
 }
 .group:hover .product-img {
-  transform: scale(1.04);
+  transform: scale(1.05);
   filter: none;
 }
 
-/* ─── VOLT GLOW — efeito brilho no verde ─────────────────────── */
+/* ─── PRODUCT CARD — depth hover ────────────────────────────── */
+.product-card {
+  background: #0a0a0a;
+  transition: background-color 0.3s ease;
+}
+.product-card:hover {
+  background: #121212;
+}
+
+/* ─── VOLT GLOW — usar com parcimônia ──────────────────────── */
 .volt-glow {
-  box-shadow: 0 0 20px rgba(163, 230, 53, 0.3);
+  box-shadow: 0 0 20px rgba(163, 230, 53, 0.15);
 }
 
 /* ─── LINE CLAMP UTIL ─────────────────────────────────────────── */
@@ -170,22 +194,18 @@ h1.hero-title {
   overflow: hidden;
 }
 
+/* ─── DOT PULSE ───────────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+.dot-pulse {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
 /* ─── ADMIN NAV ACTIVE STATE ──────────────────────────────────── */
-.admin-nav-link[data-active="true"],
-.admin-nav-link.active {
-  color: oklch(0.985 0 0);
-  border-left-color: oklch(0.85 0.22 130);
-  background: rgba(255,255,255,0.03);
-}
-
-/* ─── SELECTION COLOR — volt green ───────────────────────────── */
-::selection {
-  background: oklch(0.85 0.22 130);
-  color: oklch(0.06 0 0);
-}
-
-/* ─── FOCUS RING — volt green ────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid oklch(0.85 0.22 130);
-  outline-offset: 2px;
+.admin-nav-active {
+  color: #ffffff;
+  border-left-color: #a3e635 !important;
+  background: rgba(163, 230, 53, 0.05);
 }

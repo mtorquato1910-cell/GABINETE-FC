@@ -1,22 +1,22 @@
 export function MarqueeBanner() {
   const items = [
-    'ESTOQUE LIMITADO',
-    'SEM REPOSIÇÃO',
-    'COMPRE AGORA',
-    'VENDAS FINAIS',
-    'PIX COM 5% OFF',
-    'FRETE GRÁTIS ACIMA DE R$500',
-    'EDIÇÕES EXCLUSIVAS',
-    'AUTÊNTICAS E IMPORTADAS',
+    'Estoque Limitado',
+    'Sem Reposição',
+    'Compre Agora',
+    'Pix com 5% Off',
+    'Frete Grátis acima de R$500',
+    'Edições Exclusivas',
+    'Autênticas e Importadas',
+    'Vendas Finais',
   ]
 
   return (
-    <div className="w-full overflow-hidden border-b border-[#1a1a1a] bg-primary text-primary-foreground py-2.5 flex items-center whitespace-nowrap select-none">
+    <div className="w-full overflow-hidden border-b border-[#1a1a1a] bg-[#0a0a0a] py-2 flex items-center whitespace-nowrap select-none">
       <div className="animate-marquee flex items-center gap-0">
         {[...items, ...items].map((item, i) => (
           <span key={i} className="flex items-center">
-            <span className="text-[11px] font-black uppercase tracking-[0.2em] px-6">{item}</span>
-            <span className="text-primary-foreground/40 text-[8px]">◆</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-white/25 px-8">{item}</span>
+            <span className="text-primary/40 text-[6px]">◆</span>
           </span>
         ))}
       </div>
