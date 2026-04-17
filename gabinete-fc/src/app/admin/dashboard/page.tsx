@@ -60,7 +60,7 @@ export default async function DashboardPage() {
       {/* Page Header */}
       <div className="px-8 py-6 border-b border-[#1a1a1a] flex items-end justify-between">
         <div>
-          <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-white/30 mb-1">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-white/30 mb-1">
             Gabinete FC — Painel
           </p>
           <h1
@@ -74,7 +74,7 @@ export default async function DashboardPage() {
             Dashboard
           </h1>
         </div>
-        <div className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-bold hidden sm:block">
+        <div className="text-xs text-white/30 uppercase tracking-[0.2em] font-bold hidden sm:block">
           {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date())}
         </div>
       </div>
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[#111] mb-8">
           {kpis.map((kpi) => (
             <div key={kpi.label} className="bg-[#0a0a0a] p-6 hover:bg-[#111] transition-colors duration-200">
-              <p className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] mb-4">
+              <p className="text-xs font-bold text-white/40 uppercase tracking-[0.2em] mb-4">
                 {kpi.label}
               </p>
               <p
@@ -94,10 +94,10 @@ export default async function DashboardPage() {
                 {kpi.value}
               </p>
               <div className="flex items-center gap-2">
-                <span className={`text-[9px] font-bold uppercase tracking-[0.1em] ${kpi.trendUp ? 'text-primary' : 'text-yellow-400'}`}>
+                <span className={`text-xs font-bold uppercase tracking-[0.1em] ${kpi.trendUp ? 'text-primary' : 'text-yellow-400'}`}>
                   {kpi.trend}
                 </span>
-                <span className="text-[9px] text-white/30 uppercase tracking-[0.1em]">
+                <span className="text-xs text-white/30 uppercase tracking-[0.1em]">
                   {kpi.sub}
                 </span>
               </div>
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
             </h2>
             <Link
               href="/admin/pedidos"
-              className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] hover:text-white transition-colors"
+              className="text-xs font-bold text-white/30 uppercase tracking-[0.2em] hover:text-white transition-colors"
             >
               Ver todos →
             </Link>
@@ -128,7 +128,7 @@ export default async function DashboardPage() {
                   {['ID', 'Cliente', 'Total', 'Pagamento', 'Status', 'Data'].map((h) => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-[9px] font-bold uppercase tracking-[0.2em] text-white/30"
+                      className="px-6 py-3 text-left text-xs font-bold uppercase tracking-[0.2em] text-white/30"
                     >
                       {h}
                     </th>
@@ -143,25 +143,25 @@ export default async function DashboardPage() {
                       key={order.id}
                       className={`border-b border-[#111] last:border-0 hover:bg-[#111] transition-colors duration-150 ${i % 2 === 0 ? '' : 'bg-[#080808]'}`}
                     >
-                      <td className="px-6 py-4 font-mono text-[10px] text-white/50">
+                      <td className="px-6 py-4 font-mono text-xs text-white/50">
                         #{order.id.slice(-8).toUpperCase()}
                       </td>
                       <td className="px-6 py-4">
                         <p className="text-[11px] font-bold text-white/90">{order.user.name ?? '—'}</p>
-                        <p className="text-[9px] text-white/30 normal-case mt-0.5">{order.user.email}</p>
+                        <p className="text-xs text-white/30 normal-case mt-0.5">{order.user.email}</p>
                       </td>
                       <td className="px-6 py-4 text-[11px] font-bold text-white">
                         {formatPrice(order.total)}
                       </td>
-                      <td className="px-6 py-4 text-[9px] text-white/40 uppercase tracking-[0.1em]">
+                      <td className="px-6 py-4 text-xs text-white/40 uppercase tracking-[0.1em]">
                         {order.paymentMethod}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] ${st.color} ${st.bg}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 text-xs font-bold uppercase tracking-[0.1em] ${st.color} ${st.bg}`}>
                           {st.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-[9px] text-white/30 font-mono">
+                      <td className="px-6 py-4 text-xs text-white/30 font-mono">
                         {new Intl.DateTimeFormat('pt-BR').format(order.createdAt)}
                       </td>
                     </tr>
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
                 })}
                 {recentOrders.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-[10px] text-white/20 uppercase tracking-[0.2em]">
+                    <td colSpan={6} className="px-6 py-16 text-center text-xs text-white/20 uppercase tracking-[0.2em]">
                       Nenhum pedido ainda.
                     </td>
                   </tr>

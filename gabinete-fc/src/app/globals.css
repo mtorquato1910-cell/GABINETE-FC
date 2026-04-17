@@ -107,15 +107,19 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Space Grotesk', system-ui, sans-serif;
-    /* Renderização nítida no Windows — subpixel é mais legível que antialiased */
+    /* Renderização nítida — sem antialiased que deixa texto borrado no Windows */
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: auto;
-    text-rendering: optimizeLegibility;
+    text-rendering: geometricPrecision;
+    font-size: 14px;
   }
   html {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: auto;
+    font-size: 16px;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
   }
 
   /* Custom scrollbar */

@@ -10,7 +10,7 @@ export function Footer() {
         <div className="p-6 md:p-10 border-b md:border-b-0 md:border-r border-[#1a1a1a] flex flex-col justify-between gap-6">
           <div>
             <Logo variant="text" />
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-4 leading-relaxed">
+            <p className="text-xs text-muted-foreground uppercase tracking-widest mt-4 leading-relaxed">
               Camisas de futebol premium.<br />
               Autênticas, importadas, entregues.
             </p>
@@ -32,7 +32,7 @@ export function Footer() {
               { href: '/loja/retro', label: 'Retrô' },
               { href: '/lancamentos', label: 'Drops' },
             ].map(({ href, label }) => (
-              <Link key={href} href={href} className="text-[10px] text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
+              <Link key={href} href={href} className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
                 {label}
               </Link>
             ))}
@@ -49,7 +49,7 @@ export function Footer() {
               { href: '/sobre', label: 'Sobre Nós' },
               { href: '/minha-conta/pedidos', label: 'Meus Pedidos' },
             ].map(({ href, label }) => (
-              <Link key={href} href={href} className="text-[10px] text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
+              <Link key={href} href={href} className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
                 {label}
               </Link>
             ))}
@@ -60,13 +60,13 @@ export function Footer() {
         <div className="p-6 md:p-10">
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary mb-5">Contato</p>
           <div className="flex flex-col gap-3">
-            <a href="mailto:contato@gabinetefc.com.br" className="text-[10px] text-muted-foreground hover:text-primary transition-colors normal-case font-bold tracking-wide">
+            <a href="mailto:contato@gabinetefc.com.br" className="text-xs text-muted-foreground hover:text-primary transition-colors normal-case font-bold tracking-wide">
               contato@gabinetefc.com.br
             </a>
-            <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
+            <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
               WhatsApp
             </a>
-            <a href="https://instagram.com/gabinetefc" target="_blank" rel="noopener noreferrer" className="text-[10px] text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
+            <a href="https://instagram.com/gabinetefc" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
               @gabinetefc
             </a>
           </div>

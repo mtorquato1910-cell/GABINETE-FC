@@ -34,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Badge — verde com texto preto, igual ao Lovable */}
       {product.badge && (
-        <div className="absolute top-3 left-3 z-10 text-[10px] font-black px-2.5 py-1 uppercase tracking-wider bg-primary text-primary-foreground">
+        <div className="absolute top-3 left-3 z-10 text-xs font-black px-2.5 py-1 uppercase tracking-wider bg-primary text-primary-foreground">
           {product.badge}
         </div>
       )}
@@ -42,7 +42,7 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Esgotado overlay */}
       {isOutOfStock && (
         <div className="absolute inset-0 z-20 bg-black/70 flex items-center justify-center pointer-events-none">
-          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 border border-white/10 px-3 py-1">
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/40 border border-white/10 px-3 py-1">
             Esgotado
           </span>
         </div>
@@ -68,11 +68,11 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="px-5 py-5 flex flex-col gap-4 flex-grow bg-[#0a0a0a] group-hover:bg-[#121212] transition-colors duration-300">
         <div>
           <Link href={`/produto/${product.slug}`}>
-            <h3 className="text-[11px] font-bold uppercase tracking-wide leading-snug text-white/90 hover:text-white transition-colors duration-200">
+            <h3 className="text-xs font-bold uppercase tracking-wide leading-snug text-white/90 hover:text-white transition-colors duration-200">
               {product.name}
             </h3>
           </Link>
-          <p className="text-[10px] text-white/40 uppercase tracking-[0.15em] mt-1 font-medium">
+          <p className="text-xs text-white/40 uppercase tracking-[0.15em] mt-1 font-medium">
             {product.team}
           </p>
         </div>
@@ -84,7 +84,7 @@ export function ProductCard({ product }: ProductCardProps) {
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`min-w-[30px] h-7 px-1.5 text-[9px] font-bold uppercase transition-all duration-150 ${
+                className={`min-w-[30px] h-7 px-1.5 text-xs font-bold uppercase transition-all duration-150 ${
                   selectedSize === size
                     ? 'bg-white text-black'
                     : 'border border-white/10 text-white/40 hover:border-white/30 hover:text-white/70'
@@ -100,7 +100,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex justify-between items-end mt-auto">
           <div className="flex flex-col">
             {product.originalPrice && (
-              <span className="text-[9px] text-white/25 line-through leading-none mb-1">
+              <span className="text-xs text-white/25 line-through leading-none mb-1">
                 R$ {product.originalPrice.toFixed(2)}
               </span>
             )}
@@ -112,7 +112,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {!isOutOfStock && (
             <button
               onClick={handleAdd}
-              className="text-[9px] font-bold uppercase tracking-[0.15em] px-4 py-2.5 border border-white/15 text-white/50 hover:border-white/40 hover:text-white hover:bg-white/5 transition-all duration-200"
+              className="text-xs font-bold uppercase tracking-[0.15em] px-4 py-2.5 border border-white/15 text-white/50 hover:border-white/40 hover:text-white hover:bg-white/5 transition-all duration-200"
             >
               + Add
             </button>

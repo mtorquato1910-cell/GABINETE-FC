@@ -21,7 +21,7 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
       <Logo variant="text" />
 
       {/* Desktop nav — igual Lovable: DROPS CAMISAS CADASTRO */}
-      <div className="hidden md:flex items-center gap-10 text-[11px] font-bold uppercase tracking-widest text-white">
+      <div className="hidden md:flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-white">
         <Link href="/lancamentos" className="hover:text-primary transition-colors duration-150">
           Drops
         </Link>
@@ -53,7 +53,7 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
 
         <Link
           href="/carrinho"
-          className="text-[11px] font-bold uppercase tracking-widest text-white hover:text-primary transition-colors duration-150"
+          className="text-xs font-bold uppercase tracking-widest text-white hover:text-primary transition-colors duration-150"
         >
           [ CART: {String(totalItems).padStart(2, '0')} ]
         </Link>
@@ -69,7 +69,7 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="absolute top-full left-0 right-0 bg-black border-b border-[#1a1a1a] flex flex-col text-[11px] font-bold uppercase tracking-widest md:hidden z-50">
+        <div className="absolute top-full left-0 right-0 bg-black border-b border-[#1a1a1a] flex flex-col text-xs font-bold uppercase tracking-widest md:hidden z-50">
           {[
             { href: '/lancamentos', label: 'Drops' },
             { href: '/loja', label: 'Camisas' },

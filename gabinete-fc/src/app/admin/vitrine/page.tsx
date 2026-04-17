@@ -117,12 +117,12 @@ export default async function VitrineAdminPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-xs font-bold uppercase tracking-wide truncate">{product.name}</p>
                       {product.badge && (
-                        <span className="text-[9px] bg-primary text-primary-foreground px-1.5 py-0.5 font-bold uppercase tracking-wider shrink-0">
+                        <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 font-bold uppercase tracking-wider shrink-0">
                           {product.badge}
                         </span>
                       )}
                       {isTopSeller && (
-                        <span className="text-[9px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 font-bold uppercase tracking-wider border border-yellow-500/30 shrink-0">
+                        <span className="text-xs bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 font-bold uppercase tracking-wider border border-yellow-500/30 shrink-0">
                           🔥 Mais vendido
                         </span>
                       )}
