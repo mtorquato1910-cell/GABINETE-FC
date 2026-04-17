@@ -11,12 +11,10 @@ export function Logo({ variant = 'full', className = '' }: LogoProps) {
     return (
       <Link href="/" className={`flex items-center ${className}`}>
         <span
-          className="text-2xl md:text-3xl leading-none uppercase"
+          className="text-2xl md:text-3xl leading-none uppercase text-primary"
           style={{ fontFamily: "'Barlow Condensed', 'Space Grotesk', sans-serif", fontWeight: 900, letterSpacing: '-0.01em' }}
         >
-          <span className="text-foreground">GABINETE</span>
-          <span className="text-primary">//</span>
-          <span className="text-foreground">FC</span>
+          GABINETE//FC
         </span>
       </Link>
     )

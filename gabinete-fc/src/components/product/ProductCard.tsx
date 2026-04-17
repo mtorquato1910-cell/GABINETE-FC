@@ -32,9 +32,9 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="product-card group flex flex-col relative overflow-hidden">
 
-      {/* Badge — mínimo e elegante */}
+      {/* Badge — verde com texto preto, igual ao Lovable */}
       {product.badge && (
-        <div className="absolute top-4 left-4 z-10 text-[9px] font-bold px-2 py-0.5 uppercase tracking-[0.15em] bg-black/80 text-white/70 border border-white/10">
+        <div className="absolute top-3 left-3 z-10 text-[10px] font-black px-2.5 py-1 uppercase tracking-wider bg-primary text-primary-foreground">
           {product.badge}
         </div>
       )}

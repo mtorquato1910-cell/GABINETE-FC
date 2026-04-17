@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Search, Menu, X, ShoppingCart, User, Shield } from 'lucide-react'
+import { Search, Menu, X } from 'lucide-react'
 import { Logo } from './Logo'
 import { useCartStore } from '@/stores/cart-store'
 
@@ -16,72 +16,50 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
   const totalItems = useCartStore((s) => s.totalItems())
 
   return (
-    <nav className="flex justify-between items-center px-4 md:px-8 py-0 border-b border-[#1a1a1a] sticky top-0 bg-[#050505]/98 backdrop-blur-md z-50 h-14 md:h-16">
+    <nav className="flex justify-between items-center px-6 md:px-8 py-4 border-b border-[#1a1a1a] sticky top-0 bg-black z-50">
+      {/* Logo */}
       <Logo variant="text" />
 
-      {/* Desktop nav */}
-      <div className="hidden md:flex gap-0 text-[11px] font-bold uppercase tracking-widest h-full">
-        {[
-          { href: '/lancamentos', label: 'Drops', highlight: true },
-          { href: '/loja', label: 'Camisas' },
-          { href: '/loja/selecoes', label: 'Seleções' },
-          { href: '/loja/clubes-europeus', label: 'Clubes' },
-          { href: '/loja/retro', label: 'Retrô' },
-        ].map(({ href, label, highlight }) => (
-          <Link
-            key={href}
-            href={href}
-            className={`flex items-center px-5 h-full border-l border-[#1a1a1a] transition-colors duration-150 hover:text-primary hover:bg-white/[0.02] ${
-              highlight ? 'text-primary' : 'text-muted-foreground'
-            }`}
-          >
-            {label}
+      {/* Desktop nav — igual Lovable: DROPS CAMISAS CADASTRO */}
+      <div className="hidden md:flex items-center gap-10 text-[11px] font-bold uppercase tracking-widest text-white">
+        <Link href="/lancamentos" className="hover:text-primary transition-colors duration-150">
+          Drops
+        </Link>
+        <Link href="/loja" className="hover:text-primary transition-colors duration-150">
+          Camisas
+        </Link>
+        {isAdmin && (
+          <Link href="/admin" className="text-primary hover:text-primary/80 transition-colors duration-150">
+            Admin
           </Link>
-        ))}
+        )}
+        <Link
+          href={isLoggedIn ? '/minha-conta' : '/auth/login'}
+          className="hover:text-primary transition-colors duration-150"
+        >
+          {isLoggedIn ? (userName?.split(' ')[0] ?? 'Conta') : 'Cadastro'}
+        </Link>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-0 items-center h-full">
+      <div className="flex items-center gap-6">
         <Link
           href="/busca"
-          className="hidden md:flex items-center justify-center w-12 h-full border-l border-[#1a1a1a] text-muted-foreground hover:text-primary transition-colors duration-150"
+          className="hidden md:flex text-white hover:text-primary transition-colors duration-150"
           aria-label="Buscar"
         >
           <Search className="w-4 h-4" />
         </Link>
 
-        {isAdmin && (
-          <Link
-            href="/admin"
-            className="hidden md:flex items-center justify-center w-12 h-full border-l border-[#1a1a1a] text-primary hover:bg-primary/10 transition-colors duration-150"
-            aria-label="Admin"
-          >
-            <Shield className="w-4 h-4" />
-          </Link>
-        )}
-
-        <Link
-          href="/minha-conta"
-          className="hidden md:flex items-center justify-center gap-1.5 px-4 h-full border-l border-[#1a1a1a] text-muted-foreground hover:text-primary transition-colors duration-150"
-        >
-          <User className="w-4 h-4 shrink-0" />
-          {isLoggedIn && userName && (
-            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
-              {userName.split(' ')[0]}
-            </span>
-          )}
-        </Link>
-
         <Link
           href="/carrinho"
-          className="flex items-center justify-center gap-1.5 px-4 h-full border-l border-[#1a1a1a] text-muted-foreground hover:text-primary transition-colors duration-150 text-[11px] font-bold uppercase tracking-widest"
+          className="text-[11px] font-bold uppercase tracking-widest text-white hover:text-primary transition-colors duration-150"
         >
-          <ShoppingCart className="w-4 h-4 shrink-0" />
-          <span className="tabular-nums">[{String(totalItems).padStart(2, '0')}]</span>
+          [ CART: {String(totalItems).padStart(2, '0')} ]
         </Link>
 
         <button
-          className="flex md:hidden items-center justify-center w-12 h-full border-l border-[#1a1a1a] text-muted-foreground hover:text-primary transition-colors"
+          className="flex md:hidden text-white hover:text-primary transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Menu"
         >
@@ -91,24 +69,19 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="absolute top-full left-0 right-0 bg-[#050505] border-b border-[#1a1a1a] flex flex-col text-[11px] font-bold uppercase tracking-widest md:hidden z-50">
+        <div className="absolute top-full left-0 right-0 bg-black border-b border-[#1a1a1a] flex flex-col text-[11px] font-bold uppercase tracking-widest md:hidden z-50">
           {[
-            { href: '/lancamentos', label: 'Drops', highlight: true },
+            { href: '/lancamentos', label: 'Drops' },
             { href: '/loja', label: 'Camisas' },
-            { href: '/loja/selecoes', label: 'Seleções' },
-            { href: '/loja/clubes-europeus', label: 'Clubes' },
-            { href: '/loja/retro', label: 'Retrô' },
             { href: '/busca', label: 'Buscar' },
-            { href: '/minha-conta', label: isLoggedIn ? 'Minha Conta' : 'Login' },
-            ...(isAdmin ? [{ href: '/admin', label: 'Painel Admin', highlight: false }] : []),
-          ].map(({ href, label, highlight }) => (
+            { href: isLoggedIn ? '/minha-conta' : '/auth/login', label: isLoggedIn ? 'Minha Conta' : 'Cadastro' },
+            ...(isAdmin ? [{ href: '/admin', label: 'Admin' }] : []),
+          ].map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               onClick={() => setMobileOpen(false)}
-              className={`px-6 py-4 border-b border-[#1a1a1a] last:border-0 transition-colors hover:text-primary hover:bg-white/[0.02] ${
-                highlight ? 'text-primary' : 'text-muted-foreground'
-              }`}
+              className="px-6 py-4 border-b border-[#1a1a1a] last:border-0 text-white hover:text-primary transition-colors"
             >
               {label}
             </Link>

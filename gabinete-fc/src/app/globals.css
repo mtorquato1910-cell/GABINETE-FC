@@ -105,11 +105,17 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
     font-family: 'Space Grotesk', system-ui, sans-serif;
+    /* Renderização nítida no Windows — subpixel é mais legível que antialiased */
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    text-rendering: optimizeLegibility;
   }
   html {
     font-family: 'Space Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
   }
 
   /* Custom scrollbar */
