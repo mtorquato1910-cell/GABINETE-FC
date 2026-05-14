@@ -24,8 +24,8 @@ export default function RegisterPage() {
         setErrors(result.error as Record<string, string[]>)
         toast.error('Verifique os campos')
       } else {
-        toast.success('Conta criada! Faça login.')
-        router.push('/auth/login')
+        toast.success('Conta criada! Verifique seu email para ativar.')
+        router.push('/auth/login?verifique=1')
       }
     })
   }

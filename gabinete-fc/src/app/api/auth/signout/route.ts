@@ -1,7 +1,14 @@
 import { signOut } from '@/lib/auth'
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export async function GET() {
-  await signOut({ redirect: false })
-  return NextResponse.redirect(new URL('/', process.env.NEXTAUTH_URL ?? 'http://localhost:3000'))
+export async function GET(request: NextRequest) {
+  await signOut()
+  const origin = new URL(request.url).origin
+  return NextResponse.redirect(`${origin}/`)
+}
+
+export async function POST(request: NextRequest) {
+  await signOut()
+  const origin = new URL(request.url).origin
+  return NextResponse.redirect(`${origin}/`)
 }

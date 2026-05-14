@@ -1,10 +1,10 @@
 'use client'
 import { Suspense, useState, useTransition } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/layout/Logo'
 import { toast } from 'sonner'
+import { loginUser } from '@/lib/actions/auth'
 
 function LoginForm() {
   const router = useRouter()
@@ -16,13 +16,9 @@ function LoginForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     startTransition(async () => {
-      const result = await signIn('credentials', {
-        email: form.email,
-        password: form.password,
-        redirect: false,
-      })
-      if (result?.error) {
-        toast.error('Email ou senha incorretos')
+      const result = await loginUser({ email: form.email, password: form.password })
+      if ('error' in result) {
+        toast.error(result.error)
       } else {
         toast.success('Bem-vindo!')
         router.push(callbackUrl)
