@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer'
 
 const navItems = [
   { href: '/minha-conta', label: 'Dashboard' },
+  { href: '/minha-conta/dados-pessoais', label: 'Meus Dados' },
   { href: '/minha-conta/pedidos', label: 'Pedidos' },
   { href: '/minha-conta/rastreio', label: 'Rastrear' },
   { href: '/minha-conta/carrinho-abandonado', label: 'Carrinho' },

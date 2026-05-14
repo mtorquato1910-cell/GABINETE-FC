@@ -121,9 +121,14 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
 
         <Link
           href="/carrinho"
-          className="text-xs font-bold uppercase tracking-widest text-white hover:text-primary transition-colors duration-150"
+          className="text-xs font-bold uppercase tracking-widest text-white hover:text-primary transition-colors duration-150 flex items-center gap-1.5"
         >
-          [ CART: {String(totalItems).padStart(2, '0')} ]
+          Carrinho
+          {totalItems > 0 && (
+            <span className="bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 leading-none">
+              {totalItems}
+            </span>
+          )}
         </Link>
 
         {/* Account icon (desktop) */}

@@ -275,7 +275,7 @@ export function ProductDetailClient({ product }: Props) {
           <div className="grid grid-cols-2 gap-4 text-xs uppercase tracking-wider text-muted-foreground border-t border-border pt-6">
             <div>
               <span className="text-foreground font-bold block mb-1">Frete</span>
-              Grátis acima de R$ 500
+              <span className="text-primary">Grátis sempre</span>
             </div>
             <div>
               <span className="text-foreground font-bold block mb-1">Troca</span>

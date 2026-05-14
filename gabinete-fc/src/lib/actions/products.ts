@@ -31,12 +31,12 @@ export async function getActiveProducts(): Promise<Product[]> {
   )
 }
 
-// Busca produtos em destaque
+// Busca produtos em destaque — ordenados por featuredOrder (1 = primeiro)
 export async function getFeaturedProducts(): Promise<Product[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true, isFeatured: true },
-    orderBy: { createdAt: 'desc' },
-    take: 6,
+    orderBy: [{ featuredOrder: 'asc' }, { createdAt: 'desc' }],
+    take: 8,
   })
 
   return Promise.all(

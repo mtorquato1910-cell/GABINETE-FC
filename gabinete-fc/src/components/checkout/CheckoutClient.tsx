@@ -5,8 +5,10 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { useCartStore } from '@/stores/cart-store'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 import { saveAddress, createOrder, validateCoupon } from '@/lib/actions/checkout'
 import { formatPrice } from '@/lib/db-helpers'
+import { lookupCep } from '@/lib/cep'
 import { PaymentForm } from './PaymentForm'
 import type { Address } from '@/types'
 
@@ -46,9 +48,11 @@ export function CheckoutClient({ existingAddresses }: Props) {
   // ─── Estado de pagamento ───
   const [orderId, setOrderId] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [cepLoading, setCepLoading] = useState(false)
+  const [addrErrors, setAddrErrors] = useState<Record<string, string[]>>({})
 
   const subtotal = totalPrice()
-  const freight = subtotal >= 500 ? 0 : 29.9
+  const freight = 0 // Política Gabinete FC: frete sempre grátis (Sprint 6)
   const total = subtotal + freight - couponDiscount
   const itemCount = items.reduce((acc, i) => acc + i.quantity, 0)
 
@@ -69,7 +73,28 @@ export function CheckoutClient({ existingAddresses }: Props) {
     })
   }
 
+  const handleCepBlur = async () => {
+    const digits = newAddr.zipCode.replace(/\D/g, '')
+    if (digits.length !== 8) return
+    setCepLoading(true)
+    const result = await lookupCep(digits)
+    setCepLoading(false)
+    if (result) {
+      setNewAddr((a) => ({
+        ...a,
+        street: a.street || result.street,
+        neighborhood: a.neighborhood || result.neighborhood,
+        city: a.city || result.city,
+        state: a.state || result.state,
+      }))
+      toast.success('Endereço preenchido pelo CEP')
+    } else {
+      toast.warning('CEP não encontrado — preencha manualmente')
+    }
+  }
+
   const handleSaveNewAddress = async () => {
+    setAddrErrors({})
     const result = await saveAddress({
       ...newAddr,
       zipCode: newAddr.zipCode.replace(/\D/g, ''),
@@ -77,7 +102,11 @@ export function CheckoutClient({ existingAddresses }: Props) {
       recipientPhone: newAddr.recipientPhone.replace(/\D/g, ''),
     })
     if ('error' in result) {
-      toast.error('Verifique CPF, telefone e endereço')
+      const fieldErrors = result.error as Record<string, string[]>
+      setAddrErrors(fieldErrors)
+      const firstKey = Object.keys(fieldErrors)[0]
+      const firstMsg = fieldErrors[firstKey]?.[0] ?? 'Verifique os dados'
+      toast.error(firstMsg)
       return null
     }
     return result.addressId
@@ -144,7 +173,17 @@ export function CheckoutClient({ existingAddresses }: Props) {
     })
   }
 
-  const inputClass = 'bg-secondary border border-border px-3 py-2 text-sm focus:outline-none focus:border-primary placeholder:text-muted-foreground normal-case tracking-normal w-full'
+  // Estilo dinâmico: cinza vazio · verde quando preenchido/focado · vermelho com erro
+  const inputClassFor = (value: string, fieldName?: string) => {
+    const filled = value.trim().length > 0
+    const hasError = fieldName ? !!addrErrors[fieldName]?.[0] : false
+    const border = hasError
+      ? 'border-destructive focus:border-destructive'
+      : filled
+        ? 'border-primary/40 focus:border-primary'
+        : 'border-border focus:border-primary'
+    return `bg-secondary border ${border} px-3 py-2 text-sm focus:outline-none placeholder:text-muted-foreground normal-case tracking-normal w-full transition-colors`
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -188,52 +227,57 @@ export function CheckoutClient({ existingAddresses }: Props) {
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   <div className="col-span-2">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Nome do destinatário</label>
-                    <input value={newAddr.recipientName} onChange={e => setNewAddr(a => ({...a, recipientName: e.target.value}))} placeholder="Nome completo" className={inputClass} />
+                    <input value={newAddr.recipientName} onChange={e => setNewAddr(a => ({...a, recipientName: e.target.value}))} placeholder="Nome completo" className={inputClassFor(newAddr.recipientName, 'recipientName')} />
+                    {addrErrors.recipientName?.map((err) => <p key={err} className="text-[10px] text-destructive normal-case mt-1">{err}</p>)}
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">CPF *</label>
-                    <input value={newAddr.recipientCpf} onChange={e => setNewAddr(a => ({...a, recipientCpf: maskCpf(e.target.value)}))} placeholder="000.000.000-00" maxLength={14} className={inputClass} />
+                    <input value={newAddr.recipientCpf} onChange={e => setNewAddr(a => ({...a, recipientCpf: maskCpf(e.target.value)}))} placeholder="000.000.000-00" maxLength={14} className={inputClassFor(newAddr.recipientCpf, 'recipientCpf')} />
+                    {addrErrors.recipientCpf?.map((err) => <p key={err} className="text-[10px] text-destructive normal-case mt-1">{err}</p>)}
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Telefone *</label>
-                    <input value={newAddr.recipientPhone} onChange={e => setNewAddr(a => ({...a, recipientPhone: maskPhone(e.target.value)}))} placeholder="(00) 00000-0000" maxLength={15} className={inputClass} />
+                    <input value={newAddr.recipientPhone} onChange={e => setNewAddr(a => ({...a, recipientPhone: maskPhone(e.target.value)}))} placeholder="(00) 00000-0000" maxLength={15} className={inputClassFor(newAddr.recipientPhone, 'recipientPhone')} />
+                    {addrErrors.recipientPhone?.map((err) => <p key={err} className="text-[10px] text-destructive normal-case mt-1">{err}</p>)}
                   </div>
                   <div className="col-span-2">
                     <p className="text-[10px] text-muted-foreground normal-case">
-                      * CPF e telefone são obrigatórios para o despacho internacional.
+                      * CPF e telefone são obrigatórios para o despacho.
                     </p>
                   </div>
-                  <div>
+                  <div className="relative">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">CEP</label>
-                    <input value={newAddr.zipCode} onChange={e => setNewAddr(a => ({...a, zipCode: e.target.value}))} placeholder="00000000" maxLength={8} className={inputClass} />
+                    <input value={newAddr.zipCode} onChange={e => setNewAddr(a => ({...a, zipCode: e.target.value.replace(/\D/g,'').slice(0,8)}))} onBlur={handleCepBlur} placeholder="00000000" maxLength={8} className={inputClassFor(newAddr.zipCode, 'zipCode')} />
+                    {cepLoading && <Loader2 className="absolute right-2 top-[34px] w-3 h-3 animate-spin text-primary" />}
+                    {addrErrors.zipCode?.map((err) => <p key={err} className="text-[10px] text-destructive normal-case mt-1">{err}</p>)}
                   </div>
                   <div className="col-span-2">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Rua</label>
-                    <input value={newAddr.street} onChange={e => setNewAddr(a => ({...a, street: e.target.value}))} className={inputClass} />
+                    <input value={newAddr.street} onChange={e => setNewAddr(a => ({...a, street: e.target.value}))} className={inputClassFor(newAddr.street, 'street')} />
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Número</label>
-                    <input value={newAddr.number} onChange={e => setNewAddr(a => ({...a, number: e.target.value}))} className={inputClass} />
+                    <input value={newAddr.number} onChange={e => setNewAddr(a => ({...a, number: e.target.value}))} className={inputClassFor(newAddr.number, 'number')} />
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Complemento</label>
-                    <input value={newAddr.complement} onChange={e => setNewAddr(a => ({...a, complement: e.target.value}))} placeholder="Opcional" className={inputClass} />
+                    <input value={newAddr.complement} onChange={e => setNewAddr(a => ({...a, complement: e.target.value}))} placeholder="Opcional" className={inputClassFor(newAddr.complement)} />
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Bairro</label>
-                    <input value={newAddr.neighborhood} onChange={e => setNewAddr(a => ({...a, neighborhood: e.target.value}))} className={inputClass} />
+                    <input value={newAddr.neighborhood} onChange={e => setNewAddr(a => ({...a, neighborhood: e.target.value}))} className={inputClassFor(newAddr.neighborhood, 'neighborhood')} />
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Cidade</label>
-                    <input value={newAddr.city} onChange={e => setNewAddr(a => ({...a, city: e.target.value}))} className={inputClass} />
+                    <input value={newAddr.city} onChange={e => setNewAddr(a => ({...a, city: e.target.value}))} className={inputClassFor(newAddr.city, 'city')} />
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Estado (UF)</label>
-                    <input value={newAddr.state} onChange={e => setNewAddr(a => ({...a, state: e.target.value.toUpperCase().slice(0,2)}))} maxLength={2} placeholder="SP" className={inputClass} />
+                    <input value={newAddr.state} onChange={e => setNewAddr(a => ({...a, state: e.target.value.toUpperCase().slice(0,2)}))} maxLength={2} placeholder="SP" className={inputClassFor(newAddr.state, 'state')} />
                   </div>
                   {existingAddresses.length > 0 && (
                     <button onClick={() => setShowNewAddress(false)} className="col-span-2 text-xs text-muted-foreground uppercase tracking-widest hover:text-primary text-left">
-                      ← Usar endereço existente
+                      ← Usar endereço cadastrado
                     </button>
                   )}
                 </div>

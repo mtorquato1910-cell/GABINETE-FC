@@ -18,6 +18,8 @@ type Seleção = {
   description: string
   badge?: string
   featured?: boolean
+  featuredOrder?: number // 1, 2, 3… na home
+  type?: 'titular' | 'reserva' | 'terceiro' | 'goleiro'
   supplierCode: string
   confederation: 'CONCACAF' | 'CONMEBOL' | 'CAF' | 'AFC' | 'OFC' | 'UEFA' | 'INTERCONTINENTAL'
 }
@@ -29,8 +31,9 @@ const SELECOES: Seleção[] = [
   { team: 'Canadá', slug: 'camisa-canada-2026', description: 'Camisa I do Canadá, país-sede da Copa 2026. Vermelho vivo com folha de bordo.', supplierCode: 'JIN-CAN-26-T', confederation: 'CONCACAF', badge: 'País-sede' },
 
   // ─── AMÉRICA DO SUL (CONMEBOL) ───
-  { team: 'Brasil', slug: 'camisa-brasil-2026', description: 'A icônica camisa amarela e azul da Seleção Brasileira para a Copa 2026. Tecido premium, idêntica à dos jogadores.', supplierCode: 'JIN-BRA-26-T', confederation: 'CONMEBOL', badge: 'Destaque', featured: true },
-  { team: 'Argentina', slug: 'camisa-argentina-2026', description: 'A albiceleste da campeã do mundo. Listras azul e branca tradicionais para a Copa 2026.', supplierCode: 'JIN-ARG-26-T', confederation: 'CONMEBOL', badge: 'Destaque', featured: true },
+  { team: 'Brasil', slug: 'camisa-brasil-2026', description: 'A icônica camisa amarela e azul da Seleção Brasileira para a Copa 2026. Tecido premium, idêntica à dos jogadores.', supplierCode: 'JIN-BRA-26-T', confederation: 'CONMEBOL', badge: 'Destaque', featured: true, featuredOrder: 1 },
+  { team: 'Brasil', slug: 'camisa-brasil-ii-2026', description: 'Camisa II do Brasil — azul tradicional com detalhes amarelos e verdes. A camisa reserva da Seleção para a Copa 2026.', supplierCode: 'JIN-BRA-26-R', confederation: 'CONMEBOL', badge: 'Destaque', featured: true, featuredOrder: 2, type: 'reserva' },
+  { team: 'Argentina', slug: 'camisa-argentina-2026', description: 'A albiceleste da campeã do mundo. Listras azul e branca tradicionais para a Copa 2026.', supplierCode: 'JIN-ARG-26-T', confederation: 'CONMEBOL', badge: 'Destaque', featured: true, featuredOrder: 5 },
   { team: 'Uruguai', slug: 'camisa-uruguai-2026', description: 'A celeste do Uruguai. Camisa I para a Copa 2026.', supplierCode: 'JIN-URU-26-T', confederation: 'CONMEBOL' },
   { team: 'Colômbia', slug: 'camisa-colombia-2026', description: 'A amarela da Colômbia. Cafeteros para a Copa 2026.', supplierCode: 'JIN-COL-26-T', confederation: 'CONMEBOL' },
   { team: 'Equador', slug: 'camisa-equador-2026', description: 'A tricolor do Equador. La Tri para a Copa 2026.', supplierCode: 'JIN-EQU-26-T', confederation: 'CONMEBOL' },
@@ -66,10 +69,10 @@ const SELECOES: Seleção[] = [
   { team: 'Nova Zelândia', slug: 'camisa-nova-zelandia-2026', description: 'Branco dos All Whites. Camisa I para a Copa 2026.', supplierCode: 'JIN-NZL-26-T', confederation: 'OFC' },
 
   // ─── EUROPA (UEFA) ───
-  { team: 'Inglaterra', slug: 'camisa-inglaterra-2026', description: 'Branco dos Three Lions. Camisa I da Inglaterra para a Copa 2026.', supplierCode: 'JIN-ENG-26-T', confederation: 'UEFA' },
-  { team: 'França', slug: 'camisa-franca-2026', description: 'A icônica camisa azul (com detalhes brancos) dos Bleus para a Copa 2026.', supplierCode: 'JIN-FRA-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true },
+  { team: 'Inglaterra', slug: 'camisa-inglaterra-2026', description: 'Branco dos Three Lions. Camisa I da Inglaterra para a Copa 2026.', supplierCode: 'JIN-ENG-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 6 },
+  { team: 'França', slug: 'camisa-franca-2026', description: 'A icônica camisa azul (com detalhes brancos) dos Bleus para a Copa 2026.', supplierCode: 'JIN-FRA-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 4 },
   { team: 'Espanha', slug: 'camisa-espanha-2026', description: 'Vermelho de La Roja. Camisa I para a Copa 2026.', supplierCode: 'JIN-ESP-26-T', confederation: 'UEFA' },
-  { team: 'Portugal', slug: 'camisa-portugal-2026', description: 'A icônica camisa vermelha da Seleção das Quinas para a Copa 2026.', supplierCode: 'JIN-POR-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true },
+  { team: 'Portugal', slug: 'camisa-portugal-2026', description: 'A icônica camisa vermelha da Seleção das Quinas para a Copa 2026.', supplierCode: 'JIN-POR-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 3 },
   { team: 'Alemanha', slug: 'camisa-alemanha-2026', description: 'Branco da Nationalmannschaft. Camisa I para a Copa 2026.', supplierCode: 'JIN-GER-26-T', confederation: 'UEFA' },
   { team: 'Holanda', slug: 'camisa-holanda-2026', description: 'Laranja da Oranje. Camisa I da Holanda para a Copa 2026.', supplierCode: 'JIN-NED-26-T', confederation: 'UEFA' },
   { team: 'Bélgica', slug: 'camisa-belgica-2026', description: 'Vinho dos Diabos Vermelhos. Camisa I para a Copa 2026.', supplierCode: 'JIN-BEL-26-T', confederation: 'UEFA' },
@@ -170,26 +173,31 @@ async function main() {
     },
   })
 
-  // ─── 48 seleções Copa 2026 ───
+  // ─── Seleções Copa 2026 (49 — Brasil tem I e II) ───
   for (const s of SELECOES) {
     const price = s.featured ? PRICE_FEATURED : PRICE_STANDARD
+    const productType = s.type ?? 'titular'
+    const variant = productType === 'reserva' ? 'II' : productType === 'terceiro' ? 'III' : 'I'
+    const name = `Camisa ${s.team} ${variant} 2026`
+
     await prisma.product.upsert({
       where: { slug: s.slug },
       update: {
-        name: `Camisa ${s.team} I 2026`,
+        name,
         description: s.description,
         price,
         costPrice: COST,
         category: 'selecoes',
         team: s.team,
-        type: 'titular',
+        type: productType,
         badge: s.badge,
         sizesAvailable: SIZES,
         isActive: true,
         isFeatured: !!s.featured,
+        featuredOrder: s.featuredOrder ?? 0,
       },
       create: {
-        name: `Camisa ${s.team} I 2026`,
+        name,
         slug: s.slug,
         description: s.description,
         price,
@@ -197,19 +205,20 @@ async function main() {
         supplierCode: s.supplierCode,
         category: 'selecoes',
         team: s.team,
-        type: 'titular',
+        type: productType,
         badge: s.badge,
         sizesAvailable: SIZES,
         images: JSON.stringify([PLACEHOLDER]),
         isActive: true,
         isFeatured: !!s.featured,
-        metaTitle: `Camisa ${s.team} 2026 | Gabinete FC`,
+        featuredOrder: s.featuredOrder ?? 0,
+        metaTitle: `${name} | Gabinete FC`,
       },
     })
   }
 
-  console.log(`✅ Seed concluído! ${SELECOES.length} seleções da Copa 2026 cadastradas.`)
-  console.log('   Destaques: Brasil · Argentina · França · Portugal (R$ 269,90)')
+  console.log(`✅ Seed concluído! ${SELECOES.length} produtos da Copa 2026 cadastrados.`)
+  console.log('   Destaques (ordem home): Brasil I · Brasil II · Portugal · França · Argentina · Inglaterra (R$ 269,90)')
   console.log('   Catálogo: R$ 249,90')
   console.log('   Cupons criados: PRIMEIRA5 e COPA5 (5% off na 1ª compra, bloqueado p/ 3+ peças)')
 }

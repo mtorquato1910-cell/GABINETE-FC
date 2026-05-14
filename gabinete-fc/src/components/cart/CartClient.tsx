@@ -25,7 +25,7 @@ export function CartClient() {
   }
 
   const subtotal = totalPrice()
-  const frete = subtotal >= 500 ? 0 : 29.9
+  const frete = 0 // Política Gabinete FC: frete sempre grátis (Sprint 6)
   const total = subtotal + frete
 
   return (
@@ -116,13 +116,8 @@ export function CartClient() {
           </div>
           <div className="flex justify-between text-xs uppercase tracking-widest">
             <span className="text-muted-foreground">Frete</span>
-            <span>{frete === 0 ? <span className="text-primary">Grátis</span> : `R$ ${frete.toFixed(2)}`}</span>
+            <span className="text-primary">Grátis</span>
           </div>
-          {frete > 0 && (
-            <p className="text-[10px] text-muted-foreground">
-              Faltam R$ {(500 - subtotal).toFixed(2)} para frete grátis
-            </p>
-          )}
           <div className="flex justify-between text-sm font-bold uppercase tracking-widest border-t border-border pt-4">
             <span>Total</span>
             <span>R$ {total.toFixed(2)}</span>

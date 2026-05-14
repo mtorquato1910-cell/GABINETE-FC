@@ -1,46 +1,42 @@
+import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { EnderecosClient } from './EnderecosClient'
 
 export default async function EnderecosPage() {
   const session = await auth()
-  const userId = (session?.user as { id?: string })?.id
+  if (!session) redirect('/auth/login')
 
-  const addresses = userId
-    ? await prisma.address.findMany({ where: { userId }, orderBy: { isDefault: 'desc' } })
-    : []
+  const addresses = await prisma.address.findMany({
+    where: { userId: session.user.id },
+    orderBy: [{ isDefault: 'desc' }, { id: 'asc' }],
+  })
 
   return (
     <div>
-      <h2 className="text-xs font-bold uppercase tracking-widest mb-6 border-b border-border pb-4">
-        Meus Endereços
-      </h2>
-      {addresses.length === 0 ? (
-        <p className="text-muted-foreground text-xs uppercase tracking-widest">
-          Nenhum endereço cadastrado.
+      <div className="border-b border-border pb-4 mb-6">
+        <h2 className="text-xs font-bold uppercase tracking-widest">Meus Endereços</h2>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1 normal-case">
+          Adicione, edite ou remova endereços de entrega
         </p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {addresses.map((addr) => (
-            <div key={addr.id} className="border border-border p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider mb-1">
-                    {addr.label} {addr.isDefault && <span className="text-primary ml-2">— Padrão</span>}
-                  </p>
-                  <p className="text-xs text-muted-foreground normal-case leading-relaxed">
-                    {addr.street}, {addr.number}{addr.complement ? ` - ${addr.complement}` : ''}<br />
-                    {addr.neighborhood} — {addr.city}/{addr.state}<br />
-                    CEP {addr.zipCode}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-      <p className="text-[10px] text-muted-foreground mt-6 uppercase tracking-widest">
-        Adicionar endereço — disponível no checkout.
-      </p>
+      </div>
+      <EnderecosClient
+        addresses={addresses.map((a) => ({
+          id: a.id,
+          label: a.label,
+          recipientName: a.recipientName,
+          recipientCpf: a.recipientCpf,
+          recipientPhone: a.recipientPhone,
+          zipCode: a.zipCode,
+          street: a.street,
+          number: a.number,
+          complement: a.complement ?? '',
+          neighborhood: a.neighborhood,
+          city: a.city,
+          state: a.state,
+          isDefault: a.isDefault,
+        }))}
+      />
     </div>
   )
 }
