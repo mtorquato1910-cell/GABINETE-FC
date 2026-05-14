@@ -1,10 +1,13 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import { useCartStore } from '@/stores/cart-store'
 import { toast } from 'sonner'
 import { saveAddress, createOrder, validateCoupon } from '@/lib/actions/checkout'
 import { formatPrice } from '@/lib/db-helpers'
+import { PaymentForm } from './PaymentForm'
 import type { Address } from '@/types'
 
 type Step = 'address' | 'review' | 'payment'
@@ -13,15 +16,19 @@ interface Props {
   existingAddresses: Address[]
 }
 
+// Carregamento singleton do Stripe.js
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null
+
 export function CheckoutClient({ existingAddresses }: Props) {
   const router = useRouter()
-  const { items, totalPrice, clearCart } = useCartStore()
+  const { items, totalPrice } = useCartStore()
   const [isPending, startTransition] = useTransition()
   const [step, setStep] = useState<Step>('address')
   const [selectedAddressId, setSelectedAddressId] = useState(
     existingAddresses.find(a => a.isDefault)?.id ?? existingAddresses[0]?.id ?? ''
   )
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'debit_card'>('pix')
   const [couponCode, setCouponCode] = useState('')
   const [couponDiscount, setCouponDiscount] = useState(0)
   const [showNewAddress, setShowNewAddress] = useState(existingAddresses.length === 0)
@@ -30,12 +37,15 @@ export function CheckoutClient({ existingAddresses }: Props) {
     complement: '', neighborhood: '', city: '', state: '', zipCode: '',
   })
 
+  // ─── Estado de pagamento ───
+  const [orderId, setOrderId] = useState<string | null>(null)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+
   const subtotal = totalPrice()
   const freight = subtotal >= 500 ? 0 : 29.9
-  const pixDiscount = paymentMethod === 'pix' ? subtotal * 0.05 : 0
-  const total = subtotal + freight - couponDiscount - pixDiscount
+  const total = subtotal + freight - couponDiscount
 
-  if (items.length === 0) {
+  if (items.length === 0 && !clientSecret) {
     router.push('/carrinho')
     return null
   }
@@ -69,7 +79,8 @@ export function CheckoutClient({ existingAddresses }: Props) {
     setStep('review')
   }
 
-  const handlePlaceOrder = () => {
+  // Cria order + PaymentIntent → entra no step de pagamento
+  const handleProceedToPayment = () => {
     startTransition(async () => {
       let addrId = selectedAddressId
       if (showNewAddress) {
@@ -78,9 +89,10 @@ export function CheckoutClient({ existingAddresses }: Props) {
         addrId = savedId
       }
 
+      // 1) Cria order no banco
       const result = await createOrder({
         addressId: addrId,
-        paymentMethod,
+        paymentMethod: 'credit_card', // Stripe decide a forma final
         couponCode: couponCode || undefined,
         items: items.map(item => ({
           productId: item.product.id,
@@ -98,8 +110,22 @@ export function CheckoutClient({ existingAddresses }: Props) {
         return
       }
 
-      clearCart()
-      router.push(`/checkout/sucesso?orderId=${result.orderId}`)
+      // 2) Cria PaymentIntent na Stripe
+      const intentRes = await fetch('/api/checkout/create-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: result.orderId }),
+      })
+
+      if (!intentRes.ok) {
+        toast.error('Erro ao iniciar pagamento')
+        return
+      }
+
+      const { clientSecret: secret } = await intentRes.json()
+      setOrderId(result.orderId!)
+      setClientSecret(secret)
+      setStep('payment')
     })
   }
 
@@ -221,46 +247,43 @@ export function CheckoutClient({ existingAddresses }: Props) {
                 <button onClick={() => setStep('address')} className="flex-1 py-4 border border-border font-bold text-xs uppercase tracking-widest hover:border-primary hover:text-primary transition-colors">
                   ← Voltar
                 </button>
-                <button onClick={() => setStep('payment')} className="flex-1 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
-                  Pagamento →
+                <button onClick={handleProceedToPayment} disabled={isPending} className="flex-1 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors disabled:opacity-50">
+                  {isPending ? 'Preparando...' : 'Pagamento →'}
                 </button>
               </div>
             </div>
           )}
 
-          {/* Step: Payment */}
-          {step === 'payment' && (
-            <div>
-              <h2 className="text-sm font-bold uppercase tracking-widest mb-6">Forma de Pagamento</h2>
-              <div className="flex flex-col gap-3 mb-8">
-                {[
-                  { value: 'pix', label: 'Pix', desc: '5% de desconto · Pagamento instantâneo' },
-                  { value: 'credit_card', label: 'Cartão de Crédito', desc: 'Até 12x sem juros acima de R$ 300' },
-                  { value: 'debit_card', label: 'Cartão de Débito', desc: 'Desconto de débito' },
-                ].map(opt => (
-                  <label key={opt.value} className={`flex gap-3 p-4 border cursor-pointer transition-colors ${paymentMethod === opt.value ? 'border-primary' : 'border-border hover:border-muted-foreground'}`}>
-                    <input type="radio" value={opt.value} checked={paymentMethod === opt.value} onChange={() => setPaymentMethod(opt.value as typeof paymentMethod)} className="mt-1" />
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider">{opt.label}</p>
-                      <p className="text-[10px] text-muted-foreground">{opt.desc}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-              {paymentMethod === 'pix' && (
-                <div className="bg-secondary border border-border p-4 mb-6 text-xs">
-                  <p className="font-bold uppercase tracking-widest mb-1 text-primary">Pix — 5% de desconto</p>
-                  <p className="text-muted-foreground">Após confirmar, você receberá o QR Code do Pix. Válido por 60 minutos.</p>
-                </div>
-              )}
-              <div className="flex gap-4">
-                <button onClick={() => setStep('review')} className="flex-1 py-4 border border-border font-bold text-xs uppercase tracking-widest hover:border-primary hover:text-primary transition-colors">
-                  ← Voltar
-                </button>
-                <button onClick={handlePlaceOrder} disabled={isPending} className="flex-1 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors disabled:opacity-50">
-                  {isPending ? 'Processando...' : `Confirmar — ${formatPrice(total)}`}
-                </button>
-              </div>
+          {/* Step: Payment com Stripe Elements */}
+          {step === 'payment' && clientSecret && orderId && stripePromise && (
+            <Elements
+              stripe={stripePromise}
+              options={{
+                clientSecret,
+                appearance: {
+                  theme: 'night',
+                  variables: {
+                    colorPrimary: '#ffffff',
+                    colorBackground: '#171717',
+                    colorText: '#ffffff',
+                    colorDanger: '#ef4444',
+                    fontFamily: 'system-ui, sans-serif',
+                    borderRadius: '0px',
+                  },
+                },
+              }}
+            >
+              <PaymentForm
+                orderId={orderId}
+                total={total}
+                onBack={() => setStep('review')}
+              />
+            </Elements>
+          )}
+
+          {step === 'payment' && !stripePromise && (
+            <div className="p-4 border border-destructive text-xs text-destructive">
+              ⚠️ Stripe não configurado. Verifique NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.
             </div>
           )}
         </div>
@@ -272,7 +295,6 @@ export function CheckoutClient({ existingAddresses }: Props) {
             <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatPrice(subtotal)}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>{freight === 0 ? <span className="text-primary">Grátis</span> : formatPrice(freight)}</span></div>
             {couponDiscount > 0 && <div className="flex justify-between text-primary"><span>Cupom</span><span>-{formatPrice(couponDiscount)}</span></div>}
-            {pixDiscount > 0 && <div className="flex justify-between text-primary"><span>Desconto Pix</span><span>-{formatPrice(pixDiscount)}</span></div>}
             <div className="flex justify-between font-bold text-sm border-t border-border pt-3"><span>Total</span><span>{formatPrice(total)}</span></div>
           </div>
         </div>

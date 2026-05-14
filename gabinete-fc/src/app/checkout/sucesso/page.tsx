@@ -5,16 +5,18 @@ import { Footer } from '@/components/layout/Footer'
 import { prisma } from '@/lib/db'
 import { auth } from '@/lib/auth'
 import { formatPrice } from '@/lib/db-helpers'
+import { ClearCartOnSuccess } from '@/components/checkout/ClearCartOnSuccess'
 
 export const metadata: Metadata = { title: 'Pedido Confirmado | Gabinete FC' }
 
 interface Props {
-  searchParams: Promise<{ orderId?: string }>
+  searchParams: Promise<{ orderId?: string; redirect_status?: string }>
 }
 
 export default async function SucessoPage({ searchParams }: Props) {
-  const { orderId } = await searchParams
+  const { orderId, redirect_status } = await searchParams
   const session = await auth()
+  const paymentOk = redirect_status === 'succeeded' || redirect_status === undefined
 
   const order = orderId
     ? await prisma.order.findFirst({
@@ -29,10 +31,15 @@ export default async function SucessoPage({ searchParams }: Props) {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      {paymentOk && <ClearCartOnSuccess />}
       <main className="flex-1 flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center py-16">
-          <div className="text-6xl mb-6 text-primary font-black tracking-tighter">✓</div>
-          <h1 className="text-2xl font-bold uppercase tracking-widest mb-4">Pedido Confirmado</h1>
+          <div className={`text-6xl mb-6 font-black tracking-tighter ${paymentOk ? 'text-primary' : 'text-destructive'}`}>
+            {paymentOk ? '✓' : '✕'}
+          </div>
+          <h1 className="text-2xl font-bold uppercase tracking-widest mb-4">
+            {paymentOk ? 'Pedido Confirmado' : 'Pagamento Falhou'}
+          </h1>
           {order && (
             <>
               <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">

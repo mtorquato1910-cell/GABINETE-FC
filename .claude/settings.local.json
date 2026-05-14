@@ -17,7 +17,9 @@
       "Bash(taskkill:*)",
       "Bash(cmd /c \"taskkill /F /IM node.exe\" 2>&1; echo \"Done\")",
       "Bash(sleep:*)",
-      "Bash(cmd /c \"del /F \\\\\"C:\\\\Users\\\\mathe\\\\OneDrive\\\\Área de Trabalho\\\\GABINETE FC\\\\GABINETE-FC\\\\gabinete-fc\\\\node_modules\\\\.prisma\\\\client\\\\query_engine-windows.dll.node\\\\\"\" 2>&1 && echo \"Deleted\")"
+      "Bash(cmd /c \"del /F \\\\\"C:\\\\Users\\\\mathe\\\\OneDrive\\\\Área de Trabalho\\\\GABINETE FC\\\\GABINETE-FC\\\\gabinete-fc\\\\node_modules\\\\.prisma\\\\client\\\\query_engine-windows.dll.node\\\\\"\" 2>&1 && echo \"Deleted\")",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)"
     ]
   }
 }
