@@ -19,7 +19,15 @@
       "Bash(sleep:*)",
       "Bash(cmd /c \"del /F \\\\\"C:\\\\Users\\\\mathe\\\\OneDrive\\\\Área de Trabalho\\\\GABINETE FC\\\\GABINETE-FC\\\\gabinete-fc\\\\node_modules\\\\.prisma\\\\client\\\\query_engine-windows.dll.node\\\\\"\" 2>&1 && echo \"Deleted\")",
       "Bash(npm install *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(start notepad *)",
+      "Bash(npx prisma *)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx prisma db push --skip-generate)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx prisma db push --force-reset --skip-generate)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npm run db:seed)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"esModuleInterop\":true,\"target\":\"ES2020\"}' prisma/seed.ts)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"esModuleInterop\":true,\"target\":\"ES2020\"}' -e 'import { PrismaClient } from '\\\\''@prisma/client'\\\\''; const p = new PrismaClient\\(\\); \\(async \\(\\) => { const products = await p.product.count\\(\\); const featured = await p.product.count\\({ where: { isFeatured: true } }\\); const coupons = await p.coupon.count\\(\\); const users = await p.user.count\\(\\); console.log\\('\\\\''Produtos:'\\\\'', products\\); console.log\\('\\\\''Destaques:'\\\\'', featured\\); console.log\\('\\\\''Cupons:'\\\\'', coupons\\); console.log\\('\\\\''Usuários:'\\\\'', users\\); await p.$disconnect\\(\\); }\\)\\(\\);')"
     ]
   }
 }

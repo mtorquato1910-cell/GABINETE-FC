@@ -1,14 +1,14 @@
 // Gabinete FC — Prisma Schema
-// Dev: SQLite | Prod: PostgreSQL (Railway)
-// Note: SQLite não tem enums nativos — usar String com validação Zod em runtime
+// PostgreSQL (Supabase) — usa pgbouncer com directUrl pra migrations
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── USUÁRIOS ────────────────────────────────────────────────
