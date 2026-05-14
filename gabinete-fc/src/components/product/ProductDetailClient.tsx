@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ShoppingCart, Check, Search } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import InnerImageZoom from 'react-inner-image-zoom'
 import 'react-inner-image-zoom/lib/styles.min.css'
@@ -25,6 +25,21 @@ export function ProductDetailClient({ product }: Props) {
   const [choice, setChoice] = useState<CustomizationChoice>(null)
   const [customName, setCustomName] = useState('')
   const [customNumber, setCustomNumber] = useState('')
+
+  // Galeria de imagens — índice da imagem atualmente exibida
+  const galleryImages = product.images.length > 0
+    ? product.images
+    : ['/images/products/placeholder-jersey.svg']
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const currentImage = galleryImages[currentImageIndex] ?? galleryImages[0]
+  const hasMultipleImages = galleryImages.length > 1
+
+  const prevImage = () => {
+    setCurrentImageIndex((i) => (i === 0 ? galleryImages.length - 1 : i - 1))
+  }
+  const nextImage = () => {
+    setCurrentImageIndex((i) => (i === galleryImages.length - 1 ? 0 : i + 1))
+  }
 
   const sanitizedName = customName.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, MAX_NAME)
   const sanitizedNumber = customNumber.replace(/\D/g, '').slice(0, 2)
@@ -92,18 +107,20 @@ export function ProductDetailClient({ product }: Props) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-200px)]">
-        {/* Image com lens magnifier (passa o mouse → lupa segue o cursor) */}
-        <div className="bg-secondary p-8 lg:p-16 flex flex-col items-center justify-center min-h-[50vh] relative gap-6">
+        {/* Galeria de imagens + lens magnifier */}
+        <div className="bg-secondary p-6 lg:p-12 flex flex-col items-center justify-center min-h-[50vh] relative gap-4">
+          {/* Imagem principal com lupa */}
           <div className="relative w-full max-w-[600px] gfc-zoom">
             <InnerImageZoom
-              src={product.images[0] || '/images/products/placeholder-jersey.svg'}
-              zoomSrc={product.images[0] || '/images/products/placeholder-jersey.svg'}
+              key={currentImage}
+              src={currentImage}
+              zoomSrc={currentImage}
               zoomType="hover"
               zoomScale={1.6}
               hideHint
               fullscreenOnMobile
               imgAttributes={{
-                alt: product.name,
+                alt: `${product.name} — foto ${currentImageIndex + 1}`,
                 className: 'w-full h-auto object-contain',
               }}
             />
@@ -111,7 +128,55 @@ export function ProductDetailClient({ product }: Props) {
               <Search className="w-3 h-3" />
               Lupa
             </div>
+
+            {/* Setas de navegação (desktop) */}
+            {hasMultipleImages && (
+              <>
+                <button
+                  onClick={prevImage}
+                  aria-label="Foto anterior"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 border border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center z-10"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  aria-label="Próxima foto"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 border border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center z-10"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                {/* Contador */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/70 border border-[#1a1a1a] text-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em]">
+                  {currentImageIndex + 1} / {galleryImages.length}
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Thumbnails */}
+          {hasMultipleImages && (
+            <div className="w-full max-w-[600px] flex gap-2 overflow-x-auto pb-1">
+              {galleryImages.map((src, idx) => (
+                <button
+                  key={src + idx}
+                  onClick={() => setCurrentImageIndex(idx)}
+                  aria-label={`Ver foto ${idx + 1}`}
+                  className={`shrink-0 w-16 h-20 border-2 transition-colors ${
+                    idx === currentImageIndex
+                      ? 'border-primary'
+                      : 'border-[#1a1a1a] hover:border-white/40'
+                  }`}
+                >
+                  <img
+                    src={src}
+                    alt={`Miniatura ${idx + 1}`}
+                    className="w-full h-full object-contain bg-white"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
 
           {choice === 'personalize' && (sanitizedName || sanitizedNumber) && (
             <div className="w-full max-w-xs border border-[#1a1a1a] bg-black p-4 flex flex-col items-center gap-1 transition-opacity">
