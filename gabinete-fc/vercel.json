@@ -1,9 +1,9 @@
 {
   "crons": [
-    { "path": "/api/cron/abandoned-cart", "schedule": "0 * * * *" },
-    { "path": "/api/cron/tracking", "schedule": "0 */6 * * *" },
+    { "path": "/api/cron/abandoned-cart", "schedule": "0 12 * * *" },
+    { "path": "/api/cron/tracking", "schedule": "0 8 * * *" },
     { "path": "/api/cron/expire-points", "schedule": "0 0 * * *" },
-    { "path": "/api/cron/pix-expiry", "schedule": "*/10 * * * *" }
+    { "path": "/api/cron/pix-expiry", "schedule": "0 6 * * *" }
   ],
   "headers": [
     {
