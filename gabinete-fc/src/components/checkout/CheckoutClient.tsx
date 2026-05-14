@@ -33,9 +33,15 @@ export function CheckoutClient({ existingAddresses }: Props) {
   const [couponDiscount, setCouponDiscount] = useState(0)
   const [showNewAddress, setShowNewAddress] = useState(existingAddresses.length === 0)
   const [newAddr, setNewAddr] = useState({
-    label: 'Casa', recipientName: '', street: '', number: '',
-    complement: '', neighborhood: '', city: '', state: '', zipCode: '',
+    label: 'Casa', recipientName: '', recipientCpf: '', recipientPhone: '',
+    street: '', number: '', complement: '', neighborhood: '', city: '', state: '', zipCode: '',
   })
+
+  // Máscaras
+  const maskCpf = (v: string) => v.replace(/\D/g, '').slice(0, 11)
+    .replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+  const maskPhone = (v: string) => v.replace(/\D/g, '').slice(0, 11)
+    .replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 
   // ─── Estado de pagamento ───
   const [orderId, setOrderId] = useState<string | null>(null)
@@ -63,9 +69,14 @@ export function CheckoutClient({ existingAddresses }: Props) {
   }
 
   const handleSaveNewAddress = async () => {
-    const result = await saveAddress({ ...newAddr, zipCode: newAddr.zipCode.replace(/\D/g, '') })
+    const result = await saveAddress({
+      ...newAddr,
+      zipCode: newAddr.zipCode.replace(/\D/g, ''),
+      recipientCpf: newAddr.recipientCpf.replace(/\D/g, ''),
+      recipientPhone: newAddr.recipientPhone.replace(/\D/g, ''),
+    })
     if ('error' in result) {
-      toast.error('Verifique o endereço')
+      toast.error('Verifique CPF, telefone e endereço')
       return null
     }
     return result.addressId
@@ -174,6 +185,19 @@ export function CheckoutClient({ existingAddresses }: Props) {
                   <div className="col-span-2">
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Nome do destinatário</label>
                     <input value={newAddr.recipientName} onChange={e => setNewAddr(a => ({...a, recipientName: e.target.value}))} placeholder="Nome completo" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">CPF *</label>
+                    <input value={newAddr.recipientCpf} onChange={e => setNewAddr(a => ({...a, recipientCpf: maskCpf(e.target.value)}))} placeholder="000.000.000-00" maxLength={14} className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">Telefone *</label>
+                    <input value={newAddr.recipientPhone} onChange={e => setNewAddr(a => ({...a, recipientPhone: maskPhone(e.target.value)}))} placeholder="(00) 00000-0000" maxLength={15} className={inputClass} />
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-[10px] text-muted-foreground normal-case">
+                      * CPF e telefone são obrigatórios para o despacho internacional.
+                    </p>
                   </div>
                   <div>
                     <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">CEP</label>

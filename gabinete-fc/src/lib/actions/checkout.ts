@@ -3,9 +3,27 @@ import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { requireAuth, auth } from '@/lib/auth'
 
+function isValidCpf(cpf: string): boolean {
+  const digits = cpf.replace(/\D/g, '')
+  if (digits.length !== 11) return false
+  if (/^(\d)\1{10}$/.test(digits)) return false // todos iguais
+  let sum = 0
+  for (let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i)
+  let rev = 11 - (sum % 11)
+  if (rev === 10 || rev === 11) rev = 0
+  if (rev !== parseInt(digits[9])) return false
+  sum = 0
+  for (let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i)
+  rev = 11 - (sum % 11)
+  if (rev === 10 || rev === 11) rev = 0
+  return rev === parseInt(digits[10])
+}
+
 const addressSchema = z.object({
   label: z.string().default('Casa'),
-  recipientName: z.string().min(2),
+  recipientName: z.string().min(2, 'Nome do destinatário é obrigatório'),
+  recipientCpf: z.string().refine(isValidCpf, 'CPF inválido'),
+  recipientPhone: z.string().min(10, 'Telefone deve ter DDD + número (mín. 10 dígitos)'),
   street: z.string().min(3),
   number: z.string().min(1),
   complement: z.string().optional(),

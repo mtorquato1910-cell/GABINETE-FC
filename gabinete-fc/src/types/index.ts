@@ -73,6 +73,9 @@ export interface Address {
   id: string
   userId: string
   label: string
+  recipientName?: string
+  recipientCpf?: string
+  recipientPhone?: string
   zipCode: string
   street: string
   number: string

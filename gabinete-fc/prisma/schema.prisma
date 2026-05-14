@@ -122,6 +122,8 @@ model Address {
   userId        String
   label         String  @default("Casa")
   recipientName String  @default("")
+  recipientCpf  String  @default("") // CPF do destinatário — obrigatório p/ importação dropshipping
+  recipientPhone String @default("") // Telefone com DDD
   street        String
   number        String
   complement    String?
