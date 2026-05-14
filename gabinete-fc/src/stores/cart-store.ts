@@ -13,6 +13,8 @@ export interface CartLineItem extends CartItem {
 
 interface CartStore {
   items: CartLineItem[]
+  /** Atualizado quando o store é populado pelo servidor — evita re-sync redundante. */
+  hydratedAt: number
   addItem: (
     product: Product,
     size: string,
@@ -21,6 +23,7 @@ interface CartStore {
   ) => void
   removeItem: (lineId: string) => void
   updateQuantity: (lineId: string, quantity: number) => void
+  setItems: (items: CartLineItem[]) => void
   clearCart: () => void
   totalItems: () => number
   totalPrice: () => number
@@ -37,6 +40,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      hydratedAt: 0,
 
       addItem: (product, size, quantity = 1, customization = null) => {
         const hasCustomization = !!customization
@@ -93,6 +97,8 @@ export const useCartStore = create<CartStore>()(
         }))
       },
 
+      setItems: (items) => set({ items, hydratedAt: Date.now() }),
+
       clearCart: () => set({ items: [] }),
 
       totalItems: () => get().items.reduce((acc, i) => acc + i.quantity, 0),
@@ -103,17 +109,18 @@ export const useCartStore = create<CartStore>()(
     {
       name: 'gabinete-fc-cart',
       version: 2,
+      partialize: (state) => ({ items: state.items }),
       migrate: (persisted: unknown, version) => {
         if (version < 2 && persisted && typeof persisted === 'object') {
           const state = persisted as { items?: CartItem[] }
           return {
-            ...state,
             items: (state.items ?? []).map((i) => ({
               ...i,
               lineId: makeLineId(),
               hasCustomization: i.hasCustomization ?? false,
             })),
-          }
+            hydratedAt: 0,
+          } as unknown as CartStore
         }
         return persisted as CartStore
       },

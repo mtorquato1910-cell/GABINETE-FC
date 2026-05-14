@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'FAQ | Gabinete FC' }
 const faqs = [
   { q: 'As camisas são originais?', a: 'Sim. Trabalhamos com fornecedores diretos que produzem camisas com o mesmo material e qualidade das versões oficiais.' },
   { q: 'Qual o prazo de entrega?', a: 'De 3 a 15 dias úteis dependendo da sua região. Enviamos via Correios PAC e SEDEX.' },
-  { q: 'Tenho frete grátis?', a: 'Sim, para compras acima de R$ 500. Abaixo disso, o frete é calculado pelo CEP no checkout.' },
+  { q: 'Tenho frete grátis?', a: 'Sim. Frete grátis para todo o Brasil em qualquer pedido.' },
   { q: 'Posso trocar o tamanho?', a: 'Sim, em até 30 dias após o recebimento. O produto deve estar sem uso e com etiqueta.' },
   { q: 'Como rastrear meu pedido?', a: 'Assim que seu pedido for enviado, você receberá o código de rastreio por email.' },
   { q: 'Vocês têm loja física?', a: 'Não, somos 100% online. Isso nos permite oferecer os melhores preços.' },

@@ -120,11 +120,16 @@ export function ProductDetailClient({ product }: Props) {
         {/* Info */}
         <div className="p-6 lg:p-16 flex flex-col justify-center gap-8 border-l border-border">
           <div>
-            {product.badge && (
-              <span className="inline-block bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 uppercase tracking-wider mb-4">
-                {product.badge}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {product.badge && (
+                <span className="inline-block bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
+                  {product.badge}
+                </span>
+              )}
+              <span className="inline-block bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 uppercase tracking-[0.2em]">
+                {product.version === 'torcedor' ? 'Versão Torcedor' : 'Versão Jogador'}
               </span>
-            )}
+            </div>
             <h1 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase mb-2">
               {product.name}
             </h1>

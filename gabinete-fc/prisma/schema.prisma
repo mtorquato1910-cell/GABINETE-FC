@@ -37,8 +37,39 @@ model User {
   loyaltyPoints  LoyaltyPoint[]
   stockAlerts    StockAlert[]
   returnRequests ReturnRequest[]
+  cart           Cart?
 
   @@map("users")
+}
+
+// ─── CARRINHO PERSISTENTE ────────────────────────────────────
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id               String   @id @default(cuid())
+  cartId           String
+  productId        String
+  size             String
+  quantity         Int      @default(1)
+  hasCustomization Boolean  @default(false)
+  customName       String?
+  customNumber     String?
+  createdAt        DateTime @default(now())
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
 }
 
 // ─── AUTH (NextAuth.js v5) ───────────────────────────────────
@@ -96,6 +127,7 @@ model Product {
   category        String // "selecoes"|"clubes-europeus"|"clubes-brasileiros"|"retro"|"especial"
   team            String
   type            String   @default("titular") // "titular"|"reserva"|"terceiro"|"goleiro"
+  version         String   @default("jogador") // "jogador"|"torcedor"
   sizesAvailable  String   @default("[]") // JSON array
   images          String   @default("[]") // JSON array de URLs
   badge           String?
@@ -112,6 +144,7 @@ model Product {
   wishlists      Wishlist[]
   stockMovements StockMovement[]
   stockAlerts    StockAlert[]
+  cartItems      CartItem[]
 
   @@map("products")
 }

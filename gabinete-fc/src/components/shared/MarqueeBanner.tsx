@@ -5,9 +5,9 @@ export function MarqueeBanner() {
     '/// COMPRE AGORA',
     '/// VENDAS FINAIS',
     '/// PIX COM 5% OFF',
-    '/// FRETE GRÁTIS ACIMA DE R$500',
+    '/// FRETE GRÁTIS',
     '/// EDIÇÕES EXCLUSIVAS',
-    '/// AUTÊNTICAS E IMPORTADAS',
+    '/// IMPORTADAS',
   ]
 
   return (

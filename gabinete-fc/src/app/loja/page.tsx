@@ -29,7 +29,7 @@ export default async function LojaPage() {
             </h1>
           </div>
           <p className="text-muted-foreground text-xs uppercase tracking-widest max-w-[28ch] sm:text-right">
-            Autênticas. Importadas.<br />Entrega para todo o Brasil.
+            Importadas.<br />Entrega para todo o Brasil.
           </p>
         </div>
         <ProductGrid products={products} showFilters />

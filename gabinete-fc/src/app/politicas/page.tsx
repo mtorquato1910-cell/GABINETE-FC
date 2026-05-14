@@ -13,11 +13,11 @@ export default function PoliticasPage() {
         <div className="space-y-10 text-sm text-muted-foreground normal-case tracking-normal leading-relaxed">
           <section>
             <h2 className="text-foreground font-bold uppercase tracking-widest text-xs mb-4">Trocas e Devoluções</h2>
-            <p>Aceitamos trocas e devoluções em até 30 dias após o recebimento do produto. O item deve estar em perfeitas condições, sem uso e com etiqueta. Entre em contato pelo email contato@gabinetefc.com.br.</p>
+            <p>Aceitamos trocas e devoluções em até 30 dias após o recebimento do produto. O item deve estar em perfeitas condições, sem uso e com etiqueta. Entre em contato pelo email tecnologia@unfoldgrowth.com.br.</p>
           </section>
           <section>
             <h2 className="text-foreground font-bold uppercase tracking-widest text-xs mb-4">Envio e Prazo</h2>
-            <p>Enviamos para todo o Brasil pelos Correios (PAC e SEDEX). Frete grátis para pedidos acima de R$ 500. O prazo de entrega varia de 3 a 15 dias úteis dependendo da região.</p>
+            <p>Enviamos para todo o Brasil pelos Correios (PAC e SEDEX). Frete grátis em todos os pedidos. O prazo de entrega varia de 3 a 15 dias úteis dependendo da região.</p>
           </section>
           <section>
             <h2 className="text-foreground font-bold uppercase tracking-widest text-xs mb-4">Privacidade (LGPD)</h2>

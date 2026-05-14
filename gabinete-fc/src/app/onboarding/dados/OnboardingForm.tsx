@@ -8,7 +8,8 @@ import { maskCpf, maskPhone, maskCep } from '@/lib/masks'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 
 interface Props {
-  nextPath: string
+  /** Mantido por compat — não usado: após onboarding sempre vai pra "/". */
+  nextPath?: string
 }
 
 export function OnboardingForm({ nextPath }: Props) {
@@ -64,8 +65,9 @@ export function OnboardingForm({ nextPath }: Props) {
         toast.error(firstMsg ?? 'Verifique os campos destacados')
         return
       }
-      toast.success('Cadastro completo!')
-      router.push(nextPath)
+      toast.success('Cadastro completo! Bem-vindo à Gabinete FC.')
+      // Conforme pedido do cliente: sempre cai na home após concluir onboarding
+      router.push('/')
       router.refresh()
     })
   }

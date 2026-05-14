@@ -5,9 +5,11 @@ const prisma = new PrismaClient()
 
 const PLACEHOLDER = '/images/products/placeholder-jersey.svg'
 const SIZES = JSON.stringify(['P', 'M', 'G', 'GG', 'XG', '2XL', '3XL'])
-// P1 (featured) mantém preço premium · P3 (catálogo geral) = preço promocional
+// JOGADOR (versão fan oficial mais alta): featured R$ 269,90 · catálogo R$ 249,90
+// TORCEDOR (versão básica): R$ 239,90 fixo
 const PRICE_FEATURED = 269.90
 const PRICE_STANDARD = 249.90
+const PRICE_TORCEDOR = 239.90
 const COST = 80.00
 
 // ─── 48 SELEÇÕES — COPA DO MUNDO 2026 (USA · MEX · CAN) ───
@@ -173,23 +175,25 @@ async function main() {
     },
   })
 
-  // ─── Seleções Copa 2026 (49 — Brasil tem I e II) ───
+  // ─── Seleções Copa 2026: cria versão JOGADOR e TORCEDOR pra cada seleção ───
   for (const s of SELECOES) {
-    const price = s.featured ? PRICE_FEATURED : PRICE_STANDARD
+    const priceJogador = s.featured ? PRICE_FEATURED : PRICE_STANDARD
     const productType = s.type ?? 'titular'
     const variant = productType === 'reserva' ? 'II' : productType === 'terceiro' ? 'III' : 'I'
-    const name = `Camisa ${s.team} ${variant} 2026`
+    const baseName = `Camisa ${s.team} ${variant} 2026`
 
+    // JOGADOR — versão fan oficial (featured se for P1)
     await prisma.product.upsert({
       where: { slug: s.slug },
       update: {
-        name,
+        name: `${baseName} · Jogador`,
         description: s.description,
-        price,
+        price: priceJogador,
         costPrice: COST,
         category: 'selecoes',
         team: s.team,
         type: productType,
+        version: 'jogador',
         badge: s.badge,
         sizesAvailable: SIZES,
         isActive: true,
@@ -197,30 +201,73 @@ async function main() {
         featuredOrder: s.featuredOrder ?? 0,
       },
       create: {
-        name,
+        name: `${baseName} · Jogador`,
         slug: s.slug,
         description: s.description,
-        price,
+        price: priceJogador,
         costPrice: COST,
         supplierCode: s.supplierCode,
         category: 'selecoes',
         team: s.team,
         type: productType,
+        version: 'jogador',
         badge: s.badge,
         sizesAvailable: SIZES,
         images: JSON.stringify([PLACEHOLDER]),
         isActive: true,
         isFeatured: !!s.featured,
         featuredOrder: s.featuredOrder ?? 0,
-        metaTitle: `${name} | Gabinete FC`,
+        metaTitle: `${baseName} Jogador | Gabinete FC`,
+      },
+    })
+
+    // TORCEDOR — versão básica, mesmo design, preço menor
+    const torcedorSlug = `${s.slug}-torcedor`
+    await prisma.product.upsert({
+      where: { slug: torcedorSlug },
+      update: {
+        name: `${baseName} · Torcedor`,
+        description: s.description,
+        price: PRICE_TORCEDOR,
+        costPrice: COST,
+        category: 'selecoes',
+        team: s.team,
+        type: productType,
+        version: 'torcedor',
+        badge: null,
+        sizesAvailable: SIZES,
+        isActive: true,
+        isFeatured: false,
+        featuredOrder: 0,
+      },
+      create: {
+        name: `${baseName} · Torcedor`,
+        slug: torcedorSlug,
+        description: s.description,
+        price: PRICE_TORCEDOR,
+        costPrice: COST,
+        supplierCode: `${s.supplierCode}-TORCEDOR`,
+        category: 'selecoes',
+        team: s.team,
+        type: productType,
+        version: 'torcedor',
+        badge: null,
+        sizesAvailable: SIZES,
+        images: JSON.stringify([PLACEHOLDER]),
+        isActive: true,
+        isFeatured: false,
+        featuredOrder: 0,
+        metaTitle: `${baseName} Torcedor | Gabinete FC`,
       },
     })
   }
 
-  console.log(`✅ Seed concluído! ${SELECOES.length} produtos da Copa 2026 cadastrados.`)
-  console.log('   Destaques (ordem home): Brasil I · Brasil II · Portugal · França · Argentina · Inglaterra (R$ 269,90)')
-  console.log('   Catálogo: R$ 249,90')
-  console.log('   Cupons criados: PRIMEIRA5 e COPA5 (5% off na 1ª compra, bloqueado p/ 3+ peças)')
+  const total = SELECOES.length * 2
+  console.log(`✅ Seed concluído! ${total} produtos cadastrados (${SELECOES.length} seleções × 2 versões).`)
+  console.log('   Versão Jogador: featured R$ 269,90 · catálogo R$ 249,90')
+  console.log('   Versão Torcedor: R$ 239,90 (todas)')
+  console.log('   Destaques (home): Brasil I · Brasil II · Portugal · França · Argentina · Inglaterra')
+  console.log('   Cupons: PRIMEIRA5 e COPA5 (5% off na 1ª compra, bloqueado ≥3 peças)')
 }
 
 main()

@@ -1,7 +1,13 @@
 import { auth } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/layout/Logo'
+
+const ADMIN_ENABLED = process.env.ADMIN_ENABLED === 'true'
+
+// Painel admin nunca pré-renderiza estaticamente — sempre roda em request time
+// pra que o lockdown (notFound) funcione antes de qualquer query Prisma.
+export const dynamic = 'force-dynamic'
 import {
   LayoutDashboard, Package, ShoppingBag, Tag,
   Settings, Star, TrendingUp, Boxes, LogOut,
@@ -24,6 +30,9 @@ const navItems = [
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Painel desativado: retorna 404 disfarçado (não revela que existe)
+  if (!ADMIN_ENABLED) notFound()
+
   const session = await auth()
   const user = session?.user as { role?: string; name?: string | null } | undefined
   if (user?.role !== 'admin') redirect('/auth/login')

@@ -31,7 +31,7 @@ export default function SobrePage() {
             de pertencimento, de história. Vendemos isso.
           </p>
           <h2 className="text-foreground font-bold uppercase tracking-widest text-xs mt-8">Contato</h2>
-          <p>contato@gabinetefc.com.br</p>
+          <p>tecnologia@unfoldgrowth.com.br</p>
         </div>
       </main>
       <Footer />

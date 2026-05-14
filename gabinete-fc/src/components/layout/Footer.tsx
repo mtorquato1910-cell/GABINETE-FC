@@ -12,7 +12,7 @@ export function Footer() {
             <Logo variant="text" />
             <p className="text-xs text-muted-foreground uppercase tracking-widest mt-4 leading-relaxed">
               Camisas de futebol premium.<br />
-              Autênticas, importadas, entregues.
+              Importadas, entregues.
             </p>
           </div>
           <div className="text-[9px] text-muted-foreground/40 uppercase tracking-[0.2em] font-bold">
@@ -60,14 +60,11 @@ export function Footer() {
         <div className="p-6 md:p-10">
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary mb-5">Contato</p>
           <div className="flex flex-col gap-3">
-            <a href="mailto:contato@gabinetefc.com.br" className="text-xs text-muted-foreground hover:text-primary transition-colors normal-case font-bold tracking-wide">
-              contato@gabinetefc.com.br
+            <a href="mailto:tecnologia@unfoldgrowth.com.br" className="text-xs text-muted-foreground hover:text-primary transition-colors normal-case font-bold tracking-wide">
+              tecnologia@unfoldgrowth.com.br
             </a>
             <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
               WhatsApp
-            </a>
-            <a href="https://instagram.com/gabinetefc" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest font-bold">
-              @gabinetefc
             </a>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import type { Product, ProductStatus } from '@/types'
+import type { Product, ProductStatus, ProductVersion } from '@/types'
 
 export function parseJsonField<T>(value: string | null | undefined, fallback: T): T {
   if (!value) return fallback
@@ -15,7 +15,7 @@ export function stringifyJsonField<T>(value: T): string {
 export function mapProductFromDb(
   dbProduct: {
     id: string; name: string; slug: string; description: string | null;
-    team: string; category: string; badge: string | null; price: number;
+    team: string; category: string; version?: string; badge: string | null; price: number;
     images: string; sizesAvailable: string; isActive: boolean; isFeatured: boolean;
     createdAt: Date; updatedAt: Date;
   },
@@ -28,6 +28,7 @@ export function mapProductFromDb(
     description: dbProduct.description ?? '',
     team: dbProduct.team,
     category: dbProduct.category,
+    version: (dbProduct.version === 'torcedor' ? 'torcedor' : 'jogador') as ProductVersion,
     badge: dbProduct.badge,
     price: dbProduct.price,
     originalPrice: null,

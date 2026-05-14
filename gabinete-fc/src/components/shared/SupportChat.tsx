@@ -30,7 +30,7 @@ export function SupportChat() {
     await new Promise(r => setTimeout(r, 800))
     const botMsg: Message = {
       role: 'assistant',
-      content: 'Entendi! Em breve nossa equipe entra em contato. Você também pode nos enviar um email para contato@gabinetefc.com.br.',
+      content: 'Entendi! Em breve nossa equipe entra em contato. Você também pode nos enviar um email para tecnologia@unfoldgrowth.com.br.',
     }
     setMessages(m => [...m, botMsg])
     setLoading(false)

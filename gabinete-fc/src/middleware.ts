@@ -1,7 +1,20 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Painel admin: por padrão DESATIVADO até o cliente terminar.
+// Ative com ADMIN_ENABLED=true no .env quando quiser liberar.
+const ADMIN_ENABLED = process.env.ADMIN_ENABLED === 'true'
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // ─── Admin lockdown ──────────────────────────────────────────
+  // Quando desativado, retorna 404 disfarçado pra qualquer rota /admin
+  // ou /api/admin — não revela que o painel existe.
+  if (!ADMIN_ENABLED && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))) {
+    return new NextResponse('Not Found', { status: 404 })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -26,17 +39,7 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-  const { pathname } = request.nextUrl
   const isLoggedIn = !!user
-
-  // Admin precisa de role=admin no public.users
-  const isAdminRoute = pathname.startsWith('/admin')
-  if (isAdminRoute) {
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL('/auth/login?callbackUrl=' + pathname, request.url))
-    }
-    // Verificação de role acontece no layout/admin via requireAdmin() (DB query)
-  }
 
   // Rotas que exigem login
   const protectedRoutes = ['/minha-conta', '/checkout']
@@ -54,5 +57,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images|logo).*)'],
+  // Inclui rotas /api (precisamos pra interceptar /api/admin)
+  // mas continua excluindo assets estáticos
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|images|logo).*)'],
 }

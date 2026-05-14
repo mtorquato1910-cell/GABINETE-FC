@@ -32,12 +32,17 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="product-card group flex flex-col relative overflow-hidden">
 
-      {/* Badge — verde com texto preto, igual ao Lovable */}
+      {/* Badge — verde com texto preto */}
       {product.badge && (
         <div className="absolute top-3 left-3 z-10 text-xs font-black px-2.5 py-1 uppercase tracking-wider bg-primary text-primary-foreground">
           {product.badge}
         </div>
       )}
+
+      {/* Tag versão Jogador/Torcedor */}
+      <div className="absolute top-3 right-3 z-10 text-[10px] font-black px-2 py-1 uppercase tracking-[0.2em] bg-primary text-primary-foreground">
+        {product.version === 'torcedor' ? 'Torcedor' : 'Jogador'}
+      </div>
 
       {/* Esgotado overlay */}
       {isOutOfStock && (

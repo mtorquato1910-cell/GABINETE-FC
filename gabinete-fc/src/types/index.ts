@@ -19,6 +19,8 @@ export type UserRole = 'customer' | 'admin'
 // Product
 // ----------------------------------------------------------------
 
+export type ProductVersion = 'jogador' | 'torcedor'
+
 export interface Product {
   id: string
   name: string
@@ -26,6 +28,7 @@ export interface Product {
   description: string
   team: string
   category: string
+  version?: ProductVersion
   badge?: string | null
   price: number
   originalPrice?: number | null
