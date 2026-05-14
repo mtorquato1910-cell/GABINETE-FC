@@ -1,7 +1,7 @@
 'use server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { requireAuth } from '@/lib/auth'
+import { requireAuth, auth } from '@/lib/auth'
 
 const addressSchema = z.object({
   label: z.string().default('Casa'),
@@ -122,6 +122,16 @@ export async function validateCoupon(code: string, subtotal: number) {
   if (coupon.expiresAt && coupon.expiresAt < new Date()) return { valid: false, message: 'Cupom expirado' }
   if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) return { valid: false, message: 'Cupom esgotado' }
   if (subtotal < coupon.minOrderValue) return { valid: false, message: `Pedido mínimo: R$ ${coupon.minOrderValue.toFixed(2)}` }
+
+  if (coupon.firstOrderOnly) {
+    const session = await auth()
+    const userId = (session?.user as { id?: string } | undefined)?.id
+    if (!userId) return { valid: false, message: 'Faça login para usar este cupom' }
+    const previousOrders = await prisma.order.count({
+      where: { userId, paymentStatus: { in: ['paid', 'pending'] } },
+    })
+    if (previousOrders > 0) return { valid: false, message: 'Cupom válido apenas para primeira compra' }
+  }
 
   const discount = coupon.type === 'percent' ? subtotal * (coupon.value / 100) : coupon.value
   return { valid: true, couponId: coupon.id, discount, type: coupon.type, value: coupon.value }
