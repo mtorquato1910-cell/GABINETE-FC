@@ -1,28 +1,37 @@
 'use client'
 import { Suspense, useState, useTransition } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/layout/Logo'
 import { toast } from 'sonner'
 import { loginUser } from '@/lib/actions/auth'
 
+function inputCls(value: string, hasError: boolean) {
+  const filled = value.trim().length > 0
+  const border = hasError
+    ? 'border-destructive focus:border-destructive'
+    : filled
+      ? 'border-primary/40 focus:border-primary'
+      : 'border-border focus:border-primary'
+  return `bg-secondary border ${border} px-4 py-3 text-sm normal-case tracking-normal focus:outline-none transition-colors`
+}
+
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/minha-conta'
   const [isPending, startTransition] = useTransition()
   const [form, setForm] = useState({ email: '', password: '' })
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     startTransition(async () => {
-      const result = await loginUser({ email: form.email, password: form.password })
-      if ('error' in result) {
+      // Em caso de sucesso, loginUser faz redirect server-side (essa promise nem retorna)
+      const result = await loginUser({ ...form, callbackUrl })
+      if (result && 'error' in result && result.error) {
+        setError(result.error)
         toast.error(result.error)
-      } else {
-        toast.success('Bem-vindo!')
-        router.push(callbackUrl)
-        router.refresh()
       }
     })
   }
@@ -38,10 +47,10 @@ function LoginForm() {
           <input
             type="email"
             value={form.email}
-            onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             required
             placeholder="seu@email.com"
-            className="bg-secondary border border-border px-4 py-3 text-sm focus:outline-none focus:border-primary placeholder:text-muted-foreground normal-case tracking-normal"
+            className={inputCls(form.email, !!error)}
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -51,18 +60,19 @@ function LoginForm() {
           <input
             type="password"
             value={form.password}
-            onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
+            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
             required
             placeholder="••••••••"
-            className="bg-secondary border border-border px-4 py-3 text-sm focus:outline-none focus:border-primary placeholder:text-muted-foreground"
+            className={inputCls(form.password, !!error)}
           />
         </div>
+        {error && <p className="text-[10px] text-destructive normal-case">{error}</p>}
         <button
           type="submit"
           disabled={isPending}
           className="w-full py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors disabled:opacity-50 mt-2"
         >
-          {isPending ? 'Entrando...' : 'Entrar'}
+          {isPending ? 'Entrando…' : 'Entrar'}
         </button>
       </form>
       <p className="text-center text-xs text-muted-foreground mt-6 uppercase tracking-widest">
@@ -82,7 +92,13 @@ export default function LoginPage() {
         <div className="mb-8 flex justify-center">
           <Logo variant="text" />
         </div>
-        <Suspense fallback={<div className="border border-border p-8 text-center text-sm text-muted-foreground">Carregando...</div>}>
+        <Suspense
+          fallback={
+            <div className="border border-border p-8 text-center text-sm text-muted-foreground">
+              Carregando...
+            </div>
+          }
+        >
           <LoginForm />
         </Suspense>
       </div>

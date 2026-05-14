@@ -5,6 +5,7 @@ import { SupportChat } from '@/components/shared/SupportChat'
 import { BackToTop } from '@/components/shared/BackToTop'
 import { AnalyticsTracker } from '@/components/shared/AnalyticsTracker'
 import { PromoBar } from '@/components/shared/PromoBar'
+import { AuthListener } from '@/components/shared/AuthListener'
 import './globals.css'
 
 const geistMono = Geist_Mono({
@@ -62,6 +63,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="dark">
       <body className={`${geistMono.variable} antialiased`}>
+        <AuthListener />
         <PromoBar />
         {children}
         <Toaster position="bottom-right" theme="dark" />
