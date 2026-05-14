@@ -1,12 +1,11 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ShoppingCart, Check, ZoomIn } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Check, Search } from 'lucide-react'
 import { toast } from 'sonner'
-import Zoom from 'react-medium-image-zoom'
-import 'react-medium-image-zoom/dist/styles.css'
+import InnerImageZoom from 'react-inner-image-zoom'
+import 'react-inner-image-zoom/lib/styles.min.css'
 import { useCartStore } from '@/stores/cart-store'
 import { SocialProof } from '@/components/shared/SocialProof'
 import { StockAlertButton } from '@/components/product/StockAlertButton'
@@ -93,25 +92,24 @@ export function ProductDetailClient({ product }: Props) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-200px)]">
-        {/* Image + back preview */}
+        {/* Image com lens magnifier (passa o mouse → lupa segue o cursor) */}
         <div className="bg-secondary p-8 lg:p-16 flex flex-col items-center justify-center min-h-[50vh] relative gap-6">
-          <div className="relative group cursor-zoom-in">
-            <Zoom
-              zoomMargin={40}
-              classDialog="bg-black"
-            >
-              <Image
-                src={product.images[0] || '/images/products/placeholder-jersey.svg'}
-                alt={product.name}
-                width={600}
-                height={750}
-                className="max-h-[65vh] w-auto object-contain"
-                priority
-              />
-            </Zoom>
-            <div className="absolute top-2 right-2 bg-black/70 border border-primary/40 text-primary px-2 py-1 text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-              <ZoomIn className="w-3 h-3" />
-              Clique para ampliar
+          <div className="relative w-full max-w-[600px] gfc-zoom">
+            <InnerImageZoom
+              src={product.images[0] || '/images/products/placeholder-jersey.svg'}
+              zoomSrc={product.images[0] || '/images/products/placeholder-jersey.svg'}
+              zoomType="hover"
+              zoomScale={1.6}
+              hideHint
+              fullscreenOnMobile
+              imgAttributes={{
+                alt: product.name,
+                className: 'w-full h-auto object-contain',
+              }}
+            />
+            <div className="absolute top-2 right-2 bg-black/70 border border-primary/40 text-primary px-2 py-1 text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1 pointer-events-none">
+              <Search className="w-3 h-3" />
+              Lupa
             </div>
           </div>
 

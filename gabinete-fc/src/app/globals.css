@@ -219,3 +219,27 @@ h1.hero-title {
   border-left-color: #a3e635 !important;
   background: rgba(163, 230, 53, 0.05);
 }
+
+/* ─── PRODUCT IMAGE ZOOM (InnerImageZoom — lupa) ──────────────── */
+.gfc-zoom .iiz {
+  background: transparent;
+  cursor: crosshair;
+}
+.gfc-zoom .iiz__img {
+  border-radius: 0;
+}
+.gfc-zoom .iiz__zoom-img {
+  border-radius: 0;
+}
+/* Borda da janela de zoom no estilo brutal: contorno verde neon */
+.gfc-zoom .iiz__zoom-portal {
+  border: 2px solid #a3e635;
+  box-shadow: 0 0 24px rgba(163, 230, 53, 0.2);
+}
+.gfc-zoom .iiz__close {
+  background: #000;
+  border: 1px solid #a3e635;
+}
+.gfc-zoom .iiz__btn::before {
+  filter: invert(1);
+}
