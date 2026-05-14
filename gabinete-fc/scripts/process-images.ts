@@ -44,10 +44,12 @@ if (!TOKEN) {
 const REPO_ROOT = path.resolve(__dirname, '..', '..')
 const INPUT_DIR = path.join(REPO_ROOT, 'imagens-raw')
 const OUTPUT_DIR = path.resolve(__dirname, '..', 'public', 'images', 'products', 'copa2026')
+const REVIEW_DIR = path.join(OUTPUT_DIR, '_revisar')
 
 const OUTPUT_W = 1200
 const OUTPUT_H = 1500
 const BG = { r: 0xff, g: 0xff, b: 0xff } // branco puro
+const MAX_RETRIES = 2 // total de tentativas = 1 + MAX_RETRIES
 
 const MODEL_CANDIDATES = [
   'gemini-2.5-flash-image',
@@ -229,10 +231,17 @@ function parseFolderName(name: string): ParsedFolder | null {
 }
 
 // ─── Gemini API ──────────────────────────────────────────────
-async function processWithGemini(filePath: string, version: 'jogador' | 'torcedor'): Promise<Buffer> {
+async function processWithGemini(
+  filePath: string,
+  version: 'jogador' | 'torcedor',
+  feedback: string | null = null
+): Promise<Buffer> {
   const fileData = await fs.readFile(filePath)
   const base64 = fileData.toString('base64')
-  const prompt = version === 'torcedor' ? PROMPT_TORCEDOR : PROMPT_JOGADOR
+  const basePrompt = version === 'torcedor' ? PROMPT_TORCEDOR : PROMPT_JOGADOR
+  const prompt = feedback
+    ? `${basePrompt}\n\n═══ FEEDBACK DA TENTATIVA ANTERIOR ═══\nA imagem gerada anteriormente teve estes problemas: ${feedback}. Corrija essas falhas nesta nova tentativa.`
+    : basePrompt
 
   const contents = [
     {
@@ -275,6 +284,79 @@ function extractImage(response: any): Buffer {
     }
   }
   throw new Error('Gemini não retornou imagem')
+}
+
+// ─── Validação local (heurística, sem custo de API) ──────────
+async function validateImageLocal(buffer: Buffer): Promise<{ ok: boolean; issues: string[] }> {
+  const issues: string[] = []
+  const meta = await sharp(buffer).metadata()
+  if (!meta.width || !meta.height || meta.width < 600 || meta.height < 600) {
+    issues.push('resolução baixa demais')
+  }
+
+  const { data, info } = await sharp(buffer)
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true })
+  const w = info.width
+  const h = info.height
+  const c = info.channels
+
+  // 1. Cantos devem ser brancos (>240 nos 3 canais)
+  const corners: [number, number][] = [
+    [15, 15],
+    [w - 15, 15],
+    [15, h - 15],
+    [w - 15, h - 15],
+  ]
+  let nonWhiteCorners = 0
+  for (const [x, y] of corners) {
+    const idx = (y * w + x) * c
+    const r = data[idx]
+    const g = data[idx + 1]
+    const b = data[idx + 2]
+    if (r < 240 || g < 240 || b < 240) nonWhiteCorners++
+  }
+  if (nonWhiteCorners > 0) {
+    issues.push(`fundo não-branco em ${nonWhiteCorners} canto(s) — substitua TODOS os pixels não-camisa por branco puro #FFFFFF`)
+  }
+
+  // 2. Sample da área central — precisa ter pixels escuros (manequim) E conteúdo não-fundo
+  // (a regra antiga rejeitava camisas brancas porque branco tem saturação zero)
+  const cx = Math.floor(w / 2)
+  const cy = Math.floor(h / 2)
+  const radius = Math.floor(Math.min(w, h) / 3)
+  let darkCount = 0
+  let contentCount = 0
+  let total = 0
+  for (let y = cy - radius; y < cy + radius; y += 6) {
+    for (let x = cx - radius; x < cx + radius; x += 6) {
+      if (x < 0 || x >= w || y < 0 || y >= h) continue
+      const idx = (y * w + x) * c
+      const r = data[idx]
+      const g = data[idx + 1]
+      const b = data[idx + 2]
+      total++
+      const lum = (r + g + b) / 3
+      // Conteúdo = qualquer pixel que NÃO seja branco/fundo
+      const isBg = r >= 240 && g >= 240 && b >= 240
+      if (!isBg) contentCount++
+      // Escuro = provavelmente manequim preto OU detalhes escuros da camisa
+      if (lum < 100) darkCount++
+    }
+  }
+  if (total > 0) {
+    const darkRatio = darkCount / total
+    const contentRatio = contentCount / total
+    if (darkRatio < 0.01) {
+      issues.push('quase nenhum pixel escuro no centro — manequim preto pode estar ausente')
+    }
+    if (contentRatio < 0.15) {
+      issues.push('pouco conteúdo no centro — camisa pode estar muito pequena ou faltando')
+    }
+  }
+
+  return { ok: issues.length === 0, issues }
 }
 
 // ─── Sharp pipeline ──────────────────────────────────────────
@@ -398,14 +480,51 @@ async function processFolder(folderName: string): Promise<{ slug: string; images
 
     process.stdout.write(`   ${String(i + 1).padStart(2, '0')}/${files.length}  ${file} → ${outputName} ... `)
 
+    let geminiBuffer: Buffer | null = null
+    let lastIssues: string[] = []
+    let attempt = 0
     try {
-      const geminiBuffer = await processWithGemini(inputPath, parsed.version)
-      await composeOnWhiteCanvas(geminiBuffer, outputPath)
-      outputUrls.push(`/images/products/copa2026/${outputName}`)
-      console.log('✓')
+      for (attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        const feedback = attempt === 0 ? null : lastIssues.join(' · ')
+        const buf = await processWithGemini(inputPath, parsed.version, feedback)
+        const v = await validateImageLocal(buf)
+        if (v.ok) {
+          geminiBuffer = buf
+          lastIssues = []
+          break
+        }
+        // Última tentativa também vale — salva mesmo com issues em _revisar
+        geminiBuffer = buf
+        lastIssues = v.issues
+        if (attempt < MAX_RETRIES) {
+          console.log(`✗ (tentativa ${attempt + 1}: ${v.issues.join(' · ')})`)
+          process.stdout.write(
+            `              retry ${attempt + 2}/${MAX_RETRIES + 1} ... `
+          )
+        }
+      }
     } catch (err) {
       console.log('✗')
-      console.error(`        ${err instanceof Error ? err.message : err}`)
+      console.error(`        erro Gemini: ${err instanceof Error ? err.message : err}`)
+      continue
+    }
+
+    if (!geminiBuffer) {
+      console.log('✗ (sem buffer)')
+      continue
+    }
+
+    // Decide destino: se passou na validação vai pra OUTPUT_DIR, senão pra _revisar/
+    const needsReview = lastIssues.length > 0
+    if (needsReview) {
+      await fs.mkdir(REVIEW_DIR, { recursive: true })
+      const reviewPath = path.join(REVIEW_DIR, outputName)
+      await composeOnWhiteCanvas(geminiBuffer, reviewPath)
+      console.log(`⚠️ → _revisar/ (${lastIssues.join(' · ')})`)
+    } else {
+      await composeOnWhiteCanvas(geminiBuffer, outputPath)
+      outputUrls.push(`/images/products/copa2026/${outputName}`)
+      console.log(attempt > 0 ? `✓ (após ${attempt + 1} tentativas)` : '✓')
     }
   }
 

@@ -36,7 +36,19 @@
       "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --skip-project -O '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"esModuleInterop\":true}' prisma/seed.ts)",
       "Bash(rm -f camisa-brasil-2026.webp camisa-brasil-2026-back.webp camisa-brasil-2026-3.webp camisa-brasil-2026-6.webp camisa-brasil-2026-7.webp camisa-brasil-2026-9.webp camisa-brasil-2026-13.webp camisa-brasil-2026-16.webp camisa-brasil-2026-17.webp camisa-brasil-2026-19.webp)",
       "Bash(mv _test-gemini.webp camisa-brasil-2026.webp)",
-      "Bash(npx --yes *)"
+      "Bash(npx --yes *)",
+      "Bash(mv \"Brasil - jogador - Azul - manga curta \\(camisa destaque home\\)\" \"imagens-raw/Brasil II Jogador - azul - manga curta\")",
+      "Bash(mv \"Argentina - jogador - branco e azul - manga curta \\(camisa destaque home\\)\" \"imagens-raw/Argentina Jogador - branco e azul - manga curta\")",
+      "Bash(mv \"França - jogador - Branca- manga curta \\(camisa destaque home\\)\" \"imagens-raw/França Jogador - branca - manga curta\")",
+      "Bash(mv \"Inglaterra - Jogador - branca - manga curta \\(camisa destaque home\\)\" \"imagens-raw/Inglaterra Jogador - branca - manga curta\")",
+      "Bash(mkdir -p \"imagens-raw/_processado\")",
+      "Bash(mv \"imagens-raw/Brasil - jogador - amarela- manga curta \\(camisa destaque home\\)\" \"imagens-raw/_processado/\")",
+      "Bash(mv \"imagens-raw/Brasil II Jogador - azul - manga curta\" imagens-raw/_processado/)",
+      "Bash(mv \"imagens-raw/Argentina Jogador - branco e azul - manga curta\" imagens-raw/_processado/)",
+      "Bash(mv \"imagens-raw/França Jogador - branca - manga curta\" imagens-raw/_processado/)",
+      "Bash(mv \"imagens-raw/Inglaterra Jogador - branca - manga curta\" imagens-raw/_processado/)",
+      "Bash(mv \"imagens-raw/_processado/França Jogador - branca - manga curta\" imagens-raw/)",
+      "Bash(mv \"imagens-raw/_processado/Inglaterra Jogador - branca - manga curta\" imagens-raw/)"
     ]
   }
 }
