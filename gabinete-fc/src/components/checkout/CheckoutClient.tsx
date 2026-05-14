@@ -9,6 +9,7 @@ import { Loader2 } from 'lucide-react'
 import { saveAddress, createOrder, validateCoupon } from '@/lib/actions/checkout'
 import { formatPrice } from '@/lib/db-helpers'
 import { lookupCep } from '@/lib/cep'
+import { maskCpf, maskPhone } from '@/lib/masks'
 import { PaymentForm } from './PaymentForm'
 import type { Address } from '@/types'
 
@@ -38,12 +39,6 @@ export function CheckoutClient({ existingAddresses }: Props) {
     label: 'Casa', recipientName: '', recipientCpf: '', recipientPhone: '',
     street: '', number: '', complement: '', neighborhood: '', city: '', state: '', zipCode: '',
   })
-
-  // Máscaras
-  const maskCpf = (v: string) => v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-  const maskPhone = (v: string) => v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 
   // ─── Estado de pagamento ───
   const [orderId, setOrderId] = useState<string | null>(null)

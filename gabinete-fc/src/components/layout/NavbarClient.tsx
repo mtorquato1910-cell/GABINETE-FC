@@ -176,7 +176,7 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
                 </Link>
               ))}
               <Link
-                href="/api/auth/signout"
+                href="/auth/sair"
                 onClick={() => setAccountOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 border-t border-[#1a1a1a] text-white/60 hover:text-primary hover:bg-[#121212] transition-colors text-sm"
               >
@@ -251,7 +251,7 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
 
           {isLoggedIn && (
             <Link
-              href="/api/auth/signout"
+              href="/auth/sair"
               onClick={() => setMobileOpen(false)}
               className="px-6 py-4 border-t border-[#1a1a1a] text-white/60 hover:text-primary transition-colors"
             >

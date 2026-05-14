@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { mapProductFromDb } from '@/lib/db-helpers'
+import { calcStockBatch } from '@/lib/actions/products'
 import { ProductCard } from './ProductCard'
 
 interface Props {
@@ -38,7 +39,9 @@ export async function RelatedJerseys({ productId, category, team, limit = 4 }: P
 
   if (pool.length === 0) return null
 
-  const products = pool.map((p) => mapProductFromDb(p, 99))
+  // Stock real em uma única query agrupada (evita N+1)
+  const stocks = await calcStockBatch(pool.map((p) => p.id))
+  const products = pool.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 
   return (
     <section className="border-t border-border px-4 md:px-6 py-12 md:py-16">

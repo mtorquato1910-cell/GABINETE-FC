@@ -3,22 +3,7 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { requireAuth } from '@/lib/auth'
-
-function isValidCpf(cpf: string): boolean {
-  const digits = cpf.replace(/\D/g, '')
-  if (digits.length !== 11) return false
-  if (/^(\d)\1{10}$/.test(digits)) return false
-  let sum = 0
-  for (let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i)
-  let rev = 11 - (sum % 11)
-  if (rev === 10 || rev === 11) rev = 0
-  if (rev !== parseInt(digits[9])) return false
-  sum = 0
-  for (let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i)
-  rev = 11 - (sum % 11)
-  if (rev === 10 || rev === 11) rev = 0
-  return rev === parseInt(digits[10])
-}
+import { isValidCpf } from '@/lib/masks'
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Nome muito curto'),
@@ -94,17 +79,17 @@ export async function createAddress(data: unknown) {
 
   const payload = normalizeAddress(parsed.data)
 
-  // Se for default OU é o primeiro endereço → desmarca outros e força default
-  const count = await prisma.address.count({ where: { userId } })
-  const isFirst = count === 0
-  const shouldBeDefault = payload.isDefault || isFirst
-
-  if (shouldBeDefault) {
-    await prisma.address.updateMany({ where: { userId }, data: { isDefault: false } })
-  }
-
-  const address = await prisma.address.create({
-    data: { ...payload, isDefault: shouldBeDefault, userId },
+  // Transação atômica: garante invariante "1 endereço default por user"
+  // mesmo com requests simultâneos.
+  const address = await prisma.$transaction(async (tx) => {
+    const count = await tx.address.count({ where: { userId } })
+    const shouldBeDefault = payload.isDefault || count === 0
+    if (shouldBeDefault) {
+      await tx.address.updateMany({ where: { userId }, data: { isDefault: false } })
+    }
+    return tx.address.create({
+      data: { ...payload, isDefault: shouldBeDefault, userId },
+    })
   })
 
   revalidatePath('/minha-conta/enderecos')
@@ -118,19 +103,24 @@ export async function updateAddress(addressId: string, data: unknown) {
   const parsed = addressSchema.safeParse(data)
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors }
 
-  // Verifica ownership
-  const existing = await prisma.address.findUnique({ where: { id: addressId } })
-  if (!existing || existing.userId !== userId) return { error: 'Endereço não encontrado' }
+  // Ownership-safe query (não revela existência de IDs de outros users)
+  const existing = await prisma.address.findFirst({
+    where: { id: addressId, userId },
+    select: { id: true },
+  })
+  if (!existing) return { error: 'Endereço não encontrado' }
 
   const payload = normalizeAddress(parsed.data)
-  if (payload.isDefault) {
-    await prisma.address.updateMany({
-      where: { userId, NOT: { id: addressId } },
-      data: { isDefault: false },
-    })
-  }
 
-  await prisma.address.update({ where: { id: addressId }, data: payload })
+  await prisma.$transaction(async (tx) => {
+    if (payload.isDefault) {
+      await tx.address.updateMany({
+        where: { userId, NOT: { id: addressId } },
+        data: { isDefault: false },
+      })
+    }
+    await tx.address.update({ where: { id: addressId }, data: payload })
+  })
 
   revalidatePath('/minha-conta/enderecos')
   revalidatePath('/checkout')
@@ -141,16 +131,19 @@ export async function deleteAddress(addressId: string) {
   const session = await requireAuth()
   const userId = session.user.id
 
-  const existing = await prisma.address.findUnique({ where: { id: addressId } })
-  if (!existing || existing.userId !== userId) return { error: 'Endereço não encontrado' }
+  const existing = await prisma.address.findFirst({
+    where: { id: addressId, userId },
+    select: { id: true, isDefault: true },
+  })
+  if (!existing) return { error: 'Endereço não encontrado' }
 
-  await prisma.address.delete({ where: { id: addressId } })
-
-  // Se era o default, promove outro automaticamente
-  if (existing.isDefault) {
-    const next = await prisma.address.findFirst({ where: { userId }, orderBy: { id: 'asc' } })
-    if (next) await prisma.address.update({ where: { id: next.id }, data: { isDefault: true } })
-  }
+  await prisma.$transaction(async (tx) => {
+    await tx.address.delete({ where: { id: addressId } })
+    if (existing.isDefault) {
+      const next = await tx.address.findFirst({ where: { userId }, orderBy: { id: 'asc' } })
+      if (next) await tx.address.update({ where: { id: next.id }, data: { isDefault: true } })
+    }
+  })
 
   revalidatePath('/minha-conta/enderecos')
   revalidatePath('/checkout')
@@ -161,11 +154,16 @@ export async function setDefaultAddress(addressId: string) {
   const session = await requireAuth()
   const userId = session.user.id
 
-  const existing = await prisma.address.findUnique({ where: { id: addressId } })
-  if (!existing || existing.userId !== userId) return { error: 'Endereço não encontrado' }
+  const existing = await prisma.address.findFirst({
+    where: { id: addressId, userId },
+    select: { id: true },
+  })
+  if (!existing) return { error: 'Endereço não encontrado' }
 
-  await prisma.address.updateMany({ where: { userId }, data: { isDefault: false } })
-  await prisma.address.update({ where: { id: addressId }, data: { isDefault: true } })
+  await prisma.$transaction(async (tx) => {
+    await tx.address.updateMany({ where: { userId }, data: { isDefault: false } })
+    await tx.address.update({ where: { id: addressId }, data: { isDefault: true } })
+  })
 
   revalidatePath('/minha-conta/enderecos')
   revalidatePath('/checkout')

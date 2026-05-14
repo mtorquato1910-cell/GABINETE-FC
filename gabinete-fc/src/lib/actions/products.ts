@@ -3,51 +3,53 @@ import { prisma } from '@/lib/db'
 import { mapProductFromDb } from '@/lib/db-helpers'
 import type { Product } from '@/types'
 
-// Calcula estoque: soma de 'in' - soma de 'out' para um produto
-async function calcStock(productId: string): Promise<number> {
+/**
+ * Calcula estoque em batch — uma única query agrupada por productId+type.
+ * Substitui o pattern N+1 (1 query por produto). Default 99 quando sem movimentos.
+ */
+export async function calcStockBatch(
+  productIds: string[]
+): Promise<Record<string, number>> {
+  if (productIds.length === 0) return {}
   const movements = await prisma.stockMovement.groupBy({
-    by: ['type'],
-    where: { productId },
+    by: ['productId', 'type'],
+    where: { productId: { in: productIds } },
     _sum: { quantity: true },
   })
-  const inQty = movements.find(m => m.type === 'in')?._sum.quantity ?? 0
-  const outQty = movements.find(m => m.type === 'out')?._sum.quantity ?? 0
-  const calculated = inQty - outQty
-  return calculated > 0 ? calculated : 99  // default 99 para seed sem movimentos
+  const out: Record<string, number> = {}
+  for (const id of productIds) {
+    const inQty = movements.find((m) => m.productId === id && m.type === 'in')?._sum.quantity ?? 0
+    const outQty = movements.find((m) => m.productId === id && m.type === 'out')?._sum.quantity ?? 0
+    const calculated = inQty - outQty
+    out[id] = calculated > 0 ? calculated : 99 // default pra produtos sem movimento (seed inicial)
+  }
+  return out
 }
 
-// Busca todos os produtos ativos com estoque calculado
+async function calcStock(productId: string): Promise<number> {
+  const map = await calcStockBatch([productId])
+  return map[productId] ?? 99
+}
+
 export async function getActiveProducts(): Promise<Product[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true },
     orderBy: { createdAt: 'desc' },
   })
-
-  return Promise.all(
-    products.map(async (p) => {
-      const stock = await calcStock(p.id)
-      return mapProductFromDb(p, stock)
-    })
-  )
+  const stocks = await calcStockBatch(products.map((p) => p.id))
+  return products.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 
-// Busca produtos em destaque — ordenados por featuredOrder (1 = primeiro)
 export async function getFeaturedProducts(): Promise<Product[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true, isFeatured: true },
     orderBy: [{ featuredOrder: 'asc' }, { createdAt: 'desc' }],
     take: 8,
   })
-
-  return Promise.all(
-    products.map(async (p) => {
-      const stock = await calcStock(p.id)
-      return mapProductFromDb(p, stock)
-    })
-  )
+  const stocks = await calcStockBatch(products.map((p) => p.id))
+  return products.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 
-// Busca produto por slug
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const product = await prisma.product.findFirst({
     where: { slug, isActive: true },
@@ -57,29 +59,20 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return mapProductFromDb(product, stock)
 }
 
-// Busca produtos por categoria
 export async function getProductsByCategory(category: string): Promise<Product[]> {
-  const where = category === 'all' || !category
-    ? { isActive: true }
-    : { isActive: true, category }
+  const where =
+    category === 'all' || !category ? { isActive: true } : { isActive: true, category }
 
   const products = await prisma.product.findMany({
     where,
     orderBy: { createdAt: 'desc' },
   })
-
-  return Promise.all(
-    products.map(async (p) => {
-      const stock = await calcStock(p.id)
-      return mapProductFromDb(p, stock)
-    })
-  )
+  const stocks = await calcStockBatch(products.map((p) => p.id))
+  return products.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 
-// Busca de texto em nome/descrição/time
 export async function searchProductsDb(query: string): Promise<Product[]> {
   if (!query.trim()) return []
-
   const products = await prisma.product.findMany({
     where: {
       isActive: true,
@@ -93,20 +86,14 @@ export async function searchProductsDb(query: string): Promise<Product[]> {
     orderBy: { isFeatured: 'desc' },
     take: 20,
   })
-
-  return Promise.all(
-    products.map(async (p) => {
-      const stock = await calcStock(p.id)
-      return mapProductFromDb(p, stock)
-    })
-  )
+  const stocks = await calcStockBatch(products.map((p) => p.id))
+  return products.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 
-// Busca todos os slugs (para generateStaticParams)
 export async function getAllProductSlugs(): Promise<string[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true },
     select: { slug: true },
   })
-  return products.map(p => p.slug)
+  return products.map((p) => p.slug)
 }

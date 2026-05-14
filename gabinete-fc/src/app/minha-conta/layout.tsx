@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { prisma } from '@/lib/db'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 
@@ -17,7 +18,16 @@ const navItems = [
 
 export default async function ContaLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
-  if (!session?.user) redirect('/auth/login')
+  if (!session?.user) redirect('/auth/login?callbackUrl=/minha-conta')
+
+  // Exige perfil completo antes de acessar minha-conta
+  const profile = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { cpf: true, phone: true },
+  })
+  if (!profile?.cpf || !profile.phone) {
+    redirect('/onboarding/dados?next=/minha-conta')
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

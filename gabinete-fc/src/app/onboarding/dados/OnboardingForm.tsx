@@ -4,26 +4,12 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { completeOnboarding } from '@/lib/actions/profile'
 import { lookupCep } from '@/lib/cep'
+import { maskCpf, maskPhone, maskCep } from '@/lib/masks'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 
 interface Props {
   nextPath: string
 }
-
-const maskCpf = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-
-const maskPhone = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
-
-const maskCep = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 8)
-    .replace(/(\d{5})(\d)/, '$1-$2')
 
 export function OnboardingForm({ nextPath }: Props) {
   const router = useRouter()

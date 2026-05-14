@@ -15,12 +15,18 @@ export default async function OnboardingDadosPage({ searchParams }: Props) {
   const { next } = await searchParams
   const target = next ?? '/minha-conta'
 
-  // Se já tem perfil completo, pula direto
-  const profile = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { name: true, cpf: true, phone: true },
-  })
-  if (profile?.cpf && profile.phone) redirect(target)
+  // Verifica TUDO: CPF, telefone E pelo menos 1 endereço
+  const [profile, addressCount] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, cpf: true, phone: true },
+    }),
+    prisma.address.count({ where: { userId: session.user.id } }),
+  ])
+
+  if (profile?.cpf && profile.phone && addressCount > 0) {
+    redirect(target)
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">

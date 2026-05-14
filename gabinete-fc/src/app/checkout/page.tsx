@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/db'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { CheckoutClient } from '@/components/checkout/CheckoutClient'
@@ -12,6 +13,15 @@ export const metadata: Metadata = { title: 'Checkout | Gabinete FC' }
 export default async function CheckoutPage() {
   const session = await auth()
   if (!session?.user) redirect('/auth/login?callbackUrl=/checkout')
+
+  // Exige perfil completo (CPF + telefone) antes de comprar
+  const profile = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { cpf: true, phone: true },
+  })
+  if (!profile?.cpf || !profile.phone) {
+    redirect('/onboarding/dados?next=/checkout')
+  }
 
   const dbAddresses = await getUserAddresses()
   const addresses: Address[] = dbAddresses.map(a => ({

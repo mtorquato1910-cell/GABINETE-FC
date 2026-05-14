@@ -2,22 +2,7 @@
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { requireAuth, auth } from '@/lib/auth'
-
-function isValidCpf(cpf: string): boolean {
-  const digits = cpf.replace(/\D/g, '')
-  if (digits.length !== 11) return false
-  if (/^(\d)\1{10}$/.test(digits)) return false // todos iguais
-  let sum = 0
-  for (let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i)
-  let rev = 11 - (sum % 11)
-  if (rev === 10 || rev === 11) rev = 0
-  if (rev !== parseInt(digits[9])) return false
-  sum = 0
-  for (let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i)
-  rev = 11 - (sum % 11)
-  if (rev === 10 || rev === 11) rev = 0
-  return rev === parseInt(digits[10])
-}
+import { isValidCpf } from '@/lib/masks'
 
 const addressSchema = z.object({
   label: z.string().default('Casa'),
@@ -36,7 +21,7 @@ const addressSchema = z.object({
 
 export async function saveAddress(data: unknown) {
   const session = await requireAuth()
-  const userId = (session.user as { id: string }).id
+  const userId = session.user.id
   const parsed = addressSchema.safeParse(data)
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors }
 
@@ -48,7 +33,7 @@ export async function saveAddress(data: unknown) {
 
 export async function getUserAddresses() {
   const session = await requireAuth()
-  const userId = (session.user as { id: string }).id
+  const userId = session.user.id
   return prisma.address.findMany({
     where: { userId },
     orderBy: { isDefault: 'desc' },
@@ -98,81 +83,179 @@ const orderSchema = z.object({
 
 export async function createOrder(data: unknown) {
   const session = await requireAuth()
-  const userId = (session.user as { id: string }).id
+  const userId = session.user.id
   const parsed = orderSchema.safeParse(data)
   if (!parsed.success) return { error: 'Dados inválidos' }
 
   const { addressId, paymentMethod, couponCode, items, freightCost } = parsed.data
 
-  // Valida cupom se fornecido
-  let couponId: string | undefined
-  let discountAmount = 0
+  // Garante que o endereço é do user (sem revelar IDs)
+  const address = await prisma.address.findFirst({
+    where: { id: addressId, userId },
+    select: { id: true },
+  })
+  if (!address) return { error: 'Endereço inválido' }
+
+  // Valida produtos: todos precisam existir e estar ativos no momento do pedido
+  const productIds = Array.from(new Set(items.map((i) => i.productId)))
+  const validProducts = await prisma.product.findMany({
+    where: { id: { in: productIds }, isActive: true },
+    select: { id: true, price: true, name: true },
+  })
+  if (validProducts.length !== productIds.length) {
+    return {
+      error:
+        'Alguns produtos do seu carrinho não estão mais disponíveis — remova-os e tente novamente',
+    }
+  }
+  // Anti-fraude leve: usar SEMPRE o preço do banco (não do client)
+  const priceById = new Map(validProducts.map((p) => [p.id, p.price]))
+  const nameById = new Map(validProducts.map((p) => [p.id, p.name]))
+  const itemsNormalized = items.map((i) => ({
+    ...i,
+    unitPrice: priceById.get(i.productId) ?? i.unitPrice,
+    productName: nameById.get(i.productId) ?? i.productName,
+  }))
+
+  const subtotal = itemsNormalized.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
+  const itemCount = itemsNormalized.reduce((sum, i) => sum + i.quantity, 0)
+
+  // Valida cupom (inclui expiração e maxUses) ANTES da transaction pra ter early return
+  let couponSnapshot: {
+    id: string
+    type: string
+    value: number
+    firstOrderOnly: boolean
+    maxUses: number | null
+  } | null = null
   if (couponCode) {
     const coupon = await prisma.coupon.findFirst({
-      where: { code: couponCode, isActive: true },
+      where: {
+        code: couponCode.toUpperCase(),
+        isActive: true,
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
     })
-    if (coupon) {
-      couponId = coupon.id
-      const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
-      discountAmount = coupon.type === 'percent'
-        ? subtotal * (coupon.value / 100)
-        : coupon.value
+    if (!coupon) {
+      return { error: 'Cupom inválido ou expirado' }
+    }
+    if (coupon.maxUses != null && coupon.usedCount >= coupon.maxUses) {
+      return { error: 'Cupom esgotado' }
+    }
+    if (subtotal < coupon.minOrderValue) {
+      return { error: `Pedido mínimo para o cupom: R$ ${coupon.minOrderValue.toFixed(2)}` }
+    }
+    if (coupon.firstOrderOnly && itemCount > FIRST_ORDER_COUPON_MAX_ITEMS) {
+      return { error: 'Cupom não vale com 3+ peças' }
+    }
+    couponSnapshot = {
+      id: coupon.id,
+      type: coupon.type,
+      value: coupon.value,
+      firstOrderOnly: coupon.firstOrderOnly,
+      maxUses: coupon.maxUses,
     }
   }
 
-  const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
+  const discountAmount = couponSnapshot
+    ? couponSnapshot.type === 'percent'
+      ? subtotal * (couponSnapshot.value / 100)
+      : couponSnapshot.value
+    : 0
   const pixDiscount = paymentMethod === 'pix' ? subtotal * 0.05 : 0
   const total = subtotal + freightCost - discountAmount - pixDiscount
 
-  const order = await prisma.order.create({
-    data: {
-      userId,
-      addressId,
-      paymentMethod,
-      paymentStatus: 'pending',
-      status: 'pending',
-      subtotal,
-      freightCost,
-      discountAmount: discountAmount + pixDiscount,
-      total,
-      couponId,
-      items: {
-        create: items.map((item) => ({
-          productId: item.productId,
-          productName: item.productName,
-          productImage: item.productImage,
-          size: item.size,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.unitPrice * item.quantity,
-          hasCustomization: item.hasCustomization ?? false,
-          customName: item.hasCustomization ? item.customName?.toUpperCase() ?? null : null,
-          customNumber: item.hasCustomization ? item.customNumber ?? null : null,
-        })),
-      },
-    },
-  })
+  // Transação atômica: re-valida (firstOrderOnly/maxUses) + cria order + incrementa cupom
+  try {
+    const order = await prisma.$transaction(async (tx) => {
+      if (couponSnapshot?.firstOrderOnly) {
+        const previousOrders = await tx.order.count({
+          where: { userId, paymentStatus: { in: ['paid', 'pending'] } },
+        })
+        if (previousOrders > 0) {
+          throw new Error('Cupom válido apenas para primeira compra')
+        }
+      }
+      if (couponSnapshot?.maxUses != null) {
+        const fresh = await tx.coupon.findUnique({ where: { id: couponSnapshot.id } })
+        if (!fresh || fresh.usedCount >= couponSnapshot.maxUses) {
+          throw new Error('Cupom esgotado')
+        }
+      }
 
-  // Log histórico
-  await prisma.orderHistory.create({
-    data: { orderId: order.id, action: 'created', toStatus: 'pending' },
-  })
+      const created = await tx.order.create({
+        data: {
+          userId,
+          addressId: address.id,
+          paymentMethod,
+          paymentStatus: 'pending',
+          status: 'pending',
+          subtotal,
+          freightCost,
+          discountAmount: discountAmount + pixDiscount,
+          total,
+          couponId: couponSnapshot?.id,
+          items: {
+            create: itemsNormalized.map((item) => ({
+              productId: item.productId,
+              productName: item.productName,
+              productImage: item.productImage,
+              size: item.size,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              totalPrice: item.unitPrice * item.quantity,
+              hasCustomization: item.hasCustomization ?? false,
+              customName: item.hasCustomization
+                ? item.customName?.toUpperCase() ?? null
+                : null,
+              customNumber: item.hasCustomization ? item.customNumber ?? null : null,
+            })),
+          },
+        },
+      })
 
-  return { success: true, orderId: order.id }
+      if (couponSnapshot) {
+        await tx.coupon.update({
+          where: { id: couponSnapshot.id },
+          data: { usedCount: { increment: 1 } },
+        })
+      }
+
+      await tx.orderHistory.create({
+        data: { orderId: created.id, action: 'created', toStatus: 'pending' },
+      })
+
+      return created
+    })
+
+    return { success: true, orderId: order.id }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Erro ao criar pedido'
+    return { error: message }
+  }
 }
 
-// Cupons exclusivos da primeira compra ficam bloqueados quando o carrinho
-// ultrapassa este número de peças — política Gabinete FC (Sprint 4).
+// Política Gabinete FC (Sprint 4) — cupons firstOrderOnly bloqueados acima desse total.
 const FIRST_ORDER_COUPON_MAX_ITEMS = 2
 
 export async function validateCoupon(code: string, subtotal: number, itemCount = 1) {
   const coupon = await prisma.coupon.findFirst({
-    where: { code: code.toUpperCase(), isActive: true },
+    where: {
+      code: code.toUpperCase(),
+      isActive: true,
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    },
   })
   if (!coupon) return { valid: false, message: 'Cupom inválido ou expirado' }
-  if (coupon.expiresAt && coupon.expiresAt < new Date()) return { valid: false, message: 'Cupom expirado' }
-  if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) return { valid: false, message: 'Cupom esgotado' }
-  if (subtotal < coupon.minOrderValue) return { valid: false, message: `Pedido mínimo: R$ ${coupon.minOrderValue.toFixed(2)}` }
+  if (coupon.maxUses != null && coupon.usedCount >= coupon.maxUses) {
+    return { valid: false, message: 'Cupom esgotado' }
+  }
+  if (subtotal < coupon.minOrderValue) {
+    return {
+      valid: false,
+      message: `Pedido mínimo: R$ ${coupon.minOrderValue.toFixed(2)}`,
+    }
+  }
 
   if (coupon.firstOrderOnly) {
     if (itemCount > FIRST_ORDER_COUPON_MAX_ITEMS) {
@@ -182,14 +265,22 @@ export async function validateCoupon(code: string, subtotal: number, itemCount =
       }
     }
     const session = await auth()
-    const userId = (session?.user as { id?: string } | undefined)?.id
+    const userId = session?.user?.id
     if (!userId) return { valid: false, message: 'Faça login para usar este cupom' }
     const previousOrders = await prisma.order.count({
       where: { userId, paymentStatus: { in: ['paid', 'pending'] } },
     })
-    if (previousOrders > 0) return { valid: false, message: 'Cupom válido apenas para primeira compra' }
+    if (previousOrders > 0)
+      return { valid: false, message: 'Cupom válido apenas para primeira compra' }
   }
 
-  const discount = coupon.type === 'percent' ? subtotal * (coupon.value / 100) : coupon.value
-  return { valid: true, couponId: coupon.id, discount, type: coupon.type, value: coupon.value }
+  const discount =
+    coupon.type === 'percent' ? subtotal * (coupon.value / 100) : coupon.value
+  return {
+    valid: true,
+    couponId: coupon.id,
+    discount,
+    type: coupon.type,
+    value: coupon.value,
+  }
 }

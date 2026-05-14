@@ -3,6 +3,7 @@ import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Loader2, Save, Lock } from 'lucide-react'
 import { updateProfile } from '@/lib/actions/profile'
+import { maskCpf, maskPhone } from '@/lib/masks'
 
 interface Initial {
   name: string
@@ -10,17 +11,6 @@ interface Initial {
   phone: string
   cpf: string
 }
-
-const maskCpf = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-
-const maskPhone = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 
 export function DadosPessoaisForm({ initial }: { initial: Initial }) {
   const [pending, startTransition] = useTransition()

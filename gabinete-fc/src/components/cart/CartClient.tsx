@@ -2,10 +2,14 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { Minus, Plus, Trash2, Lock } from 'lucide-react'
 import { useCartStore } from '@/stores/cart-store'
 
-export function CartClient() {
+interface Props {
+  isLoggedIn?: boolean
+}
+
+export function CartClient({ isLoggedIn = false }: Props) {
   const { items, removeItem, updateQuantity, totalPrice } = useCartStore()
 
   if (items.length === 0) {
@@ -125,12 +129,27 @@ export function CartClient() {
           <p className="text-[10px] text-primary uppercase tracking-widest">
             ou R$ {(total * 0.95).toFixed(2)} no Pix (5% off)
           </p>
-          <Link
-            href="/checkout"
-            className="w-full flex items-center justify-center py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors mt-2"
-          >
-            Finalizar Compra →
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/checkout"
+              className="w-full flex items-center justify-center py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors mt-2"
+            >
+              Finalizar Compra →
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login?callbackUrl=%2Fcheckout"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors mt-2"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              Entrar para Finalizar
+            </Link>
+          )}
+          {!isLoggedIn && (
+            <p className="text-[10px] text-muted-foreground normal-case tracking-normal text-center -mt-1">
+              É preciso estar logado para finalizar a compra
+            </p>
+          )}
           <Link
             href="/loja"
             className="text-center text-[10px] text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest"

@@ -1,10 +1,21 @@
 // Service Worker — Gabinete FC
-// Handles: Push Notifications + Offline cache básico
+// v3 — NÃO cacheia rotas dinâmicas (auth/sessão).
+// Cacheia só assets estáticos enquanto offline.
 
-const CACHE_NAME = 'gabinete-fc-v1'
-const STATIC_ASSETS = ['/', '/loja', '/offline']
+const CACHE_NAME = 'gabinete-fc-v3'
+const STATIC_ASSETS = ['/offline']
 
-// Install
+// Rotas que NUNCA podem ser servidas do cache — dependem de cookie/sessão.
+const NEVER_CACHE_PATTERNS = [
+  /^\/auth\//,
+  /^\/minha-conta(\/|$)/,
+  /^\/onboarding(\/|$)/,
+  /^\/checkout(\/|$)/,
+  /^\/carrinho(\/|$)/,
+  /^\/admin(\/|$)/,
+  /^\/api\//,
+]
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS).catch(() => {}))
@@ -12,7 +23,6 @@ self.addEventListener('install', (event) => {
   self.skipWaiting()
 })
 
-// Activate
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -22,14 +32,21 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
-// Fetch — Network first, cache fallback
+// Fetch — Network first; só cai no cache se for asset estático e offline
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
-  if (event.request.url.includes('/api/')) return
 
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
-  )
+  const url = new URL(event.request.url)
+  // Não intercepta rotas dinâmicas — deixa o browser fazer request normal
+  if (NEVER_CACHE_PATTERNS.some((re) => re.test(url.pathname))) return
+
+  // Só intercepta navegação pra mostrar /offline quando der erro
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/offline'))
+    )
+    return
+  }
 })
 
 // Push notification handler
@@ -46,7 +63,6 @@ self.addEventListener('push', (event) => {
   event.waitUntil(self.registration.showNotification(title, options))
 })
 
-// Notification click
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   const url = event.notification.data?.url ?? '/'

@@ -9,6 +9,7 @@ import {
   setDefaultAddress,
 } from '@/lib/actions/profile'
 import { lookupCep } from '@/lib/cep'
+import { maskCpf, maskPhone, maskCep } from '@/lib/masks'
 
 export interface AddressDTO {
   id: string
@@ -25,20 +26,6 @@ export interface AddressDTO {
   state: string
   isDefault: boolean
 }
-
-const maskCpf = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-
-const maskPhone = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 11)
-    .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
-
-const maskCep = (v: string) =>
-  v.replace(/\D/g, '').slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2')
 
 const EMPTY: AddressDTO = {
   id: '',

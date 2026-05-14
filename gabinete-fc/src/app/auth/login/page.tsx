@@ -19,6 +19,8 @@ function inputCls(value: string, hasError: boolean) {
 function LoginForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/minha-conta'
+  const confirmedFlag = searchParams.get('confirmed') === '1'
+  const verifyFlag = searchParams.get('verifique') === '1'
   const [isPending, startTransition] = useTransition()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +41,16 @@ function LoginForm() {
   return (
     <div className="border border-border p-8">
       <h1 className="text-lg font-bold uppercase tracking-widest mb-6">Entrar</h1>
+      {confirmedFlag && (
+        <div className="border border-primary/40 bg-primary/5 p-3 mb-5 text-[10px] uppercase tracking-widest text-primary normal-case">
+          ✓ Email confirmado! Faça login para continuar.
+        </div>
+      )}
+      {verifyFlag && (
+        <div className="border border-border bg-secondary p-3 mb-5 text-[10px] uppercase tracking-widest text-muted-foreground normal-case">
+          ⚡ Conta criada. Confira seu email para confirmar antes de entrar.
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-[10px] uppercase tracking-widest text-muted-foreground">
