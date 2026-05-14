@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# imagens brutas das camisas (input do pipeline Photoroom)
+/imagens-raw/
+/Camisas brasil teste/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

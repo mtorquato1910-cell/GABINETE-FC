@@ -12,6 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "images:process": "npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --project scripts/tsconfig.json scripts/process-images.ts",
     "seed:mock": "node_modules/.bin/ts-node --skip-project --transpile-only --compiler-options {\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"} prisma/seed-mock.ts",
     "seed:clear": "node_modules/.bin/ts-node --skip-project --transpile-only --compiler-options {\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"} prisma/clear-mock.ts"
   },
@@ -21,9 +22,9 @@
   "dependencies": {
     "@base-ui/react": "^1.4.0",
     "@hookform/resolvers": "^5.2.2",
+    "@prisma/client": "^5.22.0",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.6",
-    "@prisma/client": "^5.22.0",
     "@stripe/react-stripe-js": "^6.3.0",
     "@stripe/stripe-js": "^9.5.0",
     "@supabase/ssr": "^0.10.3",
@@ -41,6 +42,7 @@
     "react-hook-form": "^7.72.1",
     "resend": "^6.12.0",
     "shadcn": "^4.3.0",
+    "sharp": "^0.34.5",
     "sonner": "^2.0.7",
     "stripe": "^22.0.2",
     "tailwind-merge": "^3.5.0",
