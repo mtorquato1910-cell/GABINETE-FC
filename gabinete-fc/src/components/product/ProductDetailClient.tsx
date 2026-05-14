@@ -3,8 +3,10 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ShoppingCart, Check } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Check, ZoomIn } from 'lucide-react'
 import { toast } from 'sonner'
+import Zoom from 'react-medium-image-zoom'
+import 'react-medium-image-zoom/dist/styles.css'
 import { useCartStore } from '@/stores/cart-store'
 import { SocialProof } from '@/components/shared/SocialProof'
 import { StockAlertButton } from '@/components/product/StockAlertButton'
@@ -93,14 +95,25 @@ export function ProductDetailClient({ product }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-200px)]">
         {/* Image + back preview */}
         <div className="bg-secondary p-8 lg:p-16 flex flex-col items-center justify-center min-h-[50vh] relative gap-6">
-          <Image
-            src={product.images[0] || '/images/products/placeholder-jersey.svg'}
-            alt={product.name}
-            width={500}
-            height={600}
-            className="max-h-[55vh] w-auto object-contain"
-            priority
-          />
+          <div className="relative group cursor-zoom-in">
+            <Zoom
+              zoomMargin={40}
+              classDialog="bg-black"
+            >
+              <Image
+                src={product.images[0] || '/images/products/placeholder-jersey.svg'}
+                alt={product.name}
+                width={600}
+                height={750}
+                className="max-h-[65vh] w-auto object-contain"
+                priority
+              />
+            </Zoom>
+            <div className="absolute top-2 right-2 bg-black/70 border border-primary/40 text-primary px-2 py-1 text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+              <ZoomIn className="w-3 h-3" />
+              Clique para ampliar
+            </div>
+          </div>
 
           {choice === 'personalize' && (sanitizedName || sanitizedNumber) && (
             <div className="w-full max-w-xs border border-[#1a1a1a] bg-black p-4 flex flex-col items-center gap-1 transition-opacity">

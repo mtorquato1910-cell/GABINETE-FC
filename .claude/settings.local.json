@@ -33,7 +33,10 @@
       "Bash(npx --yes dotenv-cli -e .env.local -- npm run build)",
       "Bash(npm run *)",
       "Bash(npx --yes dotenv-cli -e .env.local -- npx prisma db push --accept-data-loss)",
-      "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --skip-project -O '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"esModuleInterop\":true}' prisma/seed.ts)"
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --skip-project -O '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"esModuleInterop\":true}' prisma/seed.ts)",
+      "Bash(rm -f camisa-brasil-2026.webp camisa-brasil-2026-back.webp camisa-brasil-2026-3.webp camisa-brasil-2026-6.webp camisa-brasil-2026-7.webp camisa-brasil-2026-9.webp camisa-brasil-2026-13.webp camisa-brasil-2026-16.webp camisa-brasil-2026-17.webp camisa-brasil-2026-19.webp)",
+      "Bash(mv _test-gemini.webp camisa-brasil-2026.webp)",
+      "Bash(npx --yes *)"
     ]
   }
 }
