@@ -44,7 +44,7 @@ export function CartClient() {
         <div className="lg:col-span-2 border-r border-border">
           {items.map((item) => (
             <div
-              key={`${item.product.id}-${item.size}`}
+              key={item.lineId}
               className="flex gap-4 p-4 md:p-6 border-b border-border"
             >
               <div className="relative w-20 h-24 bg-secondary shrink-0">
@@ -63,23 +63,27 @@ export function CartClient() {
                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
                     Tamanho: {item.size}
                   </p>
+                  {item.hasCustomization && item.customName && item.customNumber && (
+                    <p className="text-[10px] text-primary uppercase tracking-widest mt-1">
+                      ⚡ Personalizada · {item.customName} · #{item.customNumber}
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() =>
-                        updateQuantity(item.product.id, item.size, item.quantity - 1)
-                      }
-                      className="w-7 h-7 border border-border flex items-center justify-center hover:border-foreground transition-colors"
+                      onClick={() => updateQuantity(item.lineId, item.quantity - 1)}
+                      disabled={item.hasCustomization && item.quantity === 1}
+                      className="w-7 h-7 border border-border flex items-center justify-center hover:border-foreground transition-colors disabled:opacity-40"
                     >
                       <Minus className="w-3 h-3" />
                     </button>
                     <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>
                     <button
-                      onClick={() =>
-                        updateQuantity(item.product.id, item.size, item.quantity + 1)
-                      }
-                      className="w-7 h-7 border border-border flex items-center justify-center hover:border-foreground transition-colors"
+                      onClick={() => updateQuantity(item.lineId, item.quantity + 1)}
+                      disabled={item.hasCustomization}
+                      title={item.hasCustomization ? 'Camisa personalizada — quantidade fixa em 1' : ''}
+                      className="w-7 h-7 border border-border flex items-center justify-center hover:border-foreground transition-colors disabled:opacity-40"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
@@ -89,7 +93,7 @@ export function CartClient() {
                       R$ {(item.product.price * item.quantity).toFixed(2)}
                     </span>
                     <button
-                      onClick={() => removeItem(item.product.id, item.size)}
+                      onClick={() => removeItem(item.lineId)}
                       className="text-muted-foreground hover:text-destructive transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />

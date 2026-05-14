@@ -5,10 +5,12 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 
 const navItems = [
-  { href: '/minha-conta', label: 'Perfil' },
+  { href: '/minha-conta', label: 'Dashboard' },
   { href: '/minha-conta/pedidos', label: 'Pedidos' },
+  { href: '/minha-conta/rastreio', label: 'Rastrear' },
+  { href: '/minha-conta/carrinho-abandonado', label: 'Carrinho' },
   { href: '/minha-conta/enderecos', label: 'Endereços' },
-  { href: '/minha-conta/lista-desejos', label: 'Lista de Desejos' },
+  { href: '/minha-conta/lista-desejos', label: 'Desejos' },
   { href: '/minha-conta/fidelidade', label: 'Fidelidade' },
 ]
 

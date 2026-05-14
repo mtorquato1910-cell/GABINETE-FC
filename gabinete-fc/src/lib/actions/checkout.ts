@@ -55,18 +55,44 @@ export async function getUserAddresses() {
   })
 }
 
+const customizationSchema = z.object({
+  hasCustomization: z.boolean().default(false),
+  customName: z
+    .string()
+    .trim()
+    .max(12, 'Nome até 12 caracteres')
+    .regex(/^[A-Z0-9 ]*$/i, 'Use apenas letras e números')
+    .optional()
+    .nullable(),
+  customNumber: z
+    .string()
+    .regex(/^[0-9]{1,2}$/, 'Número de 1 a 99')
+    .refine((v) => !v || (Number(v) >= 1 && Number(v) <= 99), 'Número entre 1 e 99')
+    .optional()
+    .nullable(),
+})
+
 const orderSchema = z.object({
   addressId: z.string(),
   paymentMethod: z.enum(['pix', 'credit_card', 'debit_card']),
   couponCode: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string(),
-    productName: z.string(),
-    productImage: z.string(),
-    size: z.string(),
-    quantity: z.number().int().positive(),
-    unitPrice: z.number().positive(),
-  })),
+  items: z.array(
+    z
+      .object({
+        productId: z.string(),
+        productName: z.string(),
+        productImage: z.string(),
+        size: z.string(),
+        quantity: z.number().int().positive(),
+        unitPrice: z.number().positive(),
+      })
+      .merge(customizationSchema)
+      .refine(
+        (item) =>
+          !item.hasCustomization || (!!item.customName?.trim() && !!item.customNumber),
+        { message: 'Personalização exige nome e número' }
+      ),
+  ),
   freightCost: z.number().default(0),
 })
 
@@ -119,6 +145,9 @@ export async function createOrder(data: unknown) {
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           totalPrice: item.unitPrice * item.quantity,
+          hasCustomization: item.hasCustomization ?? false,
+          customName: item.hasCustomization ? item.customName?.toUpperCase() ?? null : null,
+          customNumber: item.hasCustomization ? item.customNumber ?? null : null,
         })),
       },
     },
@@ -132,7 +161,11 @@ export async function createOrder(data: unknown) {
   return { success: true, orderId: order.id }
 }
 
-export async function validateCoupon(code: string, subtotal: number) {
+// Cupons exclusivos da primeira compra ficam bloqueados quando o carrinho
+// ultrapassa este número de peças — política Gabinete FC (Sprint 4).
+const FIRST_ORDER_COUPON_MAX_ITEMS = 2
+
+export async function validateCoupon(code: string, subtotal: number, itemCount = 1) {
   const coupon = await prisma.coupon.findFirst({
     where: { code: code.toUpperCase(), isActive: true },
   })
@@ -142,6 +175,12 @@ export async function validateCoupon(code: string, subtotal: number) {
   if (subtotal < coupon.minOrderValue) return { valid: false, message: `Pedido mínimo: R$ ${coupon.minOrderValue.toFixed(2)}` }
 
   if (coupon.firstOrderOnly) {
+    if (itemCount > FIRST_ORDER_COUPON_MAX_ITEMS) {
+      return {
+        valid: false,
+        message: 'Cupom indisponível com 3 ou mais peças — já está no melhor preço promocional',
+      }
+    }
     const session = await auth()
     const userId = (session?.user as { id?: string } | undefined)?.id
     if (!userId) return { valid: false, message: 'Faça login para usar este cupom' }

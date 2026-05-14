@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ShoppingCart } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCartStore } from '@/stores/cart-store'
 import { SocialProof } from '@/components/shared/SocialProof'
@@ -14,19 +14,68 @@ interface Props {
   product: Product
 }
 
+type CustomizationChoice = 'plain' | 'personalize' | null
+
+const MAX_NAME = 12
+
 export function ProductDetailClient({ product }: Props) {
   const addItem = useCartStore((s) => s.addItem)
   const [selectedSize, setSelectedSize] = useState('')
+  const [choice, setChoice] = useState<CustomizationChoice>(null)
+  const [customName, setCustomName] = useState('')
+  const [customNumber, setCustomNumber] = useState('')
+
+  const sanitizedName = customName.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, MAX_NAME)
+  const sanitizedNumber = customNumber.replace(/\D/g, '').slice(0, 2)
+  const numberInRange =
+    sanitizedNumber.length > 0 &&
+    Number(sanitizedNumber) >= 1 &&
+    Number(sanitizedNumber) <= 99
+
+  const canAdd = useMemo(() => {
+    if (!selectedSize) return false
+    if (choice === null) return false
+    if (choice === 'personalize') {
+      return sanitizedName.length > 0 && numberInRange
+    }
+    return true
+  }, [selectedSize, choice, sanitizedName, numberInRange])
+
+  const blocker =
+    !selectedSize
+      ? 'Selecione um tamanho'
+      : choice === null
+        ? 'Escolha se quer personalizar'
+        : choice === 'personalize' && !sanitizedName
+          ? 'Digite o nome para a personalização'
+          : choice === 'personalize' && !numberInRange
+            ? 'Digite um número entre 1 e 99'
+            : null
 
   const handleAdd = () => {
-    if (!selectedSize) {
-      toast.error('Selecione um tamanho')
+    if (!canAdd) {
+      if (blocker) toast.error(blocker)
       return
     }
-    addItem(product, selectedSize)
+    addItem(
+      product,
+      selectedSize,
+      1,
+      choice === 'personalize'
+        ? { name: sanitizedName, number: sanitizedNumber }
+        : null
+    )
     toast.success('Adicionado!', {
-      description: `${product.name} (${selectedSize}) no carrinho.`,
+      description:
+        choice === 'personalize'
+          ? `${product.name} (${selectedSize}) · ${sanitizedName} #${sanitizedNumber}`
+          : `${product.name} (${selectedSize}) no carrinho.`,
     })
+    if (choice === 'personalize') {
+      setCustomName('')
+      setCustomNumber('')
+      setChoice(null)
+    }
   }
 
   return (
@@ -42,16 +91,30 @@ export function ProductDetailClient({ product }: Props) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-200px)]">
-        {/* Image */}
-        <div className="bg-secondary p-8 lg:p-16 flex items-center justify-center min-h-[50vh] relative">
+        {/* Image + back preview */}
+        <div className="bg-secondary p-8 lg:p-16 flex flex-col items-center justify-center min-h-[50vh] relative gap-6">
           <Image
             src={product.images[0] || '/images/products/placeholder-jersey.svg'}
             alt={product.name}
             width={500}
             height={600}
-            className="max-h-[60vh] w-auto object-contain"
+            className="max-h-[55vh] w-auto object-contain"
             priority
           />
+
+          {choice === 'personalize' && (sanitizedName || sanitizedNumber) && (
+            <div className="w-full max-w-xs border border-[#1a1a1a] bg-black p-4 flex flex-col items-center gap-1 transition-opacity">
+              <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Preview · costas
+              </span>
+              <span className="text-2xl font-bold tracking-[0.15em] text-white">
+                {sanitizedName || '—'}
+              </span>
+              <span className="text-6xl font-bold leading-none text-primary">
+                {sanitizedNumber || '0'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Info */}
@@ -75,7 +138,7 @@ export function ProductDetailClient({ product }: Props) {
           </p>
 
           {/* Price */}
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-baseline gap-3 flex-wrap">
             {product.originalPrice && (
               <span className="text-lg text-muted-foreground line-through">
                 R$ {product.originalPrice.toFixed(2)}
@@ -90,7 +153,7 @@ export function ProductDetailClient({ product }: Props) {
           {/* Sizes */}
           <div>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-              Tamanho{' '}
+              1. Tamanho{' '}
               {selectedSize && (
                 <span className="text-primary ml-2">— Selecionado: {selectedSize}</span>
               )}
@@ -112,18 +175,98 @@ export function ProductDetailClient({ product }: Props) {
             </div>
           </div>
 
+          {/* Personalização */}
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+              2. Personalizar camisa?
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => {
+                  setChoice('plain')
+                  setCustomName('')
+                  setCustomNumber('')
+                }}
+                className={`flex items-center justify-center gap-2 px-3 py-3 text-xs font-bold uppercase tracking-widest transition-colors ${
+                  choice === 'plain'
+                    ? 'bg-foreground text-background'
+                    : 'border border-border text-muted-foreground hover:border-foreground hover:text-foreground'
+                }`}
+              >
+                {choice === 'plain' && <Check className="w-3 h-3" />}
+                Deixar lisa
+              </button>
+              <button
+                onClick={() => setChoice('personalize')}
+                className={`flex items-center justify-center gap-2 px-3 py-3 text-xs font-bold uppercase tracking-widest transition-colors ${
+                  choice === 'personalize'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-border text-muted-foreground hover:border-primary hover:text-primary'
+                }`}
+              >
+                {choice === 'personalize' && <Check className="w-3 h-3" />}
+                Personalizar
+              </button>
+            </div>
+
+            {choice === 'personalize' && (
+              <div className="grid grid-cols-3 gap-2 mt-3">
+                <div className="col-span-2">
+                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">
+                    Nome · max {MAX_NAME} caracteres
+                  </label>
+                  <input
+                    value={sanitizedName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    placeholder="EX: TORQUATO"
+                    maxLength={MAX_NAME}
+                    className="bg-secondary border border-border px-3 py-2 text-sm w-full uppercase tracking-widest focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">
+                    Nº · 1–99
+                  </label>
+                  <input
+                    value={sanitizedNumber}
+                    onChange={(e) => setCustomNumber(e.target.value)}
+                    placeholder="10"
+                    inputMode="numeric"
+                    maxLength={2}
+                    className="bg-secondary border border-border px-3 py-2 text-sm w-full text-center font-bold focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <p className="col-span-3 text-[10px] text-muted-foreground normal-case">
+                  Personalização é gravada com o pedido e não pode ser alterada depois da compra.
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Social Proof */}
           <SocialProof productId={product.id} />
 
           {/* CTA */}
           {product.stock > 0 ? (
-            <button
-              onClick={handleAdd}
-              className="w-full flex items-center justify-center gap-3 bg-primary text-primary-foreground py-4 font-bold text-sm uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              Adicionar ao Carrinho
-            </button>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleAdd}
+                disabled={!canAdd}
+                className={`w-full flex items-center justify-center gap-3 py-4 font-bold text-sm uppercase tracking-widest transition-colors ${
+                  canAdd
+                    ? 'bg-primary text-primary-foreground hover:bg-foreground hover:text-background'
+                    : 'bg-secondary border border-border text-muted-foreground cursor-not-allowed'
+                }`}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Adicionar ao Carrinho
+              </button>
+              {!canAdd && blocker && (
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground text-center">
+                  {blocker}
+                </p>
+              )}
+            </div>
           ) : (
             <StockAlertButton productId={product.id} size={selectedSize || 'Único'} />
           )}
@@ -148,7 +291,7 @@ export function ProductDetailClient({ product }: Props) {
             </div>
             <div>
               <span className="text-foreground font-bold block mb-1">Pagamento</span>
-              Pix, Cartão, Boleto
+              Pix (5% off) ou Cartão
             </div>
           </div>
         </div>

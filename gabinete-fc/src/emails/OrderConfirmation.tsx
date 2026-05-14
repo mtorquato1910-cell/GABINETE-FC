@@ -8,6 +8,9 @@ interface OrderItem {
   size: string
   quantity: number
   price: number
+  hasCustomization?: boolean
+  customName?: string | null
+  customNumber?: string | null
 }
 
 interface OrderConfirmationProps {
@@ -52,6 +55,11 @@ export function OrderConfirmation({ customerName, orderId, total, items }: Order
                   <Text style={{ color: '#cccccc', fontSize: '13px', margin: 0 }}>
                     {item.name} <span style={{ color: '#666666' }}>({item.size})</span> × {item.quantity}
                   </Text>
+                  {item.hasCustomization && item.customName && item.customNumber && (
+                    <Text style={{ color: '#CAFF00', fontSize: '11px', letterSpacing: '1px', margin: '4px 0 0 0' }}>
+                      ⚡ PERSONALIZADA · {item.customName} · #{item.customNumber}
+                    </Text>
+                  )}
                 </Column>
                 <Column style={{ textAlign: 'right' }}>
                   <Text style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>

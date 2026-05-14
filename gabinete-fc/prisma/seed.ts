@@ -5,7 +5,9 @@ const prisma = new PrismaClient()
 
 const PLACEHOLDER = '/images/products/placeholder-jersey.svg'
 const SIZES = JSON.stringify(['P', 'M', 'G', 'GG', 'XG', '2XL', '3XL'])
-const PRICE = 269.90
+// P1 (featured) mantém preço premium · P3 (catálogo geral) = preço promocional
+const PRICE_FEATURED = 269.90
+const PRICE_STANDARD = 249.90
 const COST = 80.00
 
 // ─── 48 SELEÇÕES — COPA DO MUNDO 2026 (USA · MEX · CAN) ───
@@ -128,7 +130,7 @@ async function main() {
     })
   }
 
-  // ─── Cupom PRIMEIRA5 — 5% off na primeira compra ───
+  // ─── Cupom PRIMEIRA5 — 5% off na primeira compra (legado) ───
   await prisma.coupon.upsert({
     where: { code: 'PRIMEIRA5' },
     update: {
@@ -148,14 +150,35 @@ async function main() {
     },
   })
 
+  // ─── Cupom COPA5 — 5% off primeira compra, bloqueado p/ 3+ peças ───
+  await prisma.coupon.upsert({
+    where: { code: 'COPA5' },
+    update: {
+      type: 'percent',
+      value: 5,
+      firstOrderOnly: true,
+      isActive: true,
+      minOrderValue: 0,
+    },
+    create: {
+      code: 'COPA5',
+      type: 'percent',
+      value: 5,
+      firstOrderOnly: true,
+      isActive: true,
+      minOrderValue: 0,
+    },
+  })
+
   // ─── 48 seleções Copa 2026 ───
   for (const s of SELECOES) {
+    const price = s.featured ? PRICE_FEATURED : PRICE_STANDARD
     await prisma.product.upsert({
       where: { slug: s.slug },
       update: {
         name: `Camisa ${s.team} I 2026`,
         description: s.description,
-        price: PRICE,
+        price,
         costPrice: COST,
         category: 'selecoes',
         team: s.team,
@@ -169,7 +192,7 @@ async function main() {
         name: `Camisa ${s.team} I 2026`,
         slug: s.slug,
         description: s.description,
-        price: PRICE,
+        price,
         costPrice: COST,
         supplierCode: s.supplierCode,
         category: 'selecoes',
@@ -186,8 +209,9 @@ async function main() {
   }
 
   console.log(`✅ Seed concluído! ${SELECOES.length} seleções da Copa 2026 cadastradas.`)
-  console.log('   Destaques: Brasil · Argentina · França · Portugal')
-  console.log('   Cupom criado: PRIMEIRA5 (5% off na 1ª compra)')
+  console.log('   Destaques: Brasil · Argentina · França · Portugal (R$ 269,90)')
+  console.log('   Catálogo: R$ 249,90')
+  console.log('   Cupons criados: PRIMEIRA5 e COPA5 (5% off na 1ª compra, bloqueado p/ 3+ peças)')
 }
 
 main()

@@ -30,7 +30,10 @@
       "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"esModuleInterop\":true,\"target\":\"ES2020\"}' -e 'import { PrismaClient } from '\\\\''@prisma/client'\\\\''; const p = new PrismaClient\\(\\); \\(async \\(\\) => { const products = await p.product.count\\(\\); const featured = await p.product.count\\({ where: { isFeatured: true } }\\); const coupons = await p.coupon.count\\(\\); const users = await p.user.count\\(\\); console.log\\('\\\\''Produtos:'\\\\'', products\\); console.log\\('\\\\''Destaques:'\\\\'', featured\\); console.log\\('\\\\''Cupons:'\\\\'', coupons\\); console.log\\('\\\\''Usuários:'\\\\'', users\\); await p.$disconnect\\(\\); }\\)\\(\\);')",
       "Bash(npm uninstall *)",
       "Bash(npx --yes dotenv-cli -e .env.local -- npx next build)",
-      "Bash(npx --yes dotenv-cli -e .env.local -- npm run build)"
+      "Bash(npx --yes dotenv-cli -e .env.local -- npm run build)",
+      "Bash(npm run *)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx prisma db push --accept-data-loss)",
+      "Bash(npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --skip-project -O '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\",\"esModuleInterop\":true}' prisma/seed.ts)"
     ]
   }
 }

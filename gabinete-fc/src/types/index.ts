@@ -46,6 +46,9 @@ export interface CartItem {
   product: Product
   size: string
   quantity: number
+  hasCustomization?: boolean
+  customName?: string
+  customNumber?: string
 }
 
 export interface Cart {
@@ -98,6 +101,9 @@ export interface OrderItem {
   quantity: number
   unitPrice: number
   totalPrice: number
+  hasCustomization?: boolean
+  customName?: string | null
+  customNumber?: string | null
 }
 
 export interface Order {

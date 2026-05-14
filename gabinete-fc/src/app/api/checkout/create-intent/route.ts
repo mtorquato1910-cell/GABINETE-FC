@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type Stripe from 'stripe'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getStripe } from '@/lib/stripe'
+
+// Stripe Brasil não libera installments por padrão pra todas as contas.
+// Mantemos DESABILITADO até migrar pra gateway com parcelamento nativo (Mercado Pago).
+// Pode ativar via env STRIPE_INSTALLMENTS_ENABLED=true se sua conta tiver.
+const INSTALLMENTS_ENABLED = process.env.STRIPE_INSTALLMENTS_ENABLED === 'true'
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +23,7 @@ export async function POST(req: NextRequest) {
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },
+      include: { items: { select: { quantity: true } } },
     })
 
     if (!order) {
@@ -28,18 +35,45 @@ export async function POST(req: NextRequest) {
     }
 
     const stripe = getStripe()
+    const itemCount = order.items.reduce((acc, i) => acc + i.quantity, 0)
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const params: Stripe.PaymentIntentCreateParams = {
       amount: Math.round(order.total * 100), // centavos
       currency: 'brl',
       automatic_payment_methods: { enabled: true },
       metadata: {
         orderId: order.id,
         userId: order.userId ?? '',
+        itemCount: String(itemCount),
       },
-    })
+    }
 
-    // Salva o paymentIntentId no pedido
+    if (INSTALLMENTS_ENABLED) {
+      // Stripe Brasil — parcelamento no cartão.
+      // Quantidade de parcelas SEM juros é configurada na Dashboard Stripe.
+      // (Settings → Payment methods → Installments → On + max parcelas sem juros).
+      // A política Gabinete FC (3+ camisas libera 5x sem juros) precisa estar
+      // refletida na config da Dashboard ou aplicada via desconto antecipado.
+      params.payment_method_options = {
+        card: { installments: { enabled: true } },
+      }
+    }
+
+    let paymentIntent: Stripe.PaymentIntent
+    try {
+      paymentIntent = await stripe.paymentIntents.create(params)
+    } catch (err) {
+      // Fallback: se installments não estiver habilitado na conta, refaz sem.
+      const message = err instanceof Error ? err.message : String(err)
+      if (INSTALLMENTS_ENABLED && /installments/i.test(message)) {
+        console.warn('[Stripe] installments indisponíveis na conta — caindo pra à vista:', message)
+        delete params.payment_method_options
+        paymentIntent = await stripe.paymentIntents.create(params)
+      } else {
+        throw err
+      }
+    }
+
     await prisma.order.update({
       where: { id: orderId },
       data: { stripePaymentIntentId: paymentIntent.id },

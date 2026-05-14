@@ -50,6 +50,7 @@ export function CheckoutClient({ existingAddresses }: Props) {
   const subtotal = totalPrice()
   const freight = subtotal >= 500 ? 0 : 29.9
   const total = subtotal + freight - couponDiscount
+  const itemCount = items.reduce((acc, i) => acc + i.quantity, 0)
 
   if (items.length === 0 && !clientSecret) {
     router.push('/carrinho')
@@ -58,7 +59,7 @@ export function CheckoutClient({ existingAddresses }: Props) {
 
   const handleApplyCoupon = () => {
     startTransition(async () => {
-      const result = await validateCoupon(couponCode, subtotal)
+      const result = await validateCoupon(couponCode, subtotal, itemCount)
       if (result.valid) {
         setCouponDiscount(result.discount ?? 0)
         toast.success(`Cupom aplicado! -${formatPrice(result.discount ?? 0)}`)
@@ -112,6 +113,9 @@ export function CheckoutClient({ existingAddresses }: Props) {
           size: item.size,
           quantity: item.quantity,
           unitPrice: item.product.price,
+          hasCustomization: !!item.hasCustomization,
+          customName: item.hasCustomization ? item.customName ?? null : null,
+          customNumber: item.hasCustomization ? item.customNumber ?? null : null,
         })),
         freightCost: freight,
       })
@@ -246,10 +250,15 @@ export function CheckoutClient({ existingAddresses }: Props) {
               <h2 className="text-sm font-bold uppercase tracking-widest mb-6">Resumo do Pedido</h2>
               <div className="flex flex-col gap-3 mb-6">
                 {items.map(item => (
-                  <div key={`${item.product.id}-${item.size}`} className="flex justify-between items-center text-xs border-b border-border pb-3">
+                  <div key={item.lineId} className="flex justify-between items-center text-xs border-b border-border pb-3">
                     <div>
                       <p className="font-bold uppercase tracking-wider">{item.product.name}</p>
                       <p className="text-muted-foreground">Tam: {item.size} · Qtd: {item.quantity}</p>
+                      {item.hasCustomization && item.customName && item.customNumber && (
+                        <p className="text-primary text-[10px] uppercase tracking-widest mt-1">
+                          ⚡ {item.customName} · #{item.customNumber}
+                        </p>
+                      )}
                     </div>
                     <span className="font-bold">{formatPrice(item.product.price * item.quantity)}</span>
                   </div>
@@ -320,6 +329,24 @@ export function CheckoutClient({ existingAddresses }: Props) {
             <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>{freight === 0 ? <span className="text-primary">Grátis</span> : formatPrice(freight)}</span></div>
             {couponDiscount > 0 && <div className="flex justify-between text-primary"><span>Cupom</span><span>-{formatPrice(couponDiscount)}</span></div>}
             <div className="flex justify-between font-bold text-sm border-t border-border pt-3"><span>Total</span><span>{formatPrice(total)}</span></div>
+            <p className="text-[10px] text-primary normal-case tracking-normal">
+              ou {formatPrice(total * 0.95)} no Pix (5% off extra)
+            </p>
+          </div>
+
+          {/* Métodos de pagamento aceitos */}
+          <div className="mt-6 border-t border-border pt-4">
+            <h4 className="text-[10px] font-bold uppercase tracking-widest mb-3">
+              Pagamento aceito
+            </h4>
+            <ul className="flex flex-col gap-1.5 text-[11px] text-muted-foreground normal-case">
+              <li>⚡ <span className="text-primary font-bold">Pix</span> — 5% off automático</li>
+              <li>💳 Cartão de crédito à vista</li>
+              <li>💳 Cartão de débito</li>
+            </ul>
+            <p className="text-[10px] text-muted-foreground normal-case tracking-normal mt-3">
+              Pagamento parcelado em breve.
+            </p>
           </div>
         </div>
       </div>

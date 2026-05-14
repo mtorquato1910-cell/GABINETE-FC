@@ -18,7 +18,15 @@ interface OrderConfirmationData {
   customerName: string
   orderId: string
   total: number
-  items: Array<{ name: string; size: string; quantity: number; price: number }>
+  items: Array<{
+    name: string
+    size: string
+    quantity: number
+    price: number
+    hasCustomization?: boolean
+    customName?: string | null
+    customNumber?: string | null
+  }>
 }
 
 export async function sendOrderConfirmation(data: OrderConfirmationData) {
