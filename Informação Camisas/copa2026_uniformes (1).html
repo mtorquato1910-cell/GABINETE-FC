@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uniformes Copa do Mundo 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #c8a84b;
+    --accent2: #e8c96b;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --kit1: #3a7bd5;
+    --kit2: #e05a3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 40px 20px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center top, rgba(200,168,75,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-trophy {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    display: block;
+    filter: drop-shadow(0 0 20px rgba(200,168,75,0.6));
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    letter-spacing: 0.08em;
+    color: var(--accent2);
+    text-shadow: 0 0 30px rgba(200,168,75,0.4);
+    line-height: 1;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .region-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .region-nav a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+
+  .region-nav a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(200,168,75,0.08);
+  }
+
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  .region-section {
+    margin-bottom: 60px;
+  }
+
+  .region-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .region-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .region-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.06em;
+    color: var(--text);
+  }
+
+  .region-subtitle {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 24px;
+  }
+
+  .team-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .team-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .team-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .team-info h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    line-height: 1.1;
+  }
+
+  .team-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .brand-badge {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    background: rgba(200,168,75,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(200,168,75,0.3);
+  }
+
+  .shield-badge {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .kits-container {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .kit-block {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .kit-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .kit-1 .kit-header { background: rgba(58,123,213,0.15); color: #7ab4f5; }
+  .kit-2 .kit-header { background: rgba(224,90,58,0.15); color: #f5a07a; }
+
+  .kit-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .kit-1 .kit-num { background: #3a7bd5; color: white; }
+  .kit-2 .kit-num { background: #e05a3a; color: white; }
+
+  .kit-body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .kit-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .kit-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    min-width: 72px;
+    padding-top: 3px;
+    flex-shrink: 0;
+  }
+
+  .kit-val {
+    font-size: 0.82rem;
+    color: var(--text);
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .colors-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .color-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+  }
+
+  .detail-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    color: var(--text);
+    margin: 2px 2px 2px 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.05em;
+  }
+
+  footer span {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .teams-grid { grid-template-columns: 1fr; }
+    .stats-bar { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-trophy">🏆</span>
+  <h1>Uniformes Copa do Mundo 2026</h1>
+  <p>Canadá · Estados Unidos · México · 11 jun – 19 jul 2026</p>
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num">48</span><span class="stat-label">Seleções</span></div>
+    <div class="stat"><span class="stat-num">33</span><span class="stat-label">Nações aqui</span></div>
+    <div class="stat"><span class="stat-num">2</span><span class="stat-label">Uniformes / seleção</span></div>
+    <div class="stat"><span class="stat-num">3</span><span class="stat-label">Países-sede</span></div>
+  </div>
+</header>
+
+<nav class="region-nav">
+  <a href="#sede">🏟️ Sedes</a>
+  <a href="#concacaf">🌎 CONCACAF</a>
+  <a href="#afc">🌏 AFC – Ásia</a>
+  <a href="#conmebol">⚽ CONMEBOL</a>
+  <a href="#caf">🌍 CAF – África</a>
+</nav>
+
+<main>
+
+<!-- ===================== SEDES ===================== -->
+<section class="region-section" id="sede">
+  <div class="region-header">
+    <div class="region-icon">🏟️</div>
+    <div>
+      <div class="region-title">Países-Sede</div>
+      <div class="region-subtitle">Canadá · Estados Unidos · México</div>
+    </div>
+  </div>
+  <div class="teams-grid">
+
+    <!-- CANADÁ -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Canadá</h2>
+          <div class="team-meta">
+            <span class="brand-badge">Nike</span>
+            <span class="shield-badge">Canada Soccer Crest</span>
+          </div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#D80621"></span>Vermelho #D80621</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Folha de Bordo central</span> <span class="detail-tag">Tom bicolor, aponta norte</span> <span class="detail-tag">Detalhes artesanais outdoor</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#000000"></span>Preto #000</span> <span class="color-chip"><span class="color-dot" style="background:#D80621"></span>Vermelho #D80621</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Identidade futebolística em evolução</span> <span class="detail-tag">Confiante e moderno</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EUA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Estados Unidos</h2>
+          <div class="team-meta">
+            <span class="brand-badge">Nike</span>
+            <span class="shield-badge">USSF Crest</span>
+          </div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#B22234"></span>Vermelho #B22234</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Listras onduladas vermelhas degradê</span> <span class="detail-tag">Simulação da bandeira tremulando</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#3C3B6E"></span>Azul Marinho #3C3B6E</span> <span class="color-chip"><span class="color-dot" style="background:#B22234"></span>Vermelho #B22234</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Patriotismo com bandeira nacional</span> <span class="detail-tag">Estrelas no padrão da flag</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MÉXICO -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>México</h2>
+          <div class="team-meta">
+            <span class="brand-badge">Adidas</span>
+            <span class="shield-badge">FMF Escudo</span>
+          </div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#006847"></span>Verde #006847</span> <span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Grafismos cultura local</span> <span class="detail-tag">Referência kit 1998</span> <span class="detail-tag">Gola V vermelha</span> <span class="detail-tag">SOMOS MÉXICO na nuca</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#006847"></span>Verde #006847</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Detalhes tricolores</span> <span class="detail-tag">Grafismos mexicas</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== CONCACAF ===================== -->
+<section class="region-section" id="concacaf">
+  <div class="region-header">
+    <div class="region-icon">🌎</div>
+    <div>
+      <div class="region-title">América do Norte, Central e Caribe</div>
+      <div class="region-subtitle">CONCACAF – Curaçao · Haiti · Panamá</div>
+    </div>
+  </div>
+  <div class="teams-grid">
+
+    <!-- CURAÇAO -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Curaçao</h2>
+          <div class="team-meta">
+            <span class="brand-badge">Macron</span>
+            <span class="shield-badge">FFK Escudo</span>
+          </div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#003DA5"></span>Azul #003DA5</span> <span class="color-chip"><span class="color-dot" style="background:#F5D000"></span>Amarelo #F5D000</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Base azul real</span> <span class="detail-tag">Estrelas douradas referência bandeira</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#003DA5"></span>Azul #003DA5</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Detalhes azuis e dourados</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAITI -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Haiti</h2>
+          <div class="team-meta">
+            <span class="brand-badge">Kelme</span>
+            <span class="shield-badge">FHF Escudo</span>
+          </div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#0032A0"></span>Azul Royal #0032A0</span> <span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Gola polo vermelha</span> <span class="detail-tag">Grafismo da independência haitiana</span> <span class="detail-tag">Palmeiras nas costas</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Mesmo simbolismo cultural</span> <span class="detail-tag">Cores da bandeira</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANAMÁ -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Panamá</h2>
+          <div class="team-meta">
+            <span class="brand-badge">Hummel</span>
+            <span class="shield-badge">FEPAFUT Escudo</span>
+          </div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span> <span class="color-chip"><span class="color-dot" style="background:#003DA5"></span>Azul #003DA5</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Estética anos 90</span> <span class="detail-tag">Laterais brancas</span> <span class="detail-tag">Gola polo azul</span> <span class="detail-tag">Águia do escudo no corpo</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#003DA5"></span>Azul Marinho #003DA5</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Mesmo conceito visual</span> <span class="detail-tag">Penas da águia como grafismo</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== AFC – ÁSIA ===================== -->
+<section class="region-section" id="afc">
+  <div class="region-header">
+    <div class="region-icon">🌏</div>
+    <div>
+      <div class="region-title">Confederação Asiática de Futebol</div>
+      <div class="region-subtitle">AFC – Japão · Irã · Arábia Saudita · Austrália · Catar · Coreia do Sul · Iraque · Jordânia · Uzbequistão</div>
+    </div>
+  </div>
+  <div class="teams-grid">
+
+    <!-- JAPÃO -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Japão</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">JFA Samurai Blue</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#00338D"></span>Azul Samurai #00338D</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Ondas shibori japonesas</span> <span class="detail-tag">Crisântemo imperial</span> <span class="detail-tag">Tiras brancas nos ombros</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#BC002D"></span>Vermelho #BC002D</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Sol nascente no peito</span> <span class="detail-tag">Grafismo minimalista</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IRÃ -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Irã</h2>
+          <div class="team-meta"><span class="brand-badge">Meyba</span><span class="shield-badge">FFIRI Escudo</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#239F40"></span>Verde #239F40</span> <span class="color-chip"><span class="color-dot" style="background:#DA0000"></span>Vermelho #DA0000</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Faixas tricolores nos ombros</span> <span class="detail-tag">Caligrafia persa</span> <span class="detail-tag">Leão solar</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#DA0000"></span>Vermelho #DA0000</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Vermelho persa vibrante</span> <span class="detail-tag">Arabesco geométrico</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARÁBIA SAUDITA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Arábia Saudita</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">SAFF Escudo</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#006C35"></span>Verde #006C35</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Verde islâmico tradicional</span> <span class="detail-tag">Palmeira e espada</span> <span class="detail-tag">Listras brancas Adidas</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#006C35"></span>Verde #006C35</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco clássico da Falcão Verde</span> <span class="detail-tag">Tiras verdes Adidas</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUSTRÁLIA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Austrália</h2>
+          <div class="team-meta"><span class="brand-badge">Nike</span><span class="shield-badge">Football Australia – Socceroos</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFD700"></span>Dourado #FFD700</span> <span class="color-chip"><span class="color-dot" style="background:#00843D"></span>Verde #00843D</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Amarelo dourado vibrante</span> <span class="detail-tag">Cruz do Sul</span> <span class="detail-tag">Canguru estilizado</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#00843D"></span>Verde #00843D</span> <span class="color-chip"><span class="color-dot" style="background:#FFD700"></span>Dourado #FFD700</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Verde profundo com grafismos aborígenes</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATAR -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Catar</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">QFA Escudo</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#8D1B3D"></span>Bordô #8D1B3D</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Bordô/maroon tradicional</span> <span class="detail-tag">Arabescos geométricos</span> <span class="detail-tag">Tiras brancas Adidas</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#8D1B3D"></span>Bordô #8D1B3D</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com detalhes bordô</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COREIA DO SUL -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Coreia do Sul</h2>
+          <div class="team-meta"><span class="brand-badge">Nike</span><span class="shield-badge">KFA – Guerreiros Taeguk</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#CD2E3A"></span>Vermelho #CD2E3A</span> <span class="color-chip"><span class="color-dot" style="background:#003478"></span>Azul #003478</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Vermelho vibrante</span> <span class="detail-tag">Camuflagem listras tigre branco</span> <span class="detail-tag">Força e dinamismo</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#4B0082"></span>Violeta #4B0082</span> <span class="color-chip"><span class="color-dot" style="background:#CD2E3A"></span>Vermelho #CD2E3A</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Violeta com grafismos florais</span> <span class="detail-tag">Energia e crescimento</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IRAQUE -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Iraque</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">Iraqi FA Escudo</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#007A3D"></span>Verde #007A3D</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Verde com listras brancas</span> <span class="detail-tag">Águia de Saladino</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#007A3D"></span>Verde #007A3D</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com detalhes verdes e tribais</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JORDÂNIA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Jordânia</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">JFA Escudo</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#007A3D"></span>Verde #007A3D</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Verde com estrela hashemita</span> <span class="detail-tag">Faixa preta no pescoço</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Vermelho hashemita</span> <span class="detail-tag">Detalhes brancos e negros</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UZBEQUISTÃO -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Uzbequistão</h2>
+          <div class="team-meta"><span class="brand-badge">Joma</span><span class="shield-badge">UFF Escudo – Leões Brancos</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#1EB4E8"></span>Azul Céu #1EB4E8</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Azul/branco da bandeira</span> <span class="detail-tag">Padrão de crescente e estrelas</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#1EB4E8"></span>Azul #1EB4E8</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com listras azuis</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== CONMEBOL ===================== -->
+<section class="region-section" id="conmebol">
+  <div class="region-header">
+    <div class="region-icon">⚽</div>
+    <div>
+      <div class="region-title">América do Sul</div>
+      <div class="region-subtitle">CONMEBOL – Argentina · Brasil · Colômbia · Equador · Paraguai · Uruguai</div>
+    </div>
+  </div>
+  <div class="teams-grid">
+
+    <!-- ARGENTINA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Argentina</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">AFA – La Albiceleste</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#75AADB"></span>Azul Celeste #75AADB</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Listras horizontais albiceleste</span> <span class="detail-tag">Sol de Maio no peito</span> <span class="detail-tag">Tiras pretas Adidas</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#000000"></span>Preto #000</span> <span class="color-chip"><span class="color-dot" style="background:#75AADB"></span>Celeste #75AADB</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Preto com detalhes celestes</span> <span class="detail-tag">Tiras douradas comemorativas</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRASIL -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Brasil</h2>
+          <div class="team-meta"><span class="brand-badge">Nike × Jordan Brand</span><span class="shield-badge">CBF – Canarinho</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FEDD00"></span>Amarelo #FEDD00</span> <span class="color-chip"><span class="color-dot" style="background:#009C3B"></span>Verde #009C3B</span> <span class="color-chip"><span class="color-dot" style="background:#002776"></span>Azul #002776</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Amarelinha clássica</span> <span class="detail-tag">Elephant print Jordan</span> <span class="detail-tag">Gola verde com detalhes azuis</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#002776"></span>Azul #002776</span> <span class="color-chip"><span class="color-dot" style="background:#FEDD00"></span>Amarelo #FEDD00</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Azul com predadores brasileiros</span> <span class="detail-tag">Elephant print azul Jordan</span> <span class="detail-tag">Estampa onça/jaguar</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLÔMBIA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Colômbia</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">FCF – Los Cafeteros</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FCD116"></span>Amarelo #FCD116</span> <span class="color-chip"><span class="color-dot" style="background:#003087"></span>Azul #003087</span> <span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Amarelo vibrante tradicional</span> <span class="detail-tag">Detalhes azul/vermelho da bandeira</span> <span class="detail-tag">Tiras Adidas azuis</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#003087"></span>Azul #003087</span> <span class="color-chip"><span class="color-dot" style="background:#FCD116"></span>Amarelo #FCD116</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Azul com grafismos latinoamericanos</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EQUADOR -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Equador</h2>
+          <div class="team-meta"><span class="brand-badge">Marathon</span><span class="shield-badge">FEF – La Tri</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFD700"></span>Amarelo #FFD700</span> <span class="color-chip"><span class="color-dot" style="background:#003DA5"></span>Azul #003DA5</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Amarelo primário</span> <span class="detail-tag">Cóndor andino</span> <span class="detail-tag">Faixas azuis nos ombros</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#003DA5"></span>Azul #003DA5</span> <span class="color-chip"><span class="color-dot" style="background:#FFD700"></span>Amarelo #FFD700</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Azul com grafismos andinos</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARAGUAI -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Paraguai</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">APF – La Albirroja</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Listras verticais vermelho/branco</span> <span class="detail-tag">Estrela e leão do brasão</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#003DA5"></span>Azul #003DA5</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Azul com detalhes vermelhos</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- URUGUAI -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Uruguai</h2>
+          <div class="team-meta"><span class="brand-badge">Nike</span><span class="shield-badge">AUF – La Celeste</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#75AADB"></span>Celeste #75AADB</span> <span class="color-chip"><span class="color-dot" style="background:#000000"></span>Preto #000</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Celeste clássica</span> <span class="detail-tag">Sol de Maio no peito</span> <span class="detail-tag">Tecnologia Aero-FIT Nike</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#000000"></span>Preto #000</span> <span class="color-chip"><span class="color-dot" style="background:#75AADB"></span>Celeste #75AADB</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Preto alternativo ousado</span> <span class="detail-tag">Detalhes celestes</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== CAF – ÁFRICA ===================== -->
+<section class="region-section" id="caf">
+  <div class="region-header">
+    <div class="region-icon">🌍</div>
+    <div>
+      <div class="region-title">Confederação Africana de Futebol</div>
+      <div class="region-subtitle">CAF – África do Sul · Argélia · Cabo Verde · Costa do Marfim · Egito · Gana · Marrocos · RD Congo · Senegal · Tunísia</div>
+    </div>
+  </div>
+  <div class="teams-grid">
+
+    <!-- ÁFRICA DO SUL -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>África do Sul</h2>
+          <div class="team-meta"><span class="brand-badge">Nike</span><span class="shield-badge">SAFA – Bafana Bafana</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFB81C"></span>Amarelo #FFB81C</span> <span class="color-chip"><span class="color-dot" style="background:#007749"></span>Verde #007749</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Memória 2010</span> <span class="detail-tag">Amarelo com detalhes verdes</span> <span class="detail-tag">Faixa verde na diagonal</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#007749"></span>Verde #007749</span> <span class="color-chip"><span class="color-dot" style="background:#FFB81C"></span>Amarelo #FFB81C</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Verde com listras e grafismos culturais</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARGÉLIA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Argélia</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">FAF – Les Fennecs</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#006233"></span>Verde #006233</span> <span class="color-chip"><span class="color-dot" style="background:#D21034"></span>Vermelho #D21034</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco clássico</span> <span class="detail-tag">Crescente e estrela</span> <span class="detail-tag">Tiras verdes/vermelhas no ombro</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#006233"></span>Verde #006233</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Verde com detalhes brancos</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CABO VERDE -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Cabo Verde</h2>
+          <div class="team-meta"><span class="brand-badge">Finta</span><span class="shield-badge">FCF – Tubarões Azuis</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#003893"></span>Azul #003893</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Azul marinho profundo</span> <span class="detail-tag">10 estrelas da bandeira</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#003893"></span>Azul #003893</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com detalhes azuis e vermelhos</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COSTA DO MARFIM -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Costa do Marfim</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">FIF – Les Éléphants</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#F77F00"></span>Laranja #F77F00</span> <span class="color-chip"><span class="color-dot" style="background:#009A44"></span>Verde #009A44</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Laranja vibrante</span> <span class="detail-tag">Elefante no escudo</span> <span class="detail-tag">Tiras verdes</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#F77F00"></span>Laranja #F77F00</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com faixas tricolores</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EGITO -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Egito</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">EFA – Faraós</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Vermelho faraônico</span> <span class="detail-tag">Águia de Saladino dourada</span> <span class="detail-tag">Hieróglifos sutis</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com detalhes vermelhos e dourados</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GANA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Gana</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">GFA – Black Stars</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#000000"></span>Preto #000</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com Estrela Negra</span> <span class="detail-tag">Kente patterns sutis</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#006B3F"></span>Verde #006B3F</span> <span class="color-chip"><span class="color-dot" style="background:#FCD116"></span>Amarelo #FCD116</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Pan-africanismo</span> <span class="detail-tag">Tecido Kente</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARROCOS -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Marrocos</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">FRMF – Atlas Lions</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#C1272D"></span>Vermelho #C1272D</span> <span class="color-chip"><span class="color-dot" style="background:#006233"></span>Verde #006233</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Vermelho ardente</span> <span class="detail-tag">Estrela verde do Pentáculo</span> <span class="detail-tag">Azulejos mouriscos</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#C1272D"></span>Vermelho #C1272D</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com ornamentos islâmicos</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RD CONGO -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>RD do Congo</h2>
+          <div class="team-meta"><span class="brand-badge">Adidas</span><span class="shield-badge">FECOFA – Léopards</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#007FFF"></span>Azul #007FFF</span> <span class="color-chip"><span class="color-dot" style="background:#F7D117"></span>Amarelo #F7D117</span> <span class="color-chip"><span class="color-dot" style="background:#CE1126"></span>Vermelho #CE1126</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Azul royal com faixa diagonal amarela/vermelha</span> <span class="detail-tag">Estampa leopardo</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#F7D117"></span>Amarelo #F7D117</span> <span class="color-chip"><span class="color-dot" style="background:#007FFF"></span>Azul #007FFF</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Amarelo com manchas de leopardo</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SENEGAL -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Senegal</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">FSF – Lions de la Teranga</span></div>
+        </div>
+      </div>
+      <div class="kits-containers">
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#00853F"></span>Verde #00853F</span> <span class="color-chip"><span class="color-dot" style="background:#FDEF42"></span>Amarelo #FDEF42</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com listras verdes/amarelas</span> <span class="detail-tag">Leão de Teranga</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#00853F"></span>Verde #00853F</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Verde com padrões wolof</span></div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- TUNÍSIA -->
+    <div class="team-card">
+      <div class="team-header">
+        
+        <div class="team-info">
+          <h2>Tunísia</h2>
+          <div class="team-meta"><span class="brand-badge">Puma</span><span class="shield-badge">FTF – Aigles de Carthage</span></div>
+        </div>
+      </div>
+      <div class="kits-container">
+        <div class="kit-block kit-1">
+          <div class="kit-header"><span class="kit-num">1</span> Uniforme Principal</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#E70013"></span>Vermelho #E70013</span> <span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Vermelho cartaginês</span> <span class="detail-tag">Crescente e estrela</span> <span class="detail-tag">Mosaico romano sutil</span></div></div>
+          </div>
+        </div>
+        <div class="kit-block kit-2">
+          <div class="kit-header"><span class="kit-num">2</span> Uniforme Reserva</div>
+          <div class="kit-body">
+            <div class="kit-row"><span class="kit-label">Cores</span><div class="colors-row"><span class="color-chip"><span class="color-dot" style="background:#FFFFFF;border-color:#555"></span>Branco #FFF</span> <span class="color-chip"><span class="color-dot" style="background:#E70013"></span>Vermelho #E70013</span></div></div>
+            <div class="kit-row"><span class="kit-label">Detalhes</span><div class="kit-val"><span class="detail-tag">Branco com gola e detalhes vermelhos</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>⚽ <span>Copa do Mundo FIFA 2026</span> · Canadá · EUA · México · 11 jun – 19 jul 2026</p>
+  <p style="margin-top:8px">Informações baseadas nos uniformes oficiais lançados até maio/2026. Dados sujeitos a atualizações pelas federações.</p>
+</footer>
+
+</body>
+</html>
