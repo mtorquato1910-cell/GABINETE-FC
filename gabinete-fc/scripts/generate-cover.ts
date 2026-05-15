@@ -180,11 +180,11 @@ async function generateAndSave(preset: Preset) {
 
   await sharp(colorBuffer)
     .resize(1024, 1280, { fit: 'cover', position: 'centre' })
-    .webp({ quality: 88 })
+    .webp({ quality: 95 })
     .toFile(path.join(COVERS_DIR, colorFile))
   await sharp(Buffer.from(apagadaResult.imageBase64, 'base64'))
     .resize(1024, 1280, { fit: 'cover', position: 'centre' })
-    .webp({ quality: 88 })
+    .webp({ quality: 95 })
     .toFile(path.join(COVERS_DIR, grayFile))
   console.log(`  ✓ Salvas em public/images/products/copa2026/covers/`)
 

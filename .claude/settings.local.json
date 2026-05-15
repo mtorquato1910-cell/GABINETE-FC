@@ -52,7 +52,8 @@
       "Bash(rm -f scripts/process-images.ts scripts/test-gemini-image.ts scripts/update-brasil-image.ts)",
       "Bash(rm -rf public/images/products/copa2026/*.webp public/images/products/copa2026/*.jpg public/images/products/copa2026/_revisar public/images/products/copa2026/_processado)",
       "Bash(rm -rf \"../imagens-raw\")",
-      "Bash(node_modules/.bin/ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"commonjs\",\"moduleResolution\":\"node\"}' prisma/reset-images.ts)"
+      "Bash(node_modules/.bin/ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"commonjs\",\"moduleResolution\":\"node\"}' prisma/reset-images.ts)",
+      "Bash(GEMINI_IMAGE_MODEL=nano-banana-pro-preview npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --project scripts/tsconfig.json scripts/generate-cover.ts camisa-brasil-2026)"
     ]
   }
 }

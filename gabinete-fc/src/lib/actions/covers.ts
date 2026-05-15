@@ -43,14 +43,14 @@ export async function saveCover(input: unknown) {
 
   await sharp(colorBuffer)
     .resize(1024, 1280, { fit: 'cover', position: 'centre' })
-    .webp({ quality: 88 })
+    .webp({ quality: 95 })
     .toFile(path.join(COVERS_DIR, colorFile))
   // Cinza derivada da colorida (composição idêntica + tons escuros estilo Lovable)
   await sharp(colorBuffer)
     .resize(1024, 1280, { fit: 'cover', position: 'centre' })
     .grayscale()
     .linear(0.55, -10)
-    .webp({ quality: 88 })
+    .webp({ quality: 95 })
     .toFile(path.join(COVERS_DIR, grayFile))
 
   const publicGray = `/images/products/copa2026/covers/${grayFile}`
