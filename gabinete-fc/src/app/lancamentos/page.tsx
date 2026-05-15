@@ -34,7 +34,7 @@ export default async function LancamentosPage() {
             <p className="text-muted-foreground text-xs uppercase tracking-widest">Em breve novidades.</p>
           </div>
         ) : (
-          <ProductGrid products={mapped} showFilters={false} />
+          <ProductGrid products={mapped} showFilters={false} showSearch searchPlaceholder="Pesquisar em lançamentos…" />
         )}
       </main>
       <Footer />

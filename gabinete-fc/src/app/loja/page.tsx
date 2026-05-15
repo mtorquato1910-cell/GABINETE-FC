@@ -32,7 +32,7 @@ export default async function LojaPage() {
             Importadas.<br />Entrega para todo o Brasil.
           </p>
         </div>
-        <ProductGrid products={products} showFilters />
+        <ProductGrid products={products} showFilters showSearch />
       </main>
       <Footer />
     </div>

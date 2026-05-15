@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Search, X } from 'lucide-react'
 import { ProductCard } from './ProductCard'
 import { mockCategories } from '@/data/products'
 import type { Product, ProductVersion } from '@/types'
@@ -10,6 +11,10 @@ interface ProductGridProps {
   showFilters?: boolean
   /** Mostra toggle Jogador/Torcedor (faz sentido em /loja/selecoes) */
   showVersionFilter?: boolean
+  /** Mostra campo de busca dentro da seção */
+  showSearch?: boolean
+  /** Placeholder customizado do campo de busca */
+  searchPlaceholder?: string
 }
 
 type VersionFilter = 'all' | ProductVersion
@@ -18,9 +23,12 @@ export function ProductGrid({
   products,
   showFilters = true,
   showVersionFilter = false,
+  showSearch = false,
+  searchPlaceholder = 'Pesquisar seleção, time…',
 }: ProductGridProps) {
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeVersion, setActiveVersion] = useState<VersionFilter>('all')
+  const [query, setQuery] = useState('')
 
   const filtered = useMemo(() => {
     let pool = products
@@ -30,8 +38,16 @@ export function ProductGrid({
     if (showVersionFilter && activeVersion !== 'all') {
       pool = pool.filter((p) => p.version === activeVersion)
     }
+    const q = query.trim().toLowerCase()
+    if (showSearch && q.length > 0) {
+      pool = pool.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.team.toLowerCase().includes(q)
+      )
+    }
     return pool
-  }, [products, activeCategory, activeVersion, showVersionFilter])
+  }, [products, activeCategory, activeVersion, showVersionFilter, showSearch, query])
 
   const versionTabs: Array<{ id: VersionFilter; label: string }> = [
     { id: 'all', label: 'Todas' },
@@ -86,7 +102,36 @@ export function ProductGrid({
         </div>
       )}
 
-      {!showFilters && showVersionFilter && (
+      {showSearch && (
+        <div className="px-6 md:px-8 py-3 border-b border-[#1a1a1a] bg-black">
+          <div className="relative max-w-xl">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 pointer-events-none"
+              aria-hidden="true"
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={searchPlaceholder}
+              aria-label="Pesquisar produtos nesta seção"
+              className="w-full bg-[#0a0a0a] border border-[#1a1a1a] pl-10 pr-10 py-2.5 text-xs uppercase tracking-[0.15em] text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 transition-colors"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Limpar busca"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!showFilters && (showVersionFilter || showSearch) && (
         <div className="px-6 md:px-8 py-2 text-right text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold border-b border-[#1a1a1a]">
           {filtered.length} {filtered.length === 1 ? 'item' : 'itens'}
         </div>

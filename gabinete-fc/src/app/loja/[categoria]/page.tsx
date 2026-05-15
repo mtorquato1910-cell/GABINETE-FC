@@ -46,6 +46,8 @@ export default async function CategoriaPage({ params }: Props) {
           products={products}
           showFilters={false}
           showVersionFilter={isSelecoes}
+          showSearch
+          searchPlaceholder={isSelecoes ? 'Pesquisar seleção, país…' : `Pesquisar em ${label.toLowerCase()}…`}
         />
       </main>
       <Footer />
