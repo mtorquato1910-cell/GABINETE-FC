@@ -51,7 +51,8 @@
       "Bash(mv \"imagens-raw/_processado/Inglaterra Jogador - branca - manga curta\" imagens-raw/)",
       "Bash(rm -f scripts/process-images.ts scripts/test-gemini-image.ts scripts/update-brasil-image.ts)",
       "Bash(rm -rf public/images/products/copa2026/*.webp public/images/products/copa2026/*.jpg public/images/products/copa2026/_revisar public/images/products/copa2026/_processado)",
-      "Bash(rm -rf \"../imagens-raw\")"
+      "Bash(rm -rf \"../imagens-raw\")",
+      "Bash(node_modules/.bin/ts-node --skip-project --transpile-only --compiler-options '{\"module\":\"commonjs\",\"moduleResolution\":\"node\"}' prisma/reset-images.ts)"
     ]
   }
 }
