@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { toast } from 'sonner'
 import { useCartStore } from '@/stores/cart-store'
+import { JerseyCover, isCoverPair } from './JerseyCover'
 import type { Product } from '@/types'
 
 interface ProductCardProps {
@@ -60,13 +61,21 @@ export function ProductCard({ product }: ProductCardProps) {
       >
         {/* Radial glow center */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(255,255,255,0.04)_0%,transparent_70%)]" />
-        <Image
-          src={product.images[0] || '/images/products/placeholder-jersey.svg'}
-          alt={product.name}
-          fill
-          className="product-img object-contain p-10 lg:p-12"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+        {isCoverPair(product.images) ? (
+          <JerseyCover
+            graySrc={product.images[0]}
+            colorSrc={product.images[1]}
+            alt={product.name}
+          />
+        ) : (
+          <Image
+            src={product.images[0] || '/images/products/placeholder-jersey.svg'}
+            alt={product.name}
+            fill
+            className="product-img object-contain p-10 lg:p-12"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        )}
       </Link>
 
       {/* Info */}

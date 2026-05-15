@@ -9,7 +9,12 @@ import 'react-inner-image-zoom/lib/styles.min.css'
 import { useCartStore } from '@/stores/cart-store'
 import { SocialProof } from '@/components/shared/SocialProof'
 import { StockAlertButton } from '@/components/product/StockAlertButton'
+import { JerseyCover, splitGallery } from '@/components/product/JerseyCover'
 import type { Product } from '@/types'
+
+type DisplayItem =
+  | { kind: 'cover'; gray: string; color: string }
+  | { kind: 'photo'; src: string }
 
 interface Props {
   product: Product
@@ -26,19 +31,29 @@ export function ProductDetailClient({ product }: Props) {
   const [customName, setCustomName] = useState('')
   const [customNumber, setCustomNumber] = useState('')
 
-  // Galeria de imagens — índice da imagem atualmente exibida
-  const galleryImages = product.images.length > 0
+  // Galeria — cover-pair (gray + color) conta como 1 item virtual com hover
+  const rawImages = product.images.length > 0
     ? product.images
     : ['/images/products/placeholder-jersey.svg']
+  const { cover, photos } = splitGallery(rawImages)
+  const displayItems: DisplayItem[] = [
+    ...(cover ? [{ kind: 'cover' as const, gray: cover.gray, color: cover.color }] : []),
+    ...photos.map((src) => ({ kind: 'photo' as const, src })),
+  ]
+  // Fallback: se nao tem nada (improvavel), renderiza placeholder como photo
+  if (displayItems.length === 0) {
+    displayItems.push({ kind: 'photo', src: '/images/products/placeholder-jersey.svg' })
+  }
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const currentImage = galleryImages[currentImageIndex] ?? galleryImages[0]
-  const hasMultipleImages = galleryImages.length > 1
+  const currentItem = displayItems[currentImageIndex] ?? displayItems[0]
+  const hasMultipleImages = displayItems.length > 1
+  const isCurrentCover = currentItem.kind === 'cover'
 
   const prevImage = () => {
-    setCurrentImageIndex((i) => (i === 0 ? galleryImages.length - 1 : i - 1))
+    setCurrentImageIndex((i) => (i === 0 ? displayItems.length - 1 : i - 1))
   }
   const nextImage = () => {
-    setCurrentImageIndex((i) => (i === galleryImages.length - 1 ? 0 : i + 1))
+    setCurrentImageIndex((i) => (i === displayItems.length - 1 ? 0 : i + 1))
   }
 
   const sanitizedName = customName.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, MAX_NAME)
@@ -109,25 +124,45 @@ export function ProductDetailClient({ product }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-200px)]">
         {/* Galeria de imagens + lens magnifier */}
         <div className="bg-secondary p-6 lg:p-12 flex flex-col items-center justify-center min-h-[50vh] relative gap-4">
-          {/* Imagem principal com lupa */}
+          {/* Imagem principal — capa AI (hover acende cor) OU foto real (com lupa) */}
           <div className="relative w-full max-w-[600px] gfc-zoom">
-            <InnerImageZoom
-              key={currentImage}
-              src={currentImage}
-              zoomSrc={currentImage}
-              zoomType="hover"
-              zoomScale={1.6}
-              hideHint
-              fullscreenOnMobile
-              imgAttributes={{
-                alt: `${product.name} — foto ${currentImageIndex + 1}`,
-                className: 'w-full h-auto object-contain',
-              }}
-            />
-            <div className="absolute top-2 right-2 bg-black/70 border border-primary/40 text-primary px-2 py-1 text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1 pointer-events-none">
-              <Search className="w-3 h-3" />
-              Lupa
-            </div>
+            {currentItem.kind === 'cover' ? (
+              <div className="group relative aspect-[4/5] bg-[#0a0a0a] overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(255,255,255,0.04)_0%,transparent_70%)]" />
+                <JerseyCover
+                  graySrc={currentItem.gray}
+                  colorSrc={currentItem.color}
+                  alt={`${product.name} — capa`}
+                  sizes="(max-width: 1024px) 100vw, 600px"
+                  priority
+                />
+              </div>
+            ) : (
+              <InnerImageZoom
+                key={currentItem.src}
+                src={currentItem.src}
+                zoomSrc={currentItem.src}
+                zoomType="hover"
+                zoomScale={1.6}
+                hideHint
+                fullscreenOnMobile
+                imgAttributes={{
+                  alt: `${product.name} — foto ${currentImageIndex + 1}`,
+                  className: 'w-full h-auto object-contain',
+                }}
+              />
+            )}
+            {!isCurrentCover && (
+              <div className="absolute top-2 right-2 bg-black/70 border border-primary/40 text-primary px-2 py-1 text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1 pointer-events-none">
+                <Search className="w-3 h-3" />
+                Lupa
+              </div>
+            )}
+            {isCurrentCover && (
+              <div className="absolute top-2 right-2 bg-black/70 border border-primary/40 text-primary px-2 py-1 text-[9px] font-bold uppercase tracking-[0.2em] pointer-events-none">
+                Hover acende
+              </div>
+            )}
 
             {/* Setas de navegação (desktop) */}
             {hasMultipleImages && (
@@ -148,7 +183,7 @@ export function ProductDetailClient({ product }: Props) {
                 </button>
                 {/* Contador */}
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/70 border border-[#1a1a1a] text-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em]">
-                  {currentImageIndex + 1} / {galleryImages.length}
+                  {currentImageIndex + 1} / {displayItems.length}
                 </div>
               </>
             )}
@@ -157,24 +192,32 @@ export function ProductDetailClient({ product }: Props) {
           {/* Thumbnails */}
           {hasMultipleImages && (
             <div className="w-full max-w-[600px] flex gap-2 overflow-x-auto pb-1">
-              {galleryImages.map((src, idx) => (
-                <button
-                  key={src + idx}
-                  onClick={() => setCurrentImageIndex(idx)}
-                  aria-label={`Ver foto ${idx + 1}`}
-                  className={`shrink-0 w-16 h-20 border-2 transition-colors ${
-                    idx === currentImageIndex
-                      ? 'border-primary'
-                      : 'border-[#1a1a1a] hover:border-white/40'
-                  }`}
-                >
-                  <img
-                    src={src}
-                    alt={`Miniatura ${idx + 1}`}
-                    className="w-full h-full object-contain bg-white"
-                  />
-                </button>
-              ))}
+              {displayItems.map((item, idx) => {
+                const thumbSrc = item.kind === 'cover' ? item.color : item.src
+                return (
+                  <button
+                    key={thumbSrc + idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    aria-label={`Ver foto ${idx + 1}`}
+                    className={`shrink-0 w-16 h-20 border-2 transition-colors relative ${
+                      idx === currentImageIndex
+                        ? 'border-primary'
+                        : 'border-[#1a1a1a] hover:border-white/40'
+                    }`}
+                  >
+                    <img
+                      src={thumbSrc}
+                      alt={`Miniatura ${idx + 1}`}
+                      className="w-full h-full object-contain bg-white"
+                    />
+                    {item.kind === 'cover' && (
+                      <span className="absolute bottom-0 left-0 right-0 bg-primary text-primary-foreground text-[8px] font-bold uppercase tracking-widest text-center py-px">
+                        Capa
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           )}
 
