@@ -71,11 +71,11 @@ const SELECOES: Seleção[] = [
   { team: 'Nova Zelândia', slug: 'camisa-nova-zelandia-2026', description: 'Branco dos All Whites. Camisa I para a Copa 2026.', supplierCode: 'JIN-NZL-26-T', confederation: 'OFC' },
 
   // ─── EUROPA (UEFA) ───
-  { team: 'Inglaterra', slug: 'camisa-inglaterra-2026', description: 'Branco dos Three Lions. Camisa I da Inglaterra para a Copa 2026.', supplierCode: 'JIN-ENG-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 6 },
+  { team: 'Inglaterra', slug: 'camisa-inglaterra-2026', description: 'Branco dos Three Lions. Camisa I da Inglaterra para a Copa 2026.', supplierCode: 'JIN-ENG-26-T', confederation: 'UEFA' },
   { team: 'França', slug: 'camisa-franca-2026', description: 'A icônica camisa azul (com detalhes brancos) dos Bleus para a Copa 2026.', supplierCode: 'JIN-FRA-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 4 },
-  { team: 'Espanha', slug: 'camisa-espanha-2026', description: 'Vermelho de La Roja. Camisa I para a Copa 2026.', supplierCode: 'JIN-ESP-26-T', confederation: 'UEFA' },
-  { team: 'Portugal', slug: 'camisa-portugal-2026', description: 'A icônica camisa vermelha da Seleção das Quinas para a Copa 2026.', supplierCode: 'JIN-POR-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 3 },
-  { team: 'Alemanha', slug: 'camisa-alemanha-2026', description: 'Branco da Nationalmannschaft. Camisa I para a Copa 2026.', supplierCode: 'JIN-GER-26-T', confederation: 'UEFA' },
+  { team: 'Espanha', slug: 'camisa-espanha-2026', description: 'Vermelho de La Roja. Camisa I para a Copa 2026.', supplierCode: 'JIN-ESP-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 3 },
+  { team: 'Portugal', slug: 'camisa-portugal-2026', description: 'A icônica camisa vermelha da Seleção das Quinas para a Copa 2026.', supplierCode: 'JIN-POR-26-T', confederation: 'UEFA' },
+  { team: 'Alemanha', slug: 'camisa-alemanha-2026', description: 'Branco da Nationalmannschaft. Camisa I para a Copa 2026.', supplierCode: 'JIN-GER-26-T', confederation: 'UEFA', badge: 'Destaque', featured: true, featuredOrder: 6 },
   { team: 'Holanda', slug: 'camisa-holanda-2026', description: 'Laranja da Oranje. Camisa I da Holanda para a Copa 2026.', supplierCode: 'JIN-NED-26-T', confederation: 'UEFA' },
   { team: 'Bélgica', slug: 'camisa-belgica-2026', description: 'Vinho dos Diabos Vermelhos. Camisa I para a Copa 2026.', supplierCode: 'JIN-BEL-26-T', confederation: 'UEFA' },
   { team: 'Croácia', slug: 'camisa-croacia-2026', description: 'O xadrez vermelho e branco. Camisa I da Croácia para a Copa 2026.', supplierCode: 'JIN-CRO-26-T', confederation: 'UEFA' },
@@ -266,7 +266,7 @@ async function main() {
   console.log(`✅ Seed concluído! ${total} produtos cadastrados (${SELECOES.length} seleções × 2 versões).`)
   console.log('   Versão Jogador: featured R$ 269,90 · catálogo R$ 249,90')
   console.log('   Versão Torcedor: R$ 239,90 (todas)')
-  console.log('   Destaques (home): Brasil I · Brasil II · Portugal · França · Argentina · Inglaterra')
+  console.log('   Destaques (home): Brasil I · Brasil II · Espanha · França · Argentina · Alemanha')
   console.log('   Cupons: PRIMEIRA5 e COPA5 (5% off na 1ª compra, bloqueado ≥3 peças)')
 }
 

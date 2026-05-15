@@ -12,8 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
-    "images:process": "npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --project scripts/tsconfig.json scripts/process-images.ts",
-    "images:test-gemini": "npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --project scripts/tsconfig.json scripts/test-gemini-image.ts",
+    "images:copy": "npx --yes dotenv-cli -e .env.local -- npx ts-node --transpile-only --project scripts/tsconfig.json scripts/copy-static-images.ts",
     "seed:mock": "node_modules/.bin/ts-node --skip-project --transpile-only --compiler-options {\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"} prisma/seed-mock.ts",
     "seed:clear": "node_modules/.bin/ts-node --skip-project --transpile-only --compiler-options {\\\"module\\\":\\\"commonjs\\\",\\\"moduleResolution\\\":\\\"node\\\"} prisma/clear-mock.ts"
   },
@@ -22,7 +21,6 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
-    "@google/genai": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^5.22.0",
     "@react-email/components": "^1.0.12",

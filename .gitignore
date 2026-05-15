@@ -1,0 +1,4 @@
+# Pastas de input local — imagens brutas que NÃO vão pro Git
+# (têm nomes longos que estouram limite do Windows, e são processadas pelo script)
+/Camisas destaques/
+/imagens-raw/
