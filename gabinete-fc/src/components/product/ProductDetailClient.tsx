@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft, ShoppingCart, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import InnerImageZoom from 'react-inner-image-zoom'
@@ -25,6 +25,7 @@ type CustomizationChoice = 'plain' | 'personalize' | null
 const MAX_NAME = 12
 
 export function ProductDetailClient({ product }: Props) {
+  const router = useRouter()
   const addItem = useCartStore((s) => s.addItem)
   const [selectedSize, setSelectedSize] = useState('')
   const [choice, setChoice] = useState<CustomizationChoice>(null)
@@ -118,12 +119,19 @@ export function ProductDetailClient({ product }: Props) {
     <div>
       {/* Breadcrumb */}
       <div className="px-4 md:px-6 py-4 border-b border-border">
-        <Link
-          href="/loja"
-          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest"
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.history.length > 1) {
+              router.back()
+            } else {
+              router.push('/loja')
+            }
+          }}
+          className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest cursor-pointer"
         >
           <ArrowLeft className="w-3 h-3" /> Voltar
-        </Link>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-200px)]">

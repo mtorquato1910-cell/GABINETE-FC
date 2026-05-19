@@ -9,7 +9,7 @@ interface LogoProps {
 export function Logo({ variant = 'full', className = '' }: LogoProps) {
   if (variant === 'text') {
     return (
-      <Link href="/" className={`flex items-center ${className}`}>
+      <Link href="/" prefetch className={`flex items-center cursor-pointer ${className}`}>
         <span
           className="text-2xl md:text-3xl leading-none uppercase text-primary"
           style={{ fontFamily: "'Barlow Condensed', 'Space Grotesk', sans-serif", fontWeight: 900, letterSpacing: '-0.01em' }}
@@ -22,7 +22,7 @@ export function Logo({ variant = 'full', className = '' }: LogoProps) {
 
   if (variant === 'icon') {
     return (
-      <Link href="/" className={`flex items-center ${className}`}>
+      <Link href="/" prefetch className={`flex items-center cursor-pointer ${className}`}>
         <Image
           src="/logo/gabinete-fc-icon.png"
           alt="Gabinete FC"
@@ -36,7 +36,7 @@ export function Logo({ variant = 'full', className = '' }: LogoProps) {
   }
 
   return (
-    <Link href="/" className={`flex items-center ${className}`}>
+    <Link href="/" prefetch className={`flex items-center cursor-pointer ${className}`}>
       <Image
         src="/logo/gabinete-fc-logo.png"
         alt="Gabinete FC"

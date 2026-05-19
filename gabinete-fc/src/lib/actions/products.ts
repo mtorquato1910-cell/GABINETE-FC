@@ -102,10 +102,10 @@ export async function searchProductsDb(query: string): Promise<Product[]> {
     where: {
       isActive: true,
       OR: [
-        { name: { contains: query } },
-        { description: { contains: query } },
-        { team: { contains: query } },
-        { category: { contains: query } },
+        { name: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+        { team: { contains: query, mode: 'insensitive' } },
+        { category: { contains: query, mode: 'insensitive' } },
       ],
     },
     orderBy: { isFeatured: 'desc' },
