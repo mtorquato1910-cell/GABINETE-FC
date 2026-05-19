@@ -31,13 +31,29 @@ async function calcStock(productId: string): Promise<number> {
   return map[productId] ?? 99
 }
 
+// Ordena produtos: com capa real primeiro (images[0] contém '/covers/'),
+// destaques antes, e depois pelo createdAt desc.
+function sortByCoverThenRecent<T extends { images: string; isFeatured: boolean; createdAt: Date }>(
+  products: T[],
+): T[] {
+  return [...products].sort((a, b) => {
+    const aHasCover = a.images.includes('/covers/') ? 1 : 0
+    const bHasCover = b.images.includes('/covers/') ? 1 : 0
+    if (aHasCover !== bHasCover) return bHasCover - aHasCover
+    const aFeat = a.isFeatured ? 1 : 0
+    const bFeat = b.isFeatured ? 1 : 0
+    if (aFeat !== bFeat) return bFeat - aFeat
+    return b.createdAt.getTime() - a.createdAt.getTime()
+  })
+}
+
 export async function getActiveProducts(): Promise<Product[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true },
-    orderBy: { createdAt: 'desc' },
   })
-  const stocks = await calcStockBatch(products.map((p) => p.id))
-  return products.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
+  const sorted = sortByCoverThenRecent(products)
+  const stocks = await calcStockBatch(sorted.map((p) => p.id))
+  return sorted.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 
 export async function getFeaturedProducts(): Promise<Product[]> {
@@ -63,12 +79,10 @@ export async function getProductsByCategory(category: string): Promise<Product[]
   const where =
     category === 'all' || !category ? { isActive: true } : { isActive: true, category }
 
-  const products = await prisma.product.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-  })
-  const stocks = await calcStockBatch(products.map((p) => p.id))
-  return products.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
+  const products = await prisma.product.findMany({ where })
+  const sorted = sortByCoverThenRecent(products)
+  const stocks = await calcStockBatch(sorted.map((p) => p.id))
+  return sorted.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 
 export async function searchProductsDb(query: string): Promise<Product[]> {

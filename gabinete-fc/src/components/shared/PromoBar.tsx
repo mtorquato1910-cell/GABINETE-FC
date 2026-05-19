@@ -14,8 +14,8 @@ export function PromoBar() {
   }
 
   return (
-    <div className="bg-primary text-primary-foreground sticky top-0 z-[60]">
-      <div className="flex items-center justify-center gap-3 px-6 py-2 text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">
+    <div className="bg-primary text-primary-foreground sticky top-0 z-[60] h-9">
+      <div className="flex items-center justify-center gap-3 px-6 h-full text-[10px] md:text-xs font-bold uppercase tracking-[0.2em]">
         <span className="hidden md:inline">⚡ Primeira compra?</span>
         <button
           onClick={handleCopy}

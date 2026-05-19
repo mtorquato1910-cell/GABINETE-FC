@@ -16,10 +16,10 @@ export function BackToTop() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-6 left-6 w-10 h-10 bg-secondary border border-border flex items-center justify-center hover:border-primary hover:text-primary transition-colors z-40"
+      className="fixed bottom-24 right-6 w-11 h-11 bg-primary/25 hover:bg-primary/60 border border-primary/40 text-primary-foreground backdrop-blur-sm flex items-center justify-center transition-all duration-200 z-40 shadow-lg"
       aria-label="Voltar ao topo"
     >
-      <ChevronUp className="w-4 h-4" />
+      <ChevronUp className="w-5 h-5" />
     </button>
   )
 }

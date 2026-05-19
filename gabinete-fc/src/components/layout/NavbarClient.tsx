@@ -55,7 +55,7 @@ export function NavbarClient({ isLoggedIn = false, isAdmin = false, userName }: 
   }, [])
 
   return (
-    <nav className="flex justify-between items-center px-6 md:px-8 py-4 border-b border-[#1a1a1a] sticky top-0 bg-black z-50">
+    <nav className="flex justify-between items-center px-6 md:px-8 py-4 border-b border-[#1a1a1a] sticky top-9 bg-black z-50">
       <Logo variant="text" />
 
       {/* Desktop nav */}
