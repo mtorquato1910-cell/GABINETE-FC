@@ -59,7 +59,8 @@
       "Bash(npx dotenv-cli *)",
       "Bash(tee /tmp/cover-gen.log)",
       "Bash(tee /tmp/cover-gen2.log)",
-      "Bash(tee /tmp/cover-gen3.log)"
+      "Bash(tee /tmp/cover-gen3.log)",
+      "Bash(tee /tmp/cover-gen-variants.log)"
     ]
   }
 }
