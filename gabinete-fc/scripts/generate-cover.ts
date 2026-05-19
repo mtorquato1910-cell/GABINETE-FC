@@ -592,6 +592,41 @@ const PRESETS: Record<string, Preset> = {
     details: 'Classic green Lions of Mesopotamia home jersey for the 2026 World Cup',
     crestFile: 'Iraque.png',
   },
+
+  // ─── VARIANTES DE COR (novos produtos) ───
+  'camisa-espanha-branca-2026': {
+    slug: 'camisa-espanha-branca-2026',
+    team: 'Spain',
+    variant: 'II away',
+    primaryColor: 'pure clean white #FFFFFF',
+    secondaryColor: 'bold La Roja red #AA151B with golden yellow #F1BF00 accents',
+    brand: 'three classic red Adidas stripes on the shoulders',
+    crest: 'RFEF crest of the Royal Spanish Football Federation with crown and red/yellow flag stripes',
+    details: 'White La Roja away jersey for the 2026 World Cup',
+    crestFile: 'Espanha-1024x614.jpg',
+  },
+  'camisa-espanha-azul-2026': {
+    slug: 'camisa-espanha-azul-2026',
+    team: 'Spain',
+    variant: 'III alternate',
+    primaryColor: 'deep royal navy blue #0F2D52',
+    secondaryColor: 'bold red #AA151B with subtle golden yellow #F1BF00 accents',
+    brand: 'three classic white Adidas stripes on the shoulders',
+    crest: 'RFEF crest of the Royal Spanish Football Federation with crown and red/yellow flag stripes',
+    details: 'Royal blue La Roja alternate jersey for the 2026 World Cup',
+    crestFile: 'Espanha-1024x614.jpg',
+  },
+  'camisa-portugal-especial-2026': {
+    slug: 'camisa-portugal-especial-2026',
+    team: 'Portugal',
+    variant: 'Special edition',
+    primaryColor: 'pure clean white #FFFFFF with subtle ivory tones',
+    secondaryColor: 'rich golden #C5A45C with deep crimson #B22234 and emerald green #006847 embroidered accents',
+    brand: 'metallic gold Puma logo (jumping cat) with golden PUMA wordmark',
+    crest: 'FPF crest of the Portuguese Football Federation with shield, castles and quinas, rendered in metallic gold embroidery',
+    details: 'Limited Special Edition white Portugal jersey with gold embroidery and intricate heritage details for the 2026 World Cup',
+    crestFile: 'Portugal-1024x614.jpg',
+  },
 }
 
 const FEATURED_SLUGS = [

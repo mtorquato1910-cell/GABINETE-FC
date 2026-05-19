@@ -28,7 +28,10 @@ export function ProductCard({ product }: ProductCardProps) {
     })
   }
 
-  const isOutOfStock = product.stock === 0
+  const hasRealPhotos = product.images.some(
+    (u) => !u.includes('/covers/') && !u.endsWith('placeholder-jersey.svg')
+  )
+  const isOutOfStock = !hasRealPhotos || product.stock === 0
 
   return (
     <article className="product-card group flex flex-col relative overflow-hidden">
@@ -40,19 +43,17 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       )}
 
-      {/* Tag versão Jogador/Torcedor */}
-      <div className="absolute top-3 right-3 z-10 text-[10px] font-black px-2 py-1 uppercase tracking-[0.2em] bg-primary text-primary-foreground">
-        {product.version === 'torcedor' ? 'Torcedor' : 'Jogador'}
-      </div>
-
-      {/* Esgotado overlay */}
-      {isOutOfStock && (
-        <div className="absolute inset-0 z-20 bg-black/70 flex items-center justify-center pointer-events-none">
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/40 border border-white/10 px-3 py-1">
-            Esgotado
+      {/* Tags versão + estoque (top-right, empilhadas) */}
+      <div className="absolute top-3 right-3 z-10 flex flex-col items-end gap-1">
+        <span className="text-[10px] font-black px-2 py-1 uppercase tracking-[0.2em] bg-primary text-primary-foreground">
+          {product.version === 'torcedor' ? 'Torcedor' : 'Jogador'}
+        </span>
+        {isOutOfStock && (
+          <span className="text-[10px] font-black px-2 py-1 uppercase tracking-[0.2em] bg-primary text-white">
+            Camisa sem estoque
           </span>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Image — camisa "flutuando" */}
       <Link

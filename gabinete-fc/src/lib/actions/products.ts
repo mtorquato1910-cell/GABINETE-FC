@@ -31,12 +31,23 @@ async function calcStock(productId: string): Promise<number> {
   return map[productId] ?? 99
 }
 
-// Ordena produtos: com capa real primeiro (images[0] contém '/covers/'),
-// destaques antes, e depois pelo createdAt desc.
-function sortByCoverThenRecent<T extends { images: string; isFeatured: boolean; createdAt: Date }>(
+// Ordena produtos: com estoque primeiro, depois com fotos reais (>2 imagens),
+// depois com capa, depois destaques, depois createdAt desc.
+function sortProducts<T extends { images: string; isFeatured: boolean; createdAt: Date; id: string }>(
   products: T[],
+  stocks: Record<string, number>,
 ): T[] {
+  const photoCount = (imagesJson: string) => {
+    try { return (JSON.parse(imagesJson) as string[]).filter((u) => !u.includes('/covers/') && !u.endsWith('placeholder-jersey.svg')).length }
+    catch { return 0 }
+  }
   return [...products].sort((a, b) => {
+    const aInStock = (stocks[a.id] ?? 99) > 0 ? 1 : 0
+    const bInStock = (stocks[b.id] ?? 99) > 0 ? 1 : 0
+    if (aInStock !== bInStock) return bInStock - aInStock
+    const aPhotos = photoCount(a.images) > 0 ? 1 : 0
+    const bPhotos = photoCount(b.images) > 0 ? 1 : 0
+    if (aPhotos !== bPhotos) return bPhotos - aPhotos
     const aHasCover = a.images.includes('/covers/') ? 1 : 0
     const bHasCover = b.images.includes('/covers/') ? 1 : 0
     if (aHasCover !== bHasCover) return bHasCover - aHasCover
@@ -51,8 +62,8 @@ export async function getActiveProducts(): Promise<Product[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true },
   })
-  const sorted = sortByCoverThenRecent(products)
-  const stocks = await calcStockBatch(sorted.map((p) => p.id))
+  const stocks = await calcStockBatch(products.map((p) => p.id))
+  const sorted = sortProducts(products, stocks)
   return sorted.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 
@@ -80,8 +91,8 @@ export async function getProductsByCategory(category: string): Promise<Product[]
     category === 'all' || !category ? { isActive: true } : { isActive: true, category }
 
   const products = await prisma.product.findMany({ where })
-  const sorted = sortByCoverThenRecent(products)
-  const stocks = await calcStockBatch(sorted.map((p) => p.id))
+  const stocks = await calcStockBatch(products.map((p) => p.id))
+  const sorted = sortProducts(products, stocks)
   return sorted.map((p) => mapProductFromDb(p, stocks[p.id] ?? 99))
 }
 

@@ -56,6 +56,11 @@ export function ProductDetailClient({ product }: Props) {
     setCurrentImageIndex((i) => (i === displayItems.length - 1 ? 0 : i + 1))
   }
 
+  const hasRealPhotos = product.images.some(
+    (u) => !u.includes('/covers/') && !u.endsWith('placeholder-jersey.svg')
+  )
+  const isOutOfStock = !hasRealPhotos || product.stock === 0
+
   const sanitizedName = customName.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, MAX_NAME)
   const sanitizedNumber = customNumber.replace(/\D/g, '').slice(0, 2)
   const numberInRange =
@@ -248,6 +253,11 @@ export function ProductDetailClient({ product }: Props) {
               <span className="inline-block bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 uppercase tracking-[0.2em]">
                 {product.version === 'torcedor' ? 'Versão Torcedor' : 'Versão Jogador'}
               </span>
+              {isOutOfStock && (
+                <span className="inline-block bg-primary text-white text-[10px] font-bold px-3 py-1 uppercase tracking-[0.2em]">
+                  Camisa sem estoque
+                </span>
+              )}
             </div>
             <h1 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase mb-2">
               {product.name}
@@ -371,7 +381,7 @@ export function ProductDetailClient({ product }: Props) {
           <SocialProof productId={product.id} />
 
           {/* CTA */}
-          {product.stock > 0 ? (
+          {!isOutOfStock ? (
             <div className="flex flex-col gap-2">
               <button
                 onClick={handleAdd}
