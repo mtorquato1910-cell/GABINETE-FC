@@ -26,7 +26,7 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..')
 const INFO_DIR = path.join(REPO_ROOT, 'Informação Camisas')
 const COVERS_DIR = path.join(__dirname, '..', 'public', 'images', 'products', 'copa2026', 'covers')
 
-interface Preset {
+export interface Preset {
   slug: string
   team: string
   variant: string
@@ -38,7 +38,7 @@ interface Preset {
   crestFile?: string
 }
 
-const PRESETS: Record<string, Preset> = {
+export const PRESETS: Record<string, Preset> = {
   'camisa-brasil-2026': {
     slug: 'camisa-brasil-2026',
     team: 'Brazil',
@@ -805,6 +805,8 @@ async function main() {
   }
 }
 
-main()
-  .catch((e) => { console.error(e); process.exit(1) })
-  .finally(() => prisma.$disconnect())
+if (require.main === module) {
+  main()
+    .catch((e) => { console.error(e); process.exit(1) })
+    .finally(() => prisma.$disconnect())
+}
