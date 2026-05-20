@@ -40,11 +40,12 @@ async function loadImageBase64(fullPath: string): Promise<{ data: string; mime: 
   return { data: buf.toString('base64'), mime }
 }
 
-async function loadPhotoAsJpeg(fullPath: string): Promise<{ data: string; mime: string }> {
+async function loadPhotoAsJpeg(fullPath: string, opts?: { hiRes?: boolean }): Promise<{ data: string; mime: string }> {
   const buf = await fs.readFile(fullPath)
+  const size = opts?.hiRes ? 1024 : 768
   const jpegBuf = await sharp(buf)
-    .resize(768, 1024, { fit: 'inside' })
-    .jpeg({ quality: 90 })
+    .resize(size, Math.round(size * 1.33), { fit: 'inside' })
+    .jpeg({ quality: opts?.hiRes ? 92 : 90 })
     .toBuffer()
   return { data: jpegBuf.toString('base64'), mime: 'image/jpeg' }
 }
@@ -83,18 +84,70 @@ Background: deep matte charcoal-black studio cyclorama, soft contact shadow. Lig
 Empty floating product shot — no mannequin, no hanger, no person, no body, no display stand. Hyper-realistic, 8k resolution, photorealistic, premium "blackout" colorway.`
 }
 
-async function listRealPhotos(slug: string): Promise<string[]> {
+function buildColorPromptHighFidelity(p: Preset): string {
+  return `Professional product photography, ultra-detailed studio shot of a premium ${p.team} national football team jersey (kit ${p.variant}). This is a MAXIMUM-FIDELITY REPLICATION job — the output must look identical to the real jersey in every visible detail.
+
+HOW TO USE THE REFERENCE IMAGES (read VERY carefully — this is the most important instruction in the entire prompt):
+- The FIRST reference image is the EXISTING STUDIO COVER. You MUST replicate ONLY its POSE, ANGLE, ROTATION, FRAMING, BACKGROUND and LIGHTING with pixel-level fidelity. SAME direction the torso is rotated, SAME shoulder elevation, SAME crop, SAME charcoal-black studio cyclorama, SAME dramatic chiaroscuro lighting. DO NOT copy the design (colors, pattern, collar style, sleeve trims, crest art) from this first image — its design will be REPLACED by what the real-jersey photos show.
+- The SECOND reference image is the federation crest art.
+- The REMAINING reference images (there are 5 of them) are PHOTOS OF THE REAL JERSEY currently being sold. Each photo shows a different angle/detail. STUDY ALL OF THEM CAREFULLY and replicate EXACTLY:
+  • The EXACT primary body color tone (do NOT approximate — match the precise hue and saturation visible in the photos)
+  • Every secondary accent color (e.g. turquoise/teal/cyan vs simple green vs lime — match precisely what the photos show)
+  • The COMPLETE all-over fabric pattern visible on the body (jacquard, embossed motifs, gradient effects, dripping wave patterns, multi-zone designs — render every element exactly as in the photos; do NOT simplify, do NOT generalize, do NOT substitute with a generic pattern)
+  • The exact collar geometry (V-neck depth, ribbed trim, inner contrast band color, layering)
+  • The exact sleeve cuff trim (color, stripes, piping, inner accent color)
+  • The exact crest layout (stars, federation badge colors and shape, country name wordmark color and font)
+  • The exact brand mark (Nike swoosh / Jumpman / Puma / Adidas — including its color, size and exact position)
+  • Side panels, dorsal stripes, sponsor heat-press, hem details — every visible element
+- DO NOT copy the pose, camera angle, framing, lighting, mannequin, store-background from the real-jersey photos — those are flat frontal store/mannequin shots and that POSE is WRONG. Use the FIRST reference for pose, the REAL PHOTOS for design.
+
+FINAL OUTPUT FORMULA: pose/angle/framing/background/lighting from the FIRST reference (existing cover) + EVERY visible design detail (color, pattern, collar, sleeves, crest, brand) from the real-jersey photos = the new cover.
+
+CRITICAL FIDELITY RULE: a customer who owns this jersey must look at the cover and immediately recognize their own jersey — same color tones, same pattern, same accents, same crest layout. If any visible detail in the real photos is missing or simplified in the cover, the output is WRONG. Generic patterns, approximated colors, missing accents — all FORBIDDEN.
+
+Background: deep matte charcoal-black studio cyclorama with subtle tonal depth, soft contact shadow grounding the jersey. Lighting: powerful directional top-down cinematic studio lighting with rim light separating the silhouette from the dark background. Fabric: extreme focus on the dry-fit mesh texture and the EXACT tonal/multi-color pattern visible in the real-jersey photos.
+
+Empty floating product shot — no mannequin visible, no hanger, no person, no body, no display stand, no banner, no store background. Hyper-realistic, 8k resolution, photorealistic, ultra-sharp focus, premium sports catalog style. ${p.details}.`
+}
+
+function buildBlackoutPromptHighFidelity(p: Preset): string {
+  return `Professional product photography, ultra-detailed shot of a premium ${p.team} national football team jersey in a deep grayscale colorway. This is a MAXIMUM-FIDELITY REPLICATION job — the output must look identical to the real jersey in every visible structural detail, only with all colors converted to neutral monochrome gray.
+
+HOW TO USE THE REFERENCE IMAGES (read very carefully):
+- The FIRST reference image is the NEW COLORED COVER you must mirror — match its POSE, ANGLE, ROTATION, FRAMING, CROP, BACKGROUND and LIGHTING with pixel-level fidelity. The two covers (color + gray) MUST look like the same product photographed in the same studio setup, only differing in colorway.
+- The REMAINING reference images (5 of them) are PHOTOS OF THE REAL JERSEY. STUDY ALL OF THEM and replicate every structural design detail: the COMPLETE all-over fabric pattern (jacquard, embossed motifs, gradient, multi-zone designs — render the EXACT pattern as a subtle gray-on-gray tonal motif, do NOT smooth out, do NOT simplify), exact collar shape and layering, exact sleeve cuff structure, exact crest layout, exact brand logo placement.
+- DO NOT copy the pose, camera angle, framing or lighting from the real-jersey photos.
+
+FINAL OUTPUT FORMULA: pose/angle/framing/background/lighting from the FIRST reference (colored cover) + EVERY structural design detail from the real-jersey photos + ALL colors converted to neutral monochrome grayscale (NO blue tint, NO cyan, NO cool tones — neutral or slightly warm grays only) = the new gray cover.
+
+CRITICAL: preserve the exact fabric pattern from the real photos — render every element of the jacquard/embossed motif as gray-on-gray tonal detail. Generic smoothed-out body is FORBIDDEN. The ${p.crest} stays in dark gray embroidery on the LEFT chest (viewer's right). The ${p.brand} logo as a tonal dark-gray heat-press.
+
+Background: deep matte charcoal-black studio cyclorama, soft contact shadow. Lighting: high-contrast chiaroscuro with prominent neutral-white rim lighting separating the gray jersey from the dark background.
+
+Empty floating product shot — no mannequin, no hanger, no person, no body, no display stand. Hyper-realistic, 8k resolution, photorealistic, premium "blackout" colorway.`
+}
+
+async function listRealPhotos(slug: string, max = 2): Promise<string[]> {
   try {
     const files = await fs.readdir(path.join(PHOTOS_DIR, slug))
     return files
       .filter((f) => PHOTO_EXT_RE.test(f))
       .sort()
-      .slice(0, 2) // pegamos as 2 primeiras (frente + detalhe)
+      .slice(0, max)
       .map((f) => path.join(PHOTOS_DIR, slug, f))
   } catch {
     return []
   }
 }
+
+/**
+ * Slugs que precisam de máxima fidelidade — usam mais fotos de referência (5)
+ * em alta resolução, e prompt reforçado de "match EVERY detail".
+ */
+const HIGH_FIDELITY_SLUGS = new Set<string>([
+  'camisa-brasil-2026',
+  'camisa-brasil-ii-2026',
+])
 
 async function hasExistingCover(slug: string): Promise<string | null> {
   const p = path.join(COVERS_DIR, `${slug}-cover-color.webp`)
@@ -136,7 +189,8 @@ async function findQualifyingSlugs(only?: string): Promise<Qualified[]> {
       console.warn(`  ⏭️  ${slug}: preset não encontrado`)
       continue
     }
-    const realPhotos = await listRealPhotos(slug)
+    const maxPhotos = HIGH_FIDELITY_SLUGS.has(slug) ? 5 : 2
+    const realPhotos = await listRealPhotos(slug, maxPhotos)
     if (realPhotos.length === 0) {
       if (only) console.warn(`  ⏭️  ${slug}: sem fotos reais em /photos/${slug}/`)
       continue
@@ -193,16 +247,17 @@ async function generateAndSave(q: Qualified) {
     }
   }
 
-  // Fotos reais convertidas pra JPEG
+  // Fotos reais convertidas pra JPEG (hi-res para slugs high-fidelity)
+  const hiRes = HIGH_FIDELITY_SLUGS.has(slug)
   const realRefs: Array<{ base64: string; mime: string }> = []
   for (const photoPath of realPhotos) {
-    const r = await loadPhotoAsJpeg(photoPath)
+    const r = await loadPhotoAsJpeg(photoPath, { hiRes })
     realRefs.push({ base64: r.data, mime: r.mime })
   }
 
   // [1/2] colorida
-  console.log('  → [1/2] colorida (pose-anchor=capa atual + brasão + fotos reais)')
-  const colorPrompt = buildColorPrompt(preset)
+  console.log(`  → [1/2] colorida (pose-anchor + brasão + ${realRefs.length} foto(s) reais${hiRes ? ', hi-res' : ''})`)
+  const colorPrompt = hiRes ? buildColorPromptHighFidelity(preset) : buildColorPrompt(preset)
   const colorResult = await generateJerseyCover({
     prompt: colorPrompt,
     referenceImageBase64: poseAnchorBuf.toString('base64'),
@@ -212,8 +267,8 @@ async function generateAndSave(q: Qualified) {
   const colorBuffer = Buffer.from(colorResult.imageBase64, 'base64')
 
   // [2/2] apagada
-  console.log('  → [2/2] apagada (pose-anchor=colorida nova + fotos reais)')
-  const blackoutPrompt = buildBlackoutPrompt(preset)
+  console.log(`  → [2/2] apagada (pose-anchor=colorida nova + ${realRefs.length} foto(s) reais${hiRes ? ', hi-res' : ''})`)
+  const blackoutPrompt = hiRes ? buildBlackoutPromptHighFidelity(preset) : buildBlackoutPrompt(preset)
   const colorAsAnchor = await sharp(colorBuffer)
     .resize(512, 640, { fit: 'inside' })
     .jpeg({ quality: 85 })
