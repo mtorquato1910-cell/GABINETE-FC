@@ -31,7 +31,26 @@ export default async function SucessoPage({ searchParams }: Props) {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      {paymentOk && <ClearCartOnSuccess />}
+      {paymentOk && (
+        <ClearCartOnSuccess
+          purchase={
+            order
+              ? {
+                  transactionId: order.id,
+                  value: order.total,
+                  shipping: order.freightCost,
+                  items: order.items.map((it) => ({
+                    item_id: it.productId,
+                    item_name: it.productName,
+                    price: it.unitPrice,
+                    quantity: it.quantity,
+                    item_variant: it.size,
+                  })),
+                }
+              : undefined
+          }
+        />
+      )}
       <main className="flex-1 flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center py-16">
           <div className={`text-6xl mb-6 font-black tracking-tighter ${paymentOk ? 'text-primary' : 'text-destructive'}`}>

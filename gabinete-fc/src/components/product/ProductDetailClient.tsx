@@ -10,6 +10,7 @@ import { useCartStore } from '@/stores/cart-store'
 import { SocialProof } from '@/components/shared/SocialProof'
 import { StockAlertButton } from '@/components/product/StockAlertButton'
 import { JerseyCover, splitGallery } from '@/components/product/JerseyCover'
+import { gtmEvents } from '@/lib/gtm'
 import type { Product } from '@/types'
 
 type DisplayItem =
@@ -102,6 +103,13 @@ export function ProductDetailClient({ product }: Props) {
         ? { name: sanitizedName, number: sanitizedNumber }
         : null
     )
+    gtmEvents.addToCart({
+      item_id: product.id,
+      item_name: product.name,
+      price: product.price,
+      quantity: 1,
+      item_variant: selectedSize,
+    })
     toast.success('Adicionado!', {
       description:
         choice === 'personalize'

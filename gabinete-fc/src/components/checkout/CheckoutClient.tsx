@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
@@ -10,6 +10,7 @@ import { saveAddress, createOrder, validateCoupon } from '@/lib/actions/checkout
 import { formatPrice } from '@/lib/db-helpers'
 import { lookupCep } from '@/lib/cep'
 import { maskCpf, maskPhone } from '@/lib/masks'
+import { gtmEvents } from '@/lib/gtm'
 import { PaymentForm } from './PaymentForm'
 import type { Address } from '@/types'
 
@@ -50,6 +51,23 @@ export function CheckoutClient({ existingAddresses }: Props) {
   const freight = 0 // Política Gabinete FC: frete sempre grátis (Sprint 6)
   const total = subtotal + freight - couponDiscount
   const itemCount = items.reduce((acc, i) => acc + i.quantity, 0)
+
+  // begin_checkout (GA4) — dispara uma única vez quando o usuário entra no checkout com itens
+  const beginFiredRef = useRef(false)
+  useEffect(() => {
+    if (beginFiredRef.current || items.length === 0) return
+    beginFiredRef.current = true
+    gtmEvents.beginCheckout(
+      items.map((i) => ({
+        item_id: i.product.id,
+        item_name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        item_variant: i.size,
+      })),
+      subtotal,
+    )
+  }, [items, subtotal])
 
   if (items.length === 0 && !clientSecret) {
     router.push('/carrinho')
