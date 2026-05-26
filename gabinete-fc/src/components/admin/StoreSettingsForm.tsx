@@ -7,7 +7,7 @@ interface Props { settings: Record<string, string> }
 
 const SETTING_GROUPS = [
   { title: 'Geral', keys: ['store_name', 'store_email', 'whatsapp'] },
-  { title: 'Pagamentos', keys: ['pix_discount_percent', 'pix_expiry_minutes', 'stripe_3ds_threshold'] },
+  { title: 'Pagamentos', keys: ['pix_discount_percent', 'pix_expiry_minutes'] },
   { title: 'Operações', keys: ['free_shipping_threshold', 'freight_origin_cep'] },
   { title: 'Fidelidade', keys: ['loyalty_points_per_real', 'loyalty_points_expiry_days'] },
   { title: 'Meta / Pixel', keys: ['meta_pixel_id', 'meta_bm_id', 'meta_access_token'] },
@@ -16,7 +16,7 @@ const SETTING_GROUPS = [
 const LABELS: Record<string, string> = {
   store_name: 'Nome da loja', store_email: 'Email da loja', whatsapp: 'WhatsApp',
   pix_discount_percent: 'Desconto Pix (%)', pix_expiry_minutes: 'Expiração Pix (min)',
-  stripe_3ds_threshold: 'Threshold 3DS (R$)', free_shipping_threshold: 'Frete grátis acima de (R$)',
+  free_shipping_threshold: 'Frete grátis acima de (R$)',
   freight_origin_cep: 'CEP de origem', loyalty_points_per_real: 'Pontos por R$ 1',
   loyalty_points_expiry_days: 'Expiração pontos (dias)',
   meta_pixel_id: 'Meta Pixel ID', meta_bm_id: 'Meta BM ID (Business Manager)',

@@ -13,9 +13,9 @@ const serverSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 
-  // Stripe (Sprint 18)
-  STRIPE_SECRET_KEY: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  // Infinity Pay (Story 035) — autenticação 100% via handle no body
+  INFINITEPAY_HANDLE: z.string().optional(),
+  INFINITEPAY_API_URL: z.string().optional().default('https://api.checkout.infinitepay.io'),
 
   // Correios CWS (Sprint 20)
   CORREIOS_USERNAME: z.string().optional(),
@@ -44,7 +44,6 @@ const serverSchema = z.object({
 const clientSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().optional().default('http://localhost:3000'),
   NEXT_PUBLIC_APP_NAME: z.string().optional().default('Gabinete FC'),
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
   NEXT_PUBLIC_META_PIXEL_ID: z.string().optional(),
 })
@@ -69,7 +68,6 @@ const _clientEnv = (() => {
   const result = clientSchema.safeParse({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     NEXT_PUBLIC_META_PIXEL_ID: process.env.NEXT_PUBLIC_META_PIXEL_ID,
   })

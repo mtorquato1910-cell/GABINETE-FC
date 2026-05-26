@@ -15,23 +15,19 @@ export const metadata: Metadata = { title: 'Pedido Confirmado | Gabinete FC' }
 const POLL_SECONDS = 5
 
 interface Props {
-  // Aceita params da Infinity Pay (order_nsu, receipt_url, etc.)
-  // e o legado orderId/redirect_status (Stripe — remover quando Story 035.5 deletar).
+  // Params retornados pela Infinity Pay na redirect URL
   searchParams: Promise<{
     order_nsu?: string
     receipt_url?: string
     slug?: string
     capture_method?: string
     transaction_nsu?: string
-    // Legado Stripe (compat temporária)
-    orderId?: string
-    redirect_status?: string
   }>
 }
 
 export default async function SucessoPage({ searchParams }: Props) {
   const params = await searchParams
-  const orderId = params.order_nsu ?? params.orderId
+  const orderId = params.order_nsu
   const session = await auth()
 
   const order = orderId
@@ -46,7 +42,7 @@ export default async function SucessoPage({ searchParams }: Props) {
 
   const isPaid = order?.paymentStatus === 'paid'
   const isPending = order?.paymentStatus === 'pending'
-  const isFailed = order?.paymentStatus === 'failed' || params.redirect_status === 'failed'
+  const isFailed = order?.paymentStatus === 'failed'
 
   // Receipt URL: prioriza o que veio do webhook (autoritativo), fallback no query param da redirect
   const receiptUrl = order?.infinitepayReceiptUrl ?? params.receipt_url ?? null

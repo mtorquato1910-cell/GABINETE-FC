@@ -20,7 +20,7 @@ export async function getUserPoints() {
   return { total: active, history: points }
 }
 
-// Adiciona pontos após compra confirmada (chamado no webhook Stripe)
+// Adiciona pontos após compra confirmada (chamado no webhook Infinity Pay)
 export async function addPurchasePoints(orderId: string, userId: string, total: number) {
   const setting = await prisma.storeSetting.findUnique({ where: { key: 'loyalty_points_per_real' } })
   const pointsPerReal = parseFloat(setting?.value ?? '1')
