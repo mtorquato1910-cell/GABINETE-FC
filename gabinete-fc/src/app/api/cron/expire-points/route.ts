@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 // Vercel Cron: executar diariamente à meia-noite
 export async function GET(req: NextRequest) {
   const cronSecret = req.headers.get('authorization')
-  if (process.env.CRON_SECRET && cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

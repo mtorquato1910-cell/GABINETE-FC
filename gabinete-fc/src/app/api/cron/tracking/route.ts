@@ -5,7 +5,7 @@ import { trackPackage } from '@/lib/actions/correios'
 // Vercel Cron: executar a cada 6h
 export async function GET(req: NextRequest) {
   const cronSecret = req.headers.get('authorization')
-  if (process.env.CRON_SECRET && cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || cronSecret !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
