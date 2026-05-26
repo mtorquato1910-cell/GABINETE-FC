@@ -116,8 +116,6 @@ async function main() {
     { key: 'whatsapp', value: '5511999999999', category: 'general' },
     { key: 'pix_discount_percent', value: '5', category: 'payments' },
     { key: 'pix_expiry_minutes', value: '60', category: 'payments' },
-    { key: 'stripe_3ds_threshold', value: '500', category: 'payments' },
-    { key: 'stripe_3ds_mode', value: 'automatic', category: 'payments' },
     { key: 'meta_pixel_id', value: '', category: 'meta' },
     { key: 'meta_bm_id', value: '', category: 'meta' },
     { key: 'meta_access_token', value: '', category: 'meta' },
