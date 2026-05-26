@@ -153,7 +153,15 @@ export function CheckoutClient({ existingAddresses }: Props) {
       })
 
       if ('error' in result || !result.orderId) {
-        toast.error('Erro ao criar pedido')
+        const details = (result as { details?: Array<{ path: string; message: string }> })
+          .details
+        if (details && details.length > 0) {
+          const firstError = details[0]
+          toast.error(`Erro: ${firstError.path} — ${firstError.message}`)
+          console.error('[createOrder] detalhes do erro Zod:', details)
+        } else {
+          toast.error('Erro ao criar pedido')
+        }
         return
       }
 

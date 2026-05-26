@@ -327,8 +327,12 @@ export function ProductDetailClient({ product }: Props) {
 
           {/* Personalização */}
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-              2. Personalizar camisa?
+            <p
+              className={`text-[10px] uppercase tracking-widest mb-3 ${
+                choice === null ? 'text-primary font-bold' : 'text-muted-foreground'
+              }`}
+            >
+              2. Personalizar camisa? {choice === null && <span className="text-primary">←</span>}
             </p>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -340,7 +344,9 @@ export function ProductDetailClient({ product }: Props) {
                 className={`flex items-center justify-center gap-2 px-3 py-3 text-xs font-bold uppercase tracking-widest transition-colors ${
                   choice === 'plain'
                     ? 'bg-foreground text-background'
-                    : 'border border-border text-muted-foreground hover:border-foreground hover:text-foreground'
+                    : choice === null
+                      ? 'border-2 border-foreground text-foreground animate-pulse hover:bg-foreground hover:text-background hover:animate-none'
+                      : 'border border-border text-muted-foreground hover:border-foreground hover:text-foreground'
                 }`}
               >
                 {choice === 'plain' && <Check className="w-3 h-3" />}
@@ -351,7 +357,9 @@ export function ProductDetailClient({ product }: Props) {
                 className={`flex items-center justify-center gap-2 px-3 py-3 text-xs font-bold uppercase tracking-widest transition-colors ${
                   choice === 'personalize'
                     ? 'bg-primary text-primary-foreground'
-                    : 'border border-border text-muted-foreground hover:border-primary hover:text-primary'
+                    : choice === null
+                      ? 'border-2 border-primary text-primary animate-pulse hover:bg-primary hover:text-primary-foreground hover:animate-none'
+                      : 'border border-border text-muted-foreground hover:border-primary hover:text-primary'
                 }`}
               >
                 {choice === 'personalize' && <Check className="w-3 h-3" />}

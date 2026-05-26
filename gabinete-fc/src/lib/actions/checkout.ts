@@ -85,7 +85,24 @@ export async function createOrder(data: unknown) {
   const session = await requireAuth()
   const userId = session.user.id
   const parsed = orderSchema.safeParse(data)
-  if (!parsed.success) return { error: 'Dados inválidos' }
+  if (!parsed.success) {
+    // Log estruturado server-side pra debug (sempre, não só dev)
+    console.error('[createOrder] Validação Zod falhou', {
+      userId,
+      issues: parsed.error.issues,
+      flatten: parsed.error.flatten(),
+      receivedKeys: data && typeof data === 'object' ? Object.keys(data) : null,
+    })
+    // Devolve detalhes pro front (não vaza nada sensível — só nomes de campos)
+    return {
+      error: 'Dados inválidos',
+      details: parsed.error.issues.map((i) => ({
+        path: i.path.join('.'),
+        message: i.message,
+        code: i.code,
+      })),
+    }
+  }
 
   const { addressId, paymentMethod, couponCode, items, freightCost } = parsed.data
 
