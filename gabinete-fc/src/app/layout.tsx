@@ -8,7 +8,6 @@ import { AnalyticsTracker } from '@/components/shared/AnalyticsTracker'
 import { PromoBar } from '@/components/shared/PromoBar'
 import { AuthListener } from '@/components/shared/AuthListener'
 import { CartSync } from '@/components/shared/CartSync'
-import { DevToolsBlocker } from '@/components/shared/DevToolsBlocker'
 import './globals.css'
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? ''
@@ -78,7 +77,6 @@ export default function RootLayout({
             />
           </noscript>
         )}
-        <DevToolsBlocker />
         <AuthListener />
         <CartSync />
         <PromoBar />
