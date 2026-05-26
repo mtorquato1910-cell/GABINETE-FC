@@ -14,6 +14,9 @@ export default async function CheckoutPage() {
   const session = await auth()
   if (!session?.user) redirect('/auth/login?callbackUrl=/checkout')
 
+  // Contas admin não podem realizar compras — devem usar uma conta cliente separada
+  if (session.user.role === 'admin') redirect('/admin/dashboard')
+
   // Exige perfil completo (CPF + telefone) antes de comprar
   const profile = await prisma.user.findUnique({
     where: { id: session.user.id },

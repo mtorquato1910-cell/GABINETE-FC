@@ -9,7 +9,7 @@ const ADMIN_ENABLED = process.env.ADMIN_ENABLED === 'true'
 // pra que o lockdown (notFound) funcione antes de qualquer query Prisma.
 export const dynamic = 'force-dynamic'
 import {
-  LayoutDashboard, Package, ShoppingBag, Tag,
+  LayoutDashboard, Package, ShoppingBag, Tag, Users,
   Settings, Star, TrendingUp, Boxes, LogOut,
   Megaphone, LayoutGrid, BarChart2, Flame,
 } from 'lucide-react'
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/admin/vitrine',   icon: LayoutGrid,      label: 'Vitrine' },
   { href: '/admin/produtos',  icon: Package,          label: 'Produtos' },
   { href: '/admin/pedidos',   icon: ShoppingBag,      label: 'Pedidos' },
+  { href: '/admin/clientes',  icon: Users,            label: 'Clientes' },
   { href: '/admin/cupons',    icon: Tag,              label: 'Cupons' },
   { href: '/admin/avaliacoes',icon: Star,             label: 'Avaliações' },
   { href: '/admin/estoque',   icon: Boxes,            label: 'Estoque' },
@@ -35,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const session = await auth()
   const user = session?.user as { role?: string; name?: string | null } | undefined
-  if (user?.role !== 'admin') redirect('/auth/login')
+  if (user?.role !== 'admin') redirect('/painel/login')
 
   return (
     <div className="flex min-h-screen bg-black">

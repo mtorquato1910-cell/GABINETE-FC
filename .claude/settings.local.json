@@ -60,7 +60,11 @@
       "Bash(tee /tmp/cover-gen.log)",
       "Bash(tee /tmp/cover-gen2.log)",
       "Bash(tee /tmp/cover-gen3.log)",
-      "Bash(tee /tmp/cover-gen-variants.log)"
+      "Bash(tee /tmp/cover-gen-variants.log)",
+      "Bash(npx eslint *)",
+      "Bash(npx next *)",
+      "WebSearch",
+      "WebFetch(domain:www.infinitepay.io)"
     ]
   }
 }

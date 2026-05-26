@@ -437,6 +437,25 @@ model PushSubscription {
   @@map("push_subscriptions")
 }
 
+// ─── AUDITORIA LGPD ──────────────────────────────────────────
+
+model AdminAuditLog {
+  id           String   @id @default(cuid())
+  adminUserId  String // quem executou
+  adminEmail   String // snapshot pra evitar JOIN futuro
+  action       String // "view_customer" | "view_cpf" | "edit_customer" | "delete_customer"
+  targetType   String // "customer" | "order" | etc
+  targetId     String // ID do alvo
+  metadata     String? // JSON livre
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([adminUserId, createdAt])
+  @@index([targetType, targetId])
+  @@map("admin_audit_logs")
+}
+
 // ─── ANALYTICS ───────────────────────────────────────────────
 
 model BehaviorEvent {

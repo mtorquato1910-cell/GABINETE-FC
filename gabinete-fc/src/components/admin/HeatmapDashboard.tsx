@@ -39,6 +39,8 @@ export function HeatmapDashboard({ availablePages }: { availablePages: string[] 
   const [showMoves, setShowMoves] = useState(true)
   const [loading, setLoading] = useState(false)
 
+  const [error, setError] = useState<string | null>(null)
+
   const [leads, setLeads] = useState<Lead[]>([])
   const [leadsLoading, setLeadsLoading] = useState(false)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
@@ -51,10 +53,19 @@ export function HeatmapDashboard({ availablePages }: { availablePages: string[] 
   // Load heatmap points
   const loadHeatmap = useCallback(async (page: string) => {
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch(`/api/analytics/heatmap?type=heatmap&page=${encodeURIComponent(page)}`)
       const data = await res.json()
-      setPoints(data.points ?? [])
+      if (!res.ok || data.error) {
+        setError(data.error ?? 'Falha ao carregar dados do heatmap')
+        setPoints([])
+      } else {
+        setPoints(data.points ?? [])
+      }
+    } catch {
+      setError('Falha de rede ao carregar heatmap')
+      setPoints([])
     } finally {
       setLoading(false)
     }
@@ -63,10 +74,19 @@ export function HeatmapDashboard({ availablePages }: { availablePages: string[] 
   // Load leads
   const loadLeads = useCallback(async () => {
     setLeadsLoading(true)
+    setError(null)
     try {
       const res = await fetch('/api/analytics/heatmap?type=leads')
       const data = await res.json()
-      setLeads(data.leads ?? [])
+      if (!res.ok || data.error) {
+        setError(data.error ?? 'Falha ao carregar leads')
+        setLeads([])
+      } else {
+        setLeads(data.leads ?? [])
+      }
+    } catch {
+      setError('Falha de rede ao carregar leads')
+      setLeads([])
     } finally {
       setLeadsLoading(false)
     }
@@ -283,7 +303,22 @@ export function HeatmapDashboard({ availablePages }: { availablePages: string[] 
               </div>
             )}
 
-            {!loading && points.length === 0 && (
+            {!loading && error && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center bg-background/80">
+                <span className="text-4xl mb-3">⚠️</span>
+                <p className="text-xs text-red-400 normal-case max-w-xs">
+                  {error}
+                </p>
+                <button
+                  onClick={() => loadHeatmap(selectedPage)}
+                  className="mt-3 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground border border-border px-3 py-1"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            )}
+
+            {!loading && !error && points.length === 0 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-4xl mb-3">🔥</span>
                 <p className="text-xs text-muted-foreground normal-case max-w-xs">

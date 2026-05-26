@@ -9,9 +9,14 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // ─── Admin lockdown ──────────────────────────────────────────
-  // Quando desativado, retorna 404 disfarçado pra qualquer rota /admin
-  // ou /api/admin — não revela que o painel existe.
-  if (!ADMIN_ENABLED && (pathname.startsWith('/admin') || pathname.startsWith('/api/admin'))) {
+  // Quando desativado, retorna 404 disfarçado pra qualquer rota /admin,
+  // /painel ou /api/admin — não revela que o painel existe.
+  if (
+    !ADMIN_ENABLED &&
+    (pathname.startsWith('/admin') ||
+      pathname.startsWith('/painel') ||
+      pathname.startsWith('/api/admin'))
+  ) {
     return new NextResponse('Not Found', { status: 404 })
   }
 

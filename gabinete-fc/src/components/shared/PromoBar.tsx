@@ -1,7 +1,14 @@
 'use client'
+import { usePathname } from 'next/navigation'
 import { toast } from 'sonner'
 
+// Rotas onde a PromoBar não deve aparecer (painel admin e futura área /painel)
+const HIDDEN_PREFIXES = ['/admin', '/painel']
+
 export function PromoBar() {
+  const pathname = usePathname()
+  if (pathname && HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText('COPA5')

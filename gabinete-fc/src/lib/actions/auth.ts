@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { prisma } from '@/lib/db'
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
@@ -75,7 +76,7 @@ export async function loginUser(data: { email: string; password: string; callbac
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email,
     password: parsed.data.password,
   })
@@ -86,6 +87,21 @@ export async function loginUser(data: { email: string; password: string; callbac
       return { error: 'Confirme seu email antes de entrar — verifique sua caixa de entrada' }
     }
     return { error: 'Email ou senha incorretos' }
+  }
+
+  // Bloqueio admin/cliente — contas admin não podem entrar no fluxo de cliente.
+  // Faz signOut imediato pra não deixar sessão pendurada.
+  if (signInData.user) {
+    const profile = await prisma.user.findUnique({
+      where: { id: signInData.user.id },
+      select: { role: true },
+    })
+    if (profile?.role === 'admin') {
+      await supabase.auth.signOut()
+      return {
+        error: 'Esta conta é administrativa. Use a área de painel para acessar.',
+      }
+    }
   }
 
   // Revalida todos os layouts pra middleware enxergar a sessão nova
