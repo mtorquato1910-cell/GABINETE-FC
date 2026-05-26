@@ -64,7 +64,9 @@
       "Bash(npx eslint *)",
       "Bash(npx next *)",
       "WebSearch",
-      "WebFetch(domain:www.infinitepay.io)"
+      "WebFetch(domain:www.infinitepay.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:ajuda.infinitepay.io)"
     ]
   }
 }
