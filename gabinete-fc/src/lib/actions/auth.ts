@@ -107,8 +107,23 @@ export async function loginUser(data: { email: string; password: string; callbac
   // Revalida todos os layouts pra middleware enxergar a sessão nova
   revalidatePath('/', 'layout')
 
-  // Redirect server-side garante que o middleware veja os cookies atualizados
-  redirect(data.callbackUrl && data.callbackUrl.startsWith('/') ? data.callbackUrl : '/minha-conta')
+  // Redirect server-side garante que o middleware veja os cookies atualizados.
+  // callbackUrl precisa ser caminho relativo SEGURO — só `/path`, nunca
+  // `//evil.com` (protocol-relative) ou `/\evil.com` (Windows-path bypass).
+  redirect(isSafeRedirectPath(data.callbackUrl) ? data.callbackUrl! : '/minha-conta')
+}
+
+/**
+ * Valida que o callbackUrl é um caminho interno seguro.
+ * Rejeita protocol-relative (`//evil.com`), Windows-path (`/\\evil.com`),
+ * URLs absolutas (`https://...`) e qualquer coisa que não comece com `/`.
+ */
+function isSafeRedirectPath(cb: string | undefined): boolean {
+  if (!cb || typeof cb !== 'string') return false
+  if (!cb.startsWith('/')) return false
+  // Bloqueia // e /\ — browsers tratam como protocol-relative
+  if (cb.startsWith('//') || cb.startsWith('/\\')) return false
+  return true
 }
 
 export async function logoutUser() {
