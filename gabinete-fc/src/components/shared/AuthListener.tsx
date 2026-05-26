@@ -18,7 +18,13 @@ export function AuthListener() {
   useEffect(() => {
     const supabase = createClient()
 
-    const handleSignIn = async () => {
+    /**
+     * Login REAL (anônimo → logado, ou troca de conta).
+     * Faz merge do cart local (anônimo) com o cart do banco.
+     * Cuidado: usar SÓ quando user mudou. Em page reload já logado, usar
+     * loadFromServer() pra evitar duplicação por soma local+server.
+     */
+    const handleNewLogin = async () => {
       const localItems = useCartStore.getState().items
       const payload = localItems.map((i) => ({
         productId: i.product.id,
@@ -36,7 +42,23 @@ export function AuthListener() {
         useCartStore.getState().setItems(result.items)
       } catch (err) {
         console.error('[AuthListener] mergeCart error:', err)
-        // Em caso de falha, marca hidratado mesmo assim pra liberar CartSync
+        useCartStore.getState().setItems(useCartStore.getState().items)
+      }
+    }
+
+    /**
+     * Page reload com user já logado, OU INITIAL_SESSION do Supabase.
+     * SOBRESCREVE o cart local pelo cart do servidor — sem merge.
+     * Isso evita duplicação quando user vai pro checkout hosted e volta
+     * sem pagar (carrinho local mantém items, server também tem, sem fix
+     * o merge faria soma).
+     */
+    const loadFromServer = async () => {
+      try {
+        const items = await getServerCart()
+        useCartStore.getState().setItems(items)
+      } catch (err) {
+        console.error('[AuthListener] getServerCart error:', err)
         useCartStore.getState().setItems(useCartStore.getState().items)
       }
     }
@@ -49,23 +71,27 @@ export function AuthListener() {
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       const userId = session?.user?.id ?? null
 
-      // Primeira chamada: registra estado inicial
+      // Primeira chamada (INITIAL_SESSION): página carregou.
+      // Se já está logado, NÃO faz merge — só carrega do servidor pra
+      // substituir o local. Evita o bug de duplicação quando volta do
+      // checkout Infinity Pay sem ter pago.
       if (lastUserId.current === undefined) {
         lastUserId.current = userId
-        if (userId) void handleSignIn() // hidrata cart do servidor na primeira carga
+        if (userId) void loadFromServer()
         return
       }
 
       // User mudou (login, logout, troca de conta)
       if (lastUserId.current !== userId) {
         lastUserId.current = userId
-        if (userId) void handleSignIn().then(() => router.refresh())
-        else {
+        if (userId) {
+          // Login REAL — merge faz sentido aqui (anônimo virou logado)
+          void handleNewLogin().then(() => router.refresh())
+        } else {
           handleSignOut()
           router.refresh()
         }
       } else if (event === 'SIGNED_OUT') {
-        // Edge case: SIGNED_OUT sem mudança de user (já era null)
         handleSignOut()
       }
     })
