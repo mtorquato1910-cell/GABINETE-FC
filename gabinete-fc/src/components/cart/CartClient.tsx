@@ -126,8 +126,8 @@ export function CartClient({ isLoggedIn = false }: Props) {
             <span>Total</span>
             <span>R$ {total.toFixed(2)}</span>
           </div>
-          <p className="text-[10px] text-primary uppercase tracking-widest">
-            ou R$ {(total * 0.95).toFixed(2)} no Pix (5% off)
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest normal-case">
+            Pix instantâneo · até 8x sem juros no cartão
           </p>
           {isLoggedIn ? (
             <Link

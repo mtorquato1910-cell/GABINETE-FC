@@ -1,8 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements } from '@stripe/react-stripe-js'
 import { useCartStore } from '@/stores/cart-store'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
@@ -11,19 +9,13 @@ import { formatPrice } from '@/lib/db-helpers'
 import { lookupCep } from '@/lib/cep'
 import { maskCpf, maskPhone } from '@/lib/masks'
 import { gtmEvents } from '@/lib/gtm'
-import { PaymentForm } from './PaymentForm'
 import type { Address } from '@/types'
 
-type Step = 'address' | 'review' | 'payment'
+type Step = 'address' | 'review'
 
 interface Props {
   existingAddresses: Address[]
 }
-
-// Carregamento singleton do Stripe.js
-const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-  : null
 
 export function CheckoutClient({ existingAddresses }: Props) {
   const router = useRouter()
@@ -41,9 +33,7 @@ export function CheckoutClient({ existingAddresses }: Props) {
     street: '', number: '', complement: '', neighborhood: '', city: '', state: '', zipCode: '',
   })
 
-  // ─── Estado de pagamento ───
-  const [orderId, setOrderId] = useState<string | null>(null)
-  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  // ─── Estado de checkout ───
   const [cepLoading, setCepLoading] = useState(false)
   const [addrErrors, setAddrErrors] = useState<Record<string, string[]>>({})
 
@@ -69,7 +59,7 @@ export function CheckoutClient({ existingAddresses }: Props) {
     )
   }, [items, subtotal])
 
-  if (items.length === 0 && !clientSecret) {
+  if (items.length === 0) {
     router.push('/carrinho')
     return null
   }
@@ -133,7 +123,7 @@ export function CheckoutClient({ existingAddresses }: Props) {
     setStep('review')
   }
 
-  // Cria order + PaymentIntent → entra no step de pagamento
+  // Cria order + link Infinity Pay → redireciona pro checkout hosted
   const handleProceedToPayment = () => {
     startTransition(async () => {
       let addrId = selectedAddressId
@@ -143,10 +133,10 @@ export function CheckoutClient({ existingAddresses }: Props) {
         addrId = savedId
       }
 
-      // 1) Cria order no banco
+      // 1) Cria order no banco (status pending)
       const result = await createOrder({
         addressId: addrId,
-        paymentMethod: 'credit_card', // Stripe decide a forma final
+        paymentMethod: 'infinitepay',
         couponCode: couponCode || undefined,
         items: items.map(item => ({
           productId: item.product.id,
@@ -162,27 +152,31 @@ export function CheckoutClient({ existingAddresses }: Props) {
         freightCost: freight,
       })
 
-      if ('error' in result) {
+      if ('error' in result || !result.orderId) {
         toast.error('Erro ao criar pedido')
         return
       }
 
-      // 2) Cria PaymentIntent na Stripe
-      const intentRes = await fetch('/api/checkout/create-intent', {
+      // 2) Pede o link de pagamento da Infinity Pay
+      const linkRes = await fetch('/api/infinitepay/create-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId: result.orderId }),
       })
 
-      if (!intentRes.ok) {
-        toast.error('Erro ao iniciar pagamento')
+      if (!linkRes.ok) {
+        toast.error('Erro ao iniciar pagamento. Tente novamente.')
         return
       }
 
-      const { clientSecret: secret } = await intentRes.json()
-      setOrderId(result.orderId!)
-      setClientSecret(secret)
-      setStep('payment')
+      const { url } = (await linkRes.json()) as { url?: string }
+      if (!url) {
+        toast.error('Link de pagamento inválido')
+        return
+      }
+
+      // 3) Redireciona pro checkout hosted da Infinity Pay
+      window.location.href = url
     })
   }
 
@@ -203,11 +197,12 @@ export function CheckoutClient({ existingAddresses }: Props) {
       {/* Progress */}
       <div className="px-4 md:px-6 py-6 border-b border-border">
         <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest">
-          {(['address', 'review', 'payment'] as Step[]).map((s, i) => (
+          {(['address', 'review'] as Step[]).map((s, i) => (
             <span key={s} className={step === s ? 'text-primary' : 'text-muted-foreground'}>
-              {i + 1}. {s === 'address' ? 'Endereço' : s === 'review' ? 'Revisão' : 'Pagamento'}
+              {i + 1}. {s === 'address' ? 'Endereço' : 'Revisão'}
             </span>
           ))}
+          <span className="text-muted-foreground">3. Pagamento (Infinity Pay)</span>
         </div>
       </div>
 
@@ -338,42 +333,9 @@ export function CheckoutClient({ existingAddresses }: Props) {
                   ← Voltar
                 </button>
                 <button onClick={handleProceedToPayment} disabled={isPending} className="flex-1 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors disabled:opacity-50">
-                  {isPending ? 'Preparando...' : 'Pagamento →'}
+                  {isPending ? 'Redirecionando...' : 'Ir para Pagamento →'}
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Step: Payment com Stripe Elements */}
-          {step === 'payment' && clientSecret && orderId && stripePromise && (
-            <Elements
-              stripe={stripePromise}
-              options={{
-                clientSecret,
-                appearance: {
-                  theme: 'night',
-                  variables: {
-                    colorPrimary: '#ffffff',
-                    colorBackground: '#171717',
-                    colorText: '#ffffff',
-                    colorDanger: '#ef4444',
-                    fontFamily: 'system-ui, sans-serif',
-                    borderRadius: '0px',
-                  },
-                },
-              }}
-            >
-              <PaymentForm
-                orderId={orderId}
-                total={total}
-                onBack={() => setStep('review')}
-              />
-            </Elements>
-          )}
-
-          {step === 'payment' && !stripePromise && (
-            <div className="p-4 border border-destructive text-xs text-destructive">
-              ⚠️ Stripe não configurado. Verifique NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.
             </div>
           )}
         </div>
@@ -386,9 +348,6 @@ export function CheckoutClient({ existingAddresses }: Props) {
             <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>{freight === 0 ? <span className="text-primary">Grátis</span> : formatPrice(freight)}</span></div>
             {couponDiscount > 0 && <div className="flex justify-between text-primary"><span>Cupom</span><span>-{formatPrice(couponDiscount)}</span></div>}
             <div className="flex justify-between font-bold text-sm border-t border-border pt-3"><span>Total</span><span>{formatPrice(total)}</span></div>
-            <p className="text-[10px] text-primary normal-case tracking-normal">
-              ou {formatPrice(total * 0.95)} no Pix (5% off extra)
-            </p>
           </div>
 
           {/* Métodos de pagamento aceitos */}
@@ -397,12 +356,13 @@ export function CheckoutClient({ existingAddresses }: Props) {
               Pagamento aceito
             </h4>
             <ul className="flex flex-col gap-1.5 text-[11px] text-muted-foreground normal-case">
-              <li>⚡ <span className="text-primary font-bold">Pix</span> — 5% off automático</li>
-              <li>💳 Cartão de crédito à vista</li>
+              <li>⚡ <span className="text-primary font-bold">Pix</span> — instantâneo</li>
+              <li>💳 Cartão de crédito até 8x sem juros</li>
               <li>💳 Cartão de débito</li>
             </ul>
             <p className="text-[10px] text-muted-foreground normal-case tracking-normal mt-3">
-              Pagamento parcelado em breve.
+              Pagamento processado por Infinity Pay (CloudWalk). Você será
+              redirecionado pra um checkout seguro.
             </p>
           </div>
         </div>
