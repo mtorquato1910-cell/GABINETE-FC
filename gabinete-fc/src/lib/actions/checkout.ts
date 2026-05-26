@@ -59,7 +59,7 @@ const customizationSchema = z.object({
 
 const orderSchema = z.object({
   addressId: z.string(),
-  paymentMethod: z.enum(['pix', 'credit_card', 'debit_card']),
+  paymentMethod: z.enum(['pix', 'credit_card', 'debit_card', 'infinitepay']),
   couponCode: z.string().optional(),
   items: z.array(
     z
