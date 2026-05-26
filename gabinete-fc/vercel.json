@@ -4,7 +4,7 @@
     { "path": "/api/cron/tracking", "schedule": "0 8 * * *" },
     { "path": "/api/cron/expire-points", "schedule": "0 0 * * *" },
     { "path": "/api/cron/pix-expiry", "schedule": "0 6 * * *" },
-    { "path": "/api/cron/check-pending-orders", "schedule": "0 * * * *" }
+    { "path": "/api/cron/check-pending-orders", "schedule": "0 4 * * *" }
   ],
   "headers": [
     {
