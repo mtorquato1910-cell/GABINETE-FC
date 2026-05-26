@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { checkPayment, toCents, InfinitePayError } from '@/lib/infinitepay'
 import { sendOrderConfirmation } from '@/lib/actions/email'
+import { addPurchasePoints } from '@/lib/actions/loyalty'
 
 /**
  * Webhook da Infinity Pay.
@@ -172,6 +173,22 @@ export async function POST(req: NextRequest) {
     installments: verification.installments,
     amountCents: verification.amount,
   })
+
+  // ─── Pontos de fidelidade ───────────────────────────────────
+  // Roda DEPOIS da transaction (não-atômico de propósito): se o cálculo de
+  // pontos falhar, não queremos reverter a confirmação do pedido — o cliente
+  // já pagou. Admin pode creditar manualmente via log.
+  if (order.user?.id) {
+    try {
+      await addPurchasePoints(order.id, order.user.id, order.total)
+    } catch (err) {
+      console.error('[infinitepay/webhook] addPurchasePoints falhou', {
+        orderId: order.id,
+        userId: order.user.id,
+        err: err instanceof Error ? err.message : String(err),
+      })
+    }
+  }
 
   // ─── Fire-and-forget: email de confirmação ──────────────────
   // Não bloqueamos a response da Infinity. Se o email falhar, log fica registrado.
