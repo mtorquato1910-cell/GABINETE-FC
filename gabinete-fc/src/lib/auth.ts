@@ -27,7 +27,7 @@ export async function auth(): Promise<AuthSession | null> {
   // Busca o profile correspondente no Prisma (sincronizado pela tabela public.users)
   const profile = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { id: true, email: true, name: true, image: true, role: true },
+    select: { id: true, email: true, name: true, image: true, role: true, deletedAt: true },
   })
 
   // Se não existe ainda, cria (1ª vez logando depois do confirm email)
@@ -44,7 +44,22 @@ export async function auth(): Promise<AuthSession | null> {
     return { user: { ...created } }
   }
 
-  return { user: { ...profile } }
+  // Soft delete: usuário deletado não tem sessão válida.
+  // Faz signOut do Supabase pra invalidar JWT atual e retorna null.
+  if (profile.deletedAt) {
+    await supabase.auth.signOut()
+    return null
+  }
+
+  return {
+    user: {
+      id: profile.id,
+      email: profile.email,
+      name: profile.name,
+      image: profile.image,
+      role: profile.role,
+    },
+  }
 }
 
 /**

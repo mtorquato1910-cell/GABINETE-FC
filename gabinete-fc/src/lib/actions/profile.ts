@@ -20,9 +20,10 @@ export async function updateProfile(data: unknown) {
   const cpf = parsed.data.cpf.replace(/\D/g, '')
   const phone = parsed.data.phone.replace(/\D/g, '')
 
-  // Verifica conflito de CPF (se já existe em outro usuário)
+  // Verifica conflito de CPF — só considera usuários ATIVOS.
+  // Usuário soft-deletado libera o CPF pra reuso (LGPD: dados removidos efetivamente).
   const conflict = await prisma.user.findFirst({
-    where: { cpf, NOT: { id: userId } },
+    where: { cpf, NOT: { id: userId }, deletedAt: null },
     select: { id: true },
   })
   if (conflict) {
@@ -192,8 +193,9 @@ export async function completeOnboarding(data: unknown) {
   const cpf = parsed.data.cpf.replace(/\D/g, '')
   const phone = parsed.data.phone.replace(/\D/g, '')
 
+  // CPF conflict check — apenas usuários ativos (soft-deleted liberam CPF)
   const conflict = await prisma.user.findFirst({
-    where: { cpf, NOT: { id: userId } },
+    where: { cpf, NOT: { id: userId }, deletedAt: null },
     select: { id: true },
   })
   if (conflict) return { error: { cpf: ['Este CPF já está em outra conta'] } }
