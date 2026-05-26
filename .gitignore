@@ -2,3 +2,8 @@
 # (têm nomes longos que estouram limite do Windows, e são processadas pelo script)
 /Camisas destaques/
 /imagens-raw/
+
+.vercel
+
+# Claude Code settings local — pode conter allowlist com tokens/secrets
+.claude/settings.local.json
