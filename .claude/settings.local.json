@@ -69,7 +69,8 @@
       "WebFetch(domain:ajuda.infinitepay.io)",
       "Bash(rm src/lib/stripe.ts src/components/checkout/PaymentForm.tsx src/app/api/checkout/create-intent/route.ts src/app/api/stripe/webhook/route.ts)",
       "Bash(rmdir src/app/api/stripe)",
-      "Bash(rmdir src/app/api/checkout/create-intent)"
+      "Bash(rmdir src/app/api/checkout/create-intent)",
+      "Bash(npx vercel *)"
     ]
   }
 }
