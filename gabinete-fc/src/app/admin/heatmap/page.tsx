@@ -1,18 +1,29 @@
 import { HeatmapDashboard } from '@/components/admin/HeatmapDashboard'
 import { prisma } from '@/lib/db'
 
-export default async function HeatmapPage() {
-  // Get available pages that have click or mouse_move events (raw query bypasses stale engine schema)
-  const rows = await prisma.$queryRaw<{ pageUrl: string }[]>`
-    SELECT DISTINCT pageUrl
-    FROM behavior_events
-    WHERE eventType IN ('click', 'mouse_move')
-      AND posX IS NOT NULL
-      AND pageUrl IS NOT NULL
-    LIMIT 50
-  `
+export const dynamic = 'force-dynamic'
 
-  const pageList = rows.map(r => r.pageUrl).filter(Boolean)
+export default async function HeatmapPage() {
+  let pageList: string[] = []
+
+  try {
+    // Lista distinct de páginas que têm clicks/mouse_move
+    const rows = await prisma.behaviorEvent.findMany({
+      where: {
+        eventType: { in: ['click', 'mouse_move'] },
+        posX: { not: null },
+        pageUrl: { not: null },
+      },
+      select: { pageUrl: true },
+      distinct: ['pageUrl'],
+      take: 50,
+    })
+    pageList = rows.map((r) => r.pageUrl).filter((u): u is string => !!u)
+  } catch (err) {
+    console.error('[/admin/heatmap] Falha ao listar páginas:', err)
+    // Fallback gracioso — renderiza a página com lista vazia,
+    // o dashboard mostra o empty state em vez de quebrar tudo.
+  }
 
   return (
     <div>
