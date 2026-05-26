@@ -24,16 +24,41 @@ const productSchema = z.object({
   metaDescription: z.string().optional(),
 })
 
+// Allowlist explícita de campos editáveis via .pick(). Spread `...parsed.data`
+// aceitaria QUALQUER campo futuro adicionado ao productSchema — risco de mass
+// assignment se um campo sensível (ex: vendorId, internalNotes) for incluído
+// no schema sem perceber. .pick() força revisão consciente do que é editável.
+const productEditableSchema = productSchema.pick({
+  name: true,
+  slug: true,
+  description: true,
+  price: true,
+  costPrice: true,
+  supplierCode: true,
+  category: true,
+  team: true,
+  type: true,
+  badge: true,
+  sizesAvailable: true,
+  images: true,
+  isActive: true,
+  isFeatured: true,
+  metaTitle: true,
+  metaDescription: true,
+})
+
 export async function createProduct(data: unknown) {
   await requireAdmin()
   const parsed = productSchema.safeParse(data)
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors }
 
+  const safeData = productEditableSchema.parse(parsed.data)
+
   const product = await prisma.product.create({
     data: {
-      ...parsed.data,
-      sizesAvailable: stringifyJsonField(parsed.data.sizesAvailable),
-      images: stringifyJsonField(parsed.data.images),
+      ...safeData,
+      sizesAvailable: stringifyJsonField(safeData.sizesAvailable),
+      images: stringifyJsonField(safeData.images),
     },
   })
 
@@ -47,9 +72,11 @@ export async function updateProduct(id: string, data: unknown) {
   const parsed = productSchema.partial().safeParse(data)
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors }
 
-  const updateData: Record<string, unknown> = { ...parsed.data }
-  if (parsed.data.sizesAvailable) updateData.sizesAvailable = stringifyJsonField(parsed.data.sizesAvailable)
-  if (parsed.data.images) updateData.images = stringifyJsonField(parsed.data.images)
+  const safeData = productEditableSchema.partial().parse(parsed.data)
+
+  const updateData: Record<string, unknown> = { ...safeData }
+  if (safeData.sizesAvailable) updateData.sizesAvailable = stringifyJsonField(safeData.sizesAvailable)
+  if (safeData.images) updateData.images = stringifyJsonField(safeData.images)
 
   await prisma.product.update({ where: { id }, data: updateData })
   revalidatePath('/loja')
