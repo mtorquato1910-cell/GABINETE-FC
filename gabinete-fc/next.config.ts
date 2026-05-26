@@ -3,6 +3,19 @@ import path from 'path'
 
 // Headers de segurança aplicados em todas as rotas.
 // CSP usa unsafe-inline pra cobrir runtime do Next.js (App Router injeta estilos inline).
+// 'unsafe-eval' é incluído APENAS em dev (HMR/React Refresh precisam). Em prod,
+// o bundle do Next.js não usa eval — manter unsafe-eval em prod abre brecha desnecessária.
+const IS_DEV = process.env.NODE_ENV !== 'production'
+
+const SCRIPT_SRC = [
+  "'self'",
+  "'unsafe-inline'",
+  ...(IS_DEV ? ["'unsafe-eval'"] : []),
+  'https://*.vercel-insights.com',
+  'https://*.vercel-analytics.com',
+  'https://connect.facebook.net',
+].join(' ')
+
 const SECURITY_HEADERS = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -19,12 +32,12 @@ const SECURITY_HEADERS = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.vercel-insights.com https://*.vercel-analytics.com https://connect.facebook.net",
+      `script-src ${SCRIPT_SRC}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "img-src 'self' data: blob: https://utfs.io https://*.supabase.co https://*.stripe.com https://www.facebook.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.vercel-insights.com https://*.vercel-analytics.com https://viacep.com.br https://www.facebook.com",
-      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+      "img-src 'self' data: blob: https://utfs.io https://*.supabase.co https://www.facebook.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-insights.com https://*.vercel-analytics.com https://viacep.com.br https://www.facebook.com",
+      "frame-src 'self'",
       "worker-src 'self' blob:",
       "object-src 'none'",
       "base-uri 'self'",
