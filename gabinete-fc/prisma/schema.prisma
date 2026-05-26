@@ -223,7 +223,16 @@ model Order {
   couponId              String?
   paymentMethod         String    @default("pix")
   paymentStatus         String    @default("pending")
+  // Stripe — mantido por 30 dias após migração Infinity Pay (rollback safety, deletar em 2026-06-26)
   stripePaymentIntentId String?
+  // Infinity Pay (Story 035 — gateway atual)
+  infinitepayCheckoutUrl    String? // URL retornada do POST /links — persiste na CRIAÇÃO
+  infinitepayInvoiceSlug    String? @unique // do webhook
+  infinitepayTransactionNsu String? @unique // do webhook
+  infinitepayReceiptUrl     String? // do webhook
+  installments              Int? // 1..8
+  captureMethod             String? // "pix" | "credit_card" | "debit_card"
+  paidAt                    DateTime?
   pixQrCode             String?
   pixExpiration         DateTime?
   threeDsTriggered      Boolean   @default(false)
