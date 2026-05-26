@@ -81,40 +81,114 @@ export async function POST(req: NextRequest) {
     }
 
     // Monta items[] com preço recalculado DO BANCO (segurança — nunca confiar
-    // no que veio do cliente). OrderItem.unitPrice já foi gravado no momento
-    // de criar a Order via lógica server-side existente; mas pra blindar,
-    // recalculamos o subtotal e checamos que bate.
-    const items: InfinitePayItem[] = order.items.map((item) => {
+    // no que veio do cliente).
+    type ItemDraft = InfinitePayItem & { _lineFullCents: number }
+    const itemDrafts: ItemDraft[] = order.items.map((item) => {
       const productName = item.product?.name ?? item.productName ?? 'Item'
       const sizeLabel = item.size ? ` — Tam ${item.size.toUpperCase()}` : ''
       const customLabel =
         item.hasCustomization && (item.customName || item.customNumber)
           ? ` (${item.customName ?? ''}${item.customNumber ? ` #${item.customNumber}` : ''})`
           : ''
+      const unitPriceCents = toCents(item.unitPrice)
       return {
         quantity: item.quantity,
-        price: toCents(item.unitPrice),
+        price: unitPriceCents,
         description: `${productName}${sizeLabel}${customLabel}`.trim(),
+        _lineFullCents: unitPriceCents * item.quantity,
       }
     })
 
-    // Sanity-check: soma dos itens + frete - desconto deve bater com order.total
-    const computedSubtotalCents = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
-    const expectedTotalCents =
-      computedSubtotalCents + toCents(order.freightCost) - toCents(order.discountAmount)
-    if (Math.abs(expectedTotalCents - toCents(order.total)) > 2) {
-      // Tolerância de 2 centavos pra arredondamento. Divergência maior = bug,
-      // recusa pra evitar cobrar valor errado do cliente.
-      console.error('[create-link] Divergência no total:', {
+    // ─── Aplica desconto proporcionalmente ─────────────────────
+    // discountAmount no banco já inclui cupom + 5% Pix (se aplicável).
+    // Distribuímos pelo peso de cada linha no subtotal e ajustamos o último
+    // pra garantir que a soma final bata exato com order.total (em centavos).
+    const subtotalFullCents = itemDrafts.reduce((s, i) => s + i._lineFullCents, 0)
+    const freightCents = toCents(order.freightCost)
+    const discountCents = toCents(order.discountAmount)
+    const expectedTotalCents = toCents(order.total)
+    const targetItemsTotalCents = expectedTotalCents - freightCents
+
+    if (subtotalFullCents - discountCents !== targetItemsTotalCents) {
+      // subtotal - desconto deve bater com (total - frete). Se não bate, bug
+      // de cálculo na createOrder — recusa pra não cobrar valor errado.
+      console.error('[create-link] Subtotal/desconto não fecha com total:', {
         orderId,
-        computedSubtotalCents,
-        freightCents: toCents(order.freightCost),
-        discountCents: toCents(order.discountAmount),
+        subtotalFullCents,
+        discountCents,
+        freightCents,
         expectedTotalCents,
-        orderTotalCents: toCents(order.total),
+        targetItemsTotalCents,
       })
       return NextResponse.json(
         { error: 'Inconsistência no valor do pedido — contate o suporte' },
+        { status: 500 },
+      )
+    }
+
+    // Distribui: cada linha leva uma fatia do desconto proporcional ao seu peso
+    let allocated = 0
+    const linesAfterDiscount = itemDrafts.map((draft, idx) => {
+      let lineDiscountCents: number
+      if (idx === itemDrafts.length - 1) {
+        // Último item absorve o resto (corrige arredondamentos acumulados)
+        lineDiscountCents = discountCents - allocated
+      } else {
+        lineDiscountCents = Math.round((discountCents * draft._lineFullCents) / subtotalFullCents)
+        allocated += lineDiscountCents
+      }
+      const lineAfter = draft._lineFullCents - lineDiscountCents
+      return { draft, lineAfter }
+    })
+
+    // Converte line-total de volta pra unit price. Se o desconto da linha não
+    // dividir igualmente pela quantidade, expandimos pra qty=1 e ajustamos.
+    const items: InfinitePayItem[] = []
+    for (const { draft, lineAfter } of linesAfterDiscount) {
+      if (lineAfter <= 0) {
+        console.error('[create-link] Linha zerou após desconto:', { orderId, draft, lineAfter })
+        return NextResponse.json(
+          { error: 'Inconsistência no valor do pedido — contate o suporte' },
+          { status: 500 },
+        )
+      }
+      if (draft.quantity === 1 || lineAfter % draft.quantity === 0) {
+        // Caso simples: divide exato
+        items.push({
+          quantity: draft.quantity,
+          price: lineAfter / draft.quantity,
+          description: draft.description,
+        })
+      } else {
+        // Não divide exato: expande em qty=1 e distribui o resto no último
+        const basePrice = Math.floor(lineAfter / draft.quantity)
+        const remainder = lineAfter - basePrice * draft.quantity
+        for (let i = 0; i < draft.quantity; i++) {
+          items.push({
+            quantity: 1,
+            price: i === draft.quantity - 1 ? basePrice + remainder : basePrice,
+            description: draft.description,
+          })
+        }
+      }
+    }
+
+    // Frete vai como item separado quando > 0 (defensivo — hoje é sempre 0)
+    if (freightCents > 0) {
+      items.push({ quantity: 1, price: freightCents, description: 'Frete' })
+    }
+
+    // Sanity-check final: soma EXATA do payload bate com order.total em centavos
+    const finalPayloadCents = items.reduce((s, i) => s + i.price * i.quantity, 0)
+    if (finalPayloadCents !== expectedTotalCents) {
+      console.error('[create-link] Payload Infinity ≠ order.total:', {
+        orderId,
+        finalPayloadCents,
+        expectedTotalCents,
+        diff: finalPayloadCents - expectedTotalCents,
+      })
+      return NextResponse.json(
+        { error: 'Inconsistência no valor final — contate o suporte' },
         { status: 500 },
       )
     }

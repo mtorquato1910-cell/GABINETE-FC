@@ -165,6 +165,14 @@ export async function createOrder(data: unknown) {
     if (coupon.firstOrderOnly && itemCount > FIRST_ORDER_COUPON_MAX_ITEMS) {
       return { error: 'Cupom não vale com 3+ peças' }
     }
+    // Bloqueio: cupom não pode zerar pedido. Máximo 99% off pra percent,
+    // e fixo não pode ser ≥ subtotal.
+    if (coupon.type === 'percent' && coupon.value >= 100) {
+      return { error: 'Cupom inválido (máximo 99% de desconto)' }
+    }
+    if (coupon.type === 'fixed' && coupon.value >= subtotal) {
+      return { error: 'Cupom de valor fixo maior ou igual ao subtotal — não permitido' }
+    }
     couponSnapshot = {
       id: coupon.id,
       type: coupon.type,
@@ -181,6 +189,11 @@ export async function createOrder(data: unknown) {
     : 0
   const pixDiscount = paymentMethod === 'pix' ? subtotal * 0.05 : 0
   const total = subtotal + freightCost - discountAmount - pixDiscount
+
+  // Safety: total mínimo R$ 1,00 (Infinity Pay rejeita valores menores)
+  if (total < 1) {
+    return { error: 'Total do pedido muito baixo após descontos (mínimo R$ 1,00)' }
+  }
 
   // Transação atômica: re-valida (firstOrderOnly/maxUses) + cria order + incrementa cupom
   try {
