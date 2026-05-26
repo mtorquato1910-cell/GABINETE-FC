@@ -6,6 +6,11 @@ import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 const RATE_MAX = 30
 const RATE_WINDOW_MS = 60_000
 
+// sessionId precisa ser UUID v4 — gerado por crypto.randomUUID() no client.
+// Sem validar formato, atacante poderia poluir behavior_events com strings
+// arbitrárias e criar sessões "falsas" pra distorcer analytics.
+const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 export async function POST(req: NextRequest) {
   try {
     const ip = getClientIp(req.headers)
@@ -42,7 +47,7 @@ export async function POST(req: NextRequest) {
     if (!sessionId || !eventType) {
       return NextResponse.json({ error: 'sessionId e eventType obrigatórios' }, { status: 400 })
     }
-    if (typeof sessionId !== 'string' || sessionId.length > 64) {
+    if (typeof sessionId !== 'string' || !UUID_V4_RE.test(sessionId)) {
       return NextResponse.json({ error: 'sessionId inválido' }, { status: 400 })
     }
     if (typeof eventType !== 'string' || eventType.length > 32) {

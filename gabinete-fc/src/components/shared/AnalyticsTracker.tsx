@@ -2,11 +2,15 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 
+const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 function getOrCreateSessionId(): string {
   const key = 'gfc_session'
   let id = sessionStorage.getItem(key)
-  if (!id) {
-    id = Math.random().toString(36).slice(2) + Date.now().toString(36)
+  // Backend agora exige UUID v4. IDs antigos (formato Math.random)
+  // são descartados — geramos novo via crypto.randomUUID().
+  if (!id || !UUID_V4_RE.test(id)) {
+    id = crypto.randomUUID()
     sessionStorage.setItem(key, id)
   }
   return id
